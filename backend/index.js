@@ -21,6 +21,8 @@ passport.use(
   }
 ));
 
+app.use(passport.initialize());
+
 app.get('/', (req, res) => {
   res.end('hello');
 });
