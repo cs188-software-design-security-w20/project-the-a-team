@@ -1,15 +1,16 @@
 version: '3'
 services:
-  # db_postgres:
-  #   image: postgres:11
-  #   environment:
-  #     POSTGRES_USER: mentorq-api
-  #     POSTGRES_DB: mentorq
-  #   logging:
-  #     driver: none
+  db_postgres:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: taximus
+      POSTGRES_DB: taxmax
+      # POSTGRES_PASSWORD: assign during production
+    logging:
+      driver: none
   backend:
     build: ./backend
     ports:
       - "8080:8080"
-    # links:
-    #   - db_postgres
+    links:
+      - db_postgres
