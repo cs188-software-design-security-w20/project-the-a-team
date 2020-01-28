@@ -1,4 +1,5 @@
 'use strict';
+
 const express = require('express');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
@@ -10,7 +11,7 @@ passport.use(
   new GoogleStrategy({
     clientID: credentials.clientId,
     clientSecret: credentials.clientSecret,
-    callbackURL: 'http://localhost:8080/auth/google/callback'
+    callbackURL: 'http://localhost:8080/auth/google/callback',
   },
   (accessToken, refreshToken, profile, done) => {
     console.log(accessToken, refreshToken, profile);
@@ -18,8 +19,8 @@ passport.use(
     // User.findOrCreate({ googleId: profile.id }, function (err, user) {
     //   return done(err, user);
     // });
-  }
-));
+  }),
+);
 
 app.use(passport.initialize());
 
@@ -32,7 +33,7 @@ app.get('/auth/google',
     scope: ['profile', 'email'],
     successRedirect: '/',
     failureRedirect: '/',
-    failureFlash: true
+    failureFlash: true,
   }));
 
 app.get(
@@ -40,7 +41,7 @@ app.get(
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
     res.redirect('/');
-  }
+  },
 );
 
 app.listen(8080, () => {
