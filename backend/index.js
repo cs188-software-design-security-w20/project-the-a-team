@@ -1,9 +1,11 @@
 'use strict';
 
 const express = require('express');
+const bodyParser = require('body-parser');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const credentials = require('./credentials.json');
+const Taxinfo = require('./models/Taxinfo.js');
 
 const app = express();
 
@@ -43,6 +45,21 @@ app.get(
     res.redirect('/');
   },
 );
+
+app.get('/taxinfo', (req, res) => {
+  // dummy
+  Taxinfo.findAll().then((data) => {
+    res.json(data);
+  });
+});
+
+app.post('/taxinfo', bodyParser.json(), (req, res) => {
+  // dummy
+  Taxinfo.create({ ssn: req.body.ssn || '123456789' }).then((data) => {
+    console.log('created tax info with id', data.id);
+    res.end();
+  });
+});
 
 app.listen(8080, () => {
   console.log('Listening on port 8080');
