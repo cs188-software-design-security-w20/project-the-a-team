@@ -1,5 +1,7 @@
 'use strict';
+
 const express = require('express');
+const cookieSession = require('cookie-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const credentials = require('./credentials.json');
@@ -21,10 +23,33 @@ passport.use(
   }
 ));
 
+app.use(cookieSession({
+  secret: 'cookie',
+  maxAge: 15 * 60 * 1000,
+  sameSite: 'strict',
+}));
+
 app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser( (user, done) => {
+  done(null, user);
+});
+
+passport.deserializeUser( (user, done) => {
+  done(null, user);
+});
 
 app.get('/', (req, res) => {
   res.end('hello');
+});
+
+app.get('/main', (req, res) => {
+  res.end('logged in');
+});
+
+app.get('/login', (req, res) => {
+  res.end('failed to log in');
 });
 
 app.get('/auth/google',
@@ -37,9 +62,9 @@ app.get('/auth/google',
 
 app.get(
   '/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
+  passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
-    res.redirect('/');
+    res.redirect('/main');
   }
 );
 

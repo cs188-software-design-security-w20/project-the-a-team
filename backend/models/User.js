@@ -5,7 +5,10 @@ const { sequelize } = require('./database.js');
 class User extends Sequelize.Model {}
 
 User.init({
-  email: Sequelize.DataTypes.STRING,
+  google_id: Sequelize.DataTypes.STRING,
+  pdf_result: Sequelize.DataTypes.STRING,
+  created_at: Sequelize.DataTypes.TIME,
+  updated_at: Sequelize.DataTypes.TIME
 }, { sequelize, modelName: 'user-test' }); // TODO: change model name
 
 User.sync().catch(err => {
