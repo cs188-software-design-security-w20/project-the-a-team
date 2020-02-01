@@ -1,0 +1,16 @@
+{
+  "settings": {
+    "react": {
+      "version": "16.12.0"
+    }
+  },
+  "env": {
+    "browser": true
+  },
+  "extends": ["airbnb", "airbnb/hooks"],
+  "rules": {
+    "no-param-reassign": "off",
+    "no-use-before-define": "off",
+    "react/jsx-filename-extension": ["error", { "extensions": [".js"] }]
+  }
+}

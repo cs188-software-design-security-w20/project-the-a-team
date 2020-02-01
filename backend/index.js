@@ -14,22 +14,25 @@ passport.use(
   new GoogleStrategy({
     clientID: credentials.clientId,
     clientSecret: credentials.clientSecret,
-    callbackURL: 'http://localhost:8080/auth/google/callback'
+    callbackURL: 'http://localhost:8080/auth/google/callback',
   },
-  (accessToken, refreshToken, profile, done) => {
-    // console.log(accessToken, refreshToken, profile);
-    // done(null, profile.id);
-    User.findOrCreate({ where: { google_id: profile.id }, defaults: { uuid: uuid.v4() } })
-        .then(([user, created]) => {
-          console.log('logged in with google id', profile.id);
-          done(null, user);
-        });
-  }
-));
+  async (accessToken, refreshToken, profile, done) => {
+    try {
+      const [user, created] = await User.findOrCreate({
+        where: { google_id: profile.id },
+        defaults: { uuid: uuid.v4() },
+      });
+      console.log('logged in with google id', profile.id, 'created', created);
+      done(null, user);
+    } catch (err) {
+      done(err);
+    }
+  }),
+);
 
 app.use(cookieSession({
   secret: credentials.cookieSecret,
-  maxAge: 15 * 60 * 1000,
+  maxAge: 15 * 60 * 1000, // 15 min
   // secure: true, // enable this after we set up HTTPS
   sameSite: 'strict',
 }));
@@ -37,16 +40,18 @@ app.use(cookieSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.serializeUser( (user, done) => {
-  // console.log('serialize user');
-  done(null, user.uuid);
+passport.serializeUser((userObj, done) => {
+  done(null, userObj.uuid);
 });
 
-passport.deserializeUser( (user, done) => {
-  User.findOne({ where: { uuid: user } }).then((user) => {
+passport.deserializeUser(async (userId, done) => {
+  try {
+    const userObj = await User.findOne({ where: { uuid: userId } });
     // console.log('deserialize user');
-    done(null, user);
-  });
+    done(null, userObj);
+  } catch (err) {
+    done(err);
+  }
 });
 
 const isPageView = (req) => req.headers.accept && req.headers.accept.includes('text/html');
@@ -63,36 +68,52 @@ const checkLogin = (req, res, next) => {
 };
 
 app.get('/', (req, res) => {
-  res.end('hello');
-});
-
-app.get('/main', (req, res) => {
+  res.set('Content-Type', 'text/html');
   if (req.user) {
-      res.send(`debug: you are logged in with:<br>internal id: ${req.user.id}<br>uuid: ${req.user.uuid}<br>google id: ${req.user.google_id}`);
+    res.end(`
+      debug: you are logged in with:<br>
+      internal id: ${req.user.id}<br>
+      uuid: ${req.user.uuid}<br>
+      google id: ${req.user.google_id}
+    `);
   } else {
-    res.send('debug: you are not logged in');
+    res.end('debug: you are not logged in');
   }
 });
 
-app.get('/login', (req, res) => {
-  res.end('failed to log in');
+app.get('/must-login', checkLogin, (req, res) => {
+  res.set('Content-Type', 'text/html');
+  res.end(`
+    debug: you should be logged in with:<br>
+    internal id: ${req.user.id}<br>
+    uuid: ${req.user.uuid}<br>
+    google id: ${req.user.google_id}
+  `);
 });
 
-app.get('/auth/google',
+app.get(
+  '/auth/google',
   passport.authenticate('google', {
     scope: ['profile', 'email'],
-    successRedirect: '/',
-    failureRedirect: '/',
-    failureFlash: true
-  }));
+  }),
+);
 
 app.get(
   '/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/login' }),
+  passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
-    res.redirect('/main');
-  }
+    res.redirect('/auth/redirect');
+  },
 );
+
+// OAuth trampoline
+app.get('/auth/redirect', (req, res) => {
+  res.set('Content-Type', 'text/html');
+  res.end(`
+    <!doctype html>
+    <script>location.pathname = '/';</script>
+  `);
+});
 
 app.get('/logout', (req, res) => {
   req.logout();
@@ -102,7 +123,7 @@ app.get('/logout', (req, res) => {
 // 404 handler, should be the last handler
 app.use((req, res) => {
   if (isPageView(req)) { // Page view
-    res.redirect('/');
+    res.redirect('/main');
   } else { // API request
     res.status(404).json({ message: 'Invalid API endpoint or method' });
   }
