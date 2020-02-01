@@ -123,7 +123,7 @@ app.get('/logout', (req, res) => {
 // 404 handler, should be the last handler
 app.use((req, res) => {
   if (isPageView(req)) { // Page view
-    res.redirect('/main');
+    res.redirect('/');
   } else { // API request
     res.status(404).json({ message: 'Invalid API endpoint or method' });
   }
