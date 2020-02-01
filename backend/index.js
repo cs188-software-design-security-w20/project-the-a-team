@@ -1,11 +1,14 @@
 'use strict';
 
 const express = require('express');
-const bodyParser = require('body-parser');
+const cookieSession = require('cookie-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+const uuid = require('uuid');
 const credentials = require('./credentials.json');
-const Taxinfo = require('./models/Taxinfo.js');
+const User = require('./models/User.js');
+const authRouter = require('./routes/auth.js');
+const taxRouter = require('./routes/tax.js');
 
 const app = express();
 
@@ -15,50 +18,91 @@ passport.use(
     clientSecret: credentials.clientSecret,
     callbackURL: 'http://localhost:8080/auth/google/callback',
   },
-  (accessToken, refreshToken, profile, done) => {
-    console.log(accessToken, refreshToken, profile);
-    done(null, '1');
-    // User.findOrCreate({ googleId: profile.id }, function (err, user) {
-    //   return done(err, user);
-    // });
+  async (accessToken, refreshToken, profile, done) => {
+    try {
+      const [user, created] = await User.findOrCreate({
+        where: { google_id: profile.id },
+        defaults: { uuid: uuid.v4() },
+      });
+      console.log('logged in with google id', profile.id, 'created', created);
+      done(null, user);
+    } catch (err) {
+      done(err);
+    }
   }),
 );
 
+app.use(cookieSession({
+  secret: credentials.cookieSecret,
+  maxAge: 15 * 60 * 1000, // 15 min
+  // secure: true, // enable this after we set up HTTPS
+  sameSite: 'strict',
+}));
+
 app.use(passport.initialize());
+app.use(passport.session());
+
+passport.serializeUser((userObj, done) => {
+  done(null, userObj.uuid);
+});
+
+passport.deserializeUser(async (userId, done) => {
+  try {
+    const userObj = await User.findOne({ where: { uuid: userId } });
+    // console.log('deserialize user');
+    done(null, userObj);
+  } catch (err) {
+    done(err);
+  }
+});
+
+const isPageView = (req) => req.headers.accept && req.headers.accept.includes('text/html');
+
+// check login middleware
+const checkLogin = (req, res, next) => {
+  if (req.user) {
+    next();
+  } else if (isPageView(req)) { // Page view
+    res.redirect('/');
+  } else { // API request
+    res.status(401).json({ message: 'Please login' });
+  }
+};
 
 app.get('/', (req, res) => {
-  res.end('hello');
+  res.set('Content-Type', 'text/html');
+  if (req.user) {
+    res.end(`
+      debug: you are logged in with:<br>
+      internal id: ${req.user.id}<br>
+      uuid: ${req.user.uuid}<br>
+      google id: ${req.user.google_id}
+    `);
+  } else {
+    res.end('debug: you are not logged in');
+  }
 });
 
-app.get('/auth/google',
-  passport.authenticate('google', {
-    scope: ['profile', 'email'],
-    successRedirect: '/',
-    failureRedirect: '/',
-    failureFlash: true,
-  }));
+app.get('/must-login', checkLogin, (req, res) => {
+  res.set('Content-Type', 'text/html');
+  res.end(`
+    debug: you should be logged in with:<br>
+    internal id: ${req.user.id}<br>
+    uuid: ${req.user.uuid}<br>
+    google id: ${req.user.google_id}
+  `);
+});
 
-app.get(
-  '/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
-  (req, res) => {
+app.use('/auth', authRouter);
+app.use('/tax', checkLogin, taxRouter);
+
+// 404 handler, should be the last handler
+app.use((req, res) => {
+  if (isPageView(req)) { // Page view
     res.redirect('/');
-  },
-);
-
-app.get('/taxinfo', (req, res) => {
-  // dummy
-  Taxinfo.findAll().then((data) => {
-    res.json(data);
-  });
-});
-
-app.post('/taxinfo', bodyParser.json(), (req, res) => {
-  // dummy
-  Taxinfo.create({ ssn: req.body.ssn || '123456789' }).then((data) => {
-    console.log('created tax info with id', data.id);
-    res.end();
-  });
+  } else { // API request
+    res.status(404).json({ message: 'Invalid API endpoint or method' });
+  }
 });
 
 app.listen(8080, () => {
