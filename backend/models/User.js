@@ -5,11 +5,10 @@ const { sequelize } = require('./database.js');
 class User extends Sequelize.Model {}
 
 User.init({
-  google_id: Sequelize.DataTypes.STRING,
+  uuid: { type: Sequelize.DataTypes.UUID, unique: true},
+  google_id: { type: Sequelize.DataTypes.STRING, unique: true},
   pdf_result: Sequelize.DataTypes.STRING,
-  created_at: Sequelize.DataTypes.TIME,
-  updated_at: Sequelize.DataTypes.TIME
-}, { sequelize, modelName: 'user-test' }); // TODO: change model name
+}, { sequelize, modelName: 'user', indexes: [ { unique: true, fields: ['uuid'] } ] });
 
 User.sync().catch(err => {
   process.nextTick(() => {
