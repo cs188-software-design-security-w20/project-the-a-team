@@ -49,13 +49,26 @@ passport.deserializeUser( (user, done) => {
   });
 });
 
+const isPageView = (req) => req.headers.accept && req.headers.accept.includes('text/html');
+
+// check login middleware
+const checkLogin = (req, res, next) => {
+  if (req.user) {
+    next();
+  } else if (isPageView(req)) { // Page view
+    res.redirect('/');
+  } else { // API request
+    res.status(401).json({ message: 'Please login' });
+  }
+};
+
 app.get('/', (req, res) => {
   res.end('hello');
 });
 
 app.get('/main', (req, res) => {
   if (req.user) {
-      res.send(`debug: you are logged in with:<br>internal id: ${req.user.id}<br>uuid: ${req.user.uuid}<br>google id ${req.user.google_id}`);
+      res.send(`debug: you are logged in with:<br>internal id: ${req.user.id}<br>uuid: ${req.user.uuid}<br>google id: ${req.user.google_id}`);
   } else {
     res.send('debug: you are not logged in');
   }
@@ -80,6 +93,20 @@ app.get(
     res.redirect('/main');
   }
 );
+
+app.get('/logout', (req, res) => {
+  req.logout();
+  res.redirect('/');
+});
+
+// 404 handler, should be the last handler
+app.use((req, res) => {
+  if (isPageView(req)) { // Page view
+    res.redirect('/');
+  } else { // API request
+    res.status(404).json({ message: 'Invalid API endpoint or method' });
+  }
+});
 
 app.listen(8080, () => {
   console.log('Listening on port 8080');
