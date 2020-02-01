@@ -1,11 +1,13 @@
 'use strict';
 
+const { URL } = require('url');
 const express = require('express');
 const cookieSession = require('cookie-session');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const uuid = require('uuid');
-const credentials = require('./credentials.json');
+
+const config = require('./config.json');
 const User = require('./models/User.js');
 const authRouter = require('./routes/auth.js');
 const taxRouter = require('./routes/tax.js');
@@ -14,9 +16,9 @@ const app = express();
 
 passport.use(
   new GoogleStrategy({
-    clientID: credentials.clientId,
-    clientSecret: credentials.clientSecret,
-    callbackURL: 'http://localhost:8080/auth/google/callback',
+    clientID: config.credentials.googleClientId,
+    clientSecret: config.credentials.googleClientSecret,
+    callbackURL: new URL('/auth/google/callback', config.backendURL).href,
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
@@ -33,9 +35,9 @@ passport.use(
 );
 
 app.use(cookieSession({
-  secret: credentials.cookieSecret,
+  secret: config.credentials.cookieSecret,
   maxAge: 15 * 60 * 1000, // 15 min
-  // secure: true, // enable this after we set up HTTPS
+  secure: new URL(config.backendURL).protocol !== 'http',
   sameSite: 'strict',
 }));
 
