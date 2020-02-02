@@ -42,7 +42,7 @@ app.use(cors({
 app.use(cookieSession({
   secret: config.credentials.cookieSecret,
   maxAge: 15 * 60 * 1000, // 15 min
-  secure: new URL(config.backendURL).protocol !== 'http',
+  secure: new URL(config.backendURL).protocol !== 'http:',
   sameSite: 'strict',
 }));
 
