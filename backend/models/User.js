@@ -20,7 +20,7 @@ User.init({
 
 User.sync().catch((err) => {
   process.nextTick(() => {
-    console.error('Failed to sync User db'); // eslint-disable-line no-console
+    console.error('Failed to sync User table'); // eslint-disable-line no-console
     throw err;
   });
 });

@@ -22,7 +22,7 @@ F1099div.belongsTo(Taxinfo);
 
 F1099div.sync().catch((err) => {
   process.nextTick(() => {
-    console.error('Failed to sync Taxinfo db'); // eslint-disable-line no-console
+    console.error('Failed to sync F1099div table'); // eslint-disable-line no-console
     throw err;
   });
 });

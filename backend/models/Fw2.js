@@ -21,7 +21,7 @@ Fw2.belongsTo(Taxinfo);
 
 Fw2.sync().catch((err) => {
   process.nextTick(() => {
-    console.error('Failed to sync Taxinfo db'); // eslint-disable-line no-console
+    console.error('Failed to sync Fw2 table'); // eslint-disable-line no-console
     throw err;
   });
 });

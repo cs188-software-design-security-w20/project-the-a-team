@@ -18,7 +18,7 @@ Taxinfo.belongsTo(User);
 
 Taxinfo.sync().catch((err) => {
   process.nextTick(() => {
-    console.error('Failed to sync Taxinfo db'); // eslint-disable-line no-console
+    console.error('Failed to sync Taxinfo table'); // eslint-disable-line no-console
     throw err;
   });
 });
