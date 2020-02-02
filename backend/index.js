@@ -24,7 +24,7 @@ passport.use(
   async (accessToken, refreshToken, profile, done) => {
     try {
       const [user, created] = await User.findOrCreate({
-        where: { google_id: profile.id },
+        where: { googleId: profile.id },
         defaults: { uuid: uuid.v4() },
       });
       console.log('logged in with google id', profile.id, 'created', created);
@@ -83,7 +83,7 @@ app.get('/', (req, res) => {
       debug: you are logged in with:<br>
       internal id: ${req.user.id}<br>
       uuid: ${req.user.uuid}<br>
-      google id: ${req.user.google_id}
+      google id: ${req.user.googleId}
     `);
   } else {
     res.end('debug: you are not logged in');
@@ -96,7 +96,7 @@ app.get('/must-login', checkLogin, (req, res) => {
     debug: you should be logged in with:<br>
     internal id: ${req.user.id}<br>
     uuid: ${req.user.uuid}<br>
-    google id: ${req.user.google_id}
+    google id: ${req.user.googleId}
   `);
 });
 

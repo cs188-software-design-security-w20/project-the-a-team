@@ -7,14 +7,14 @@ class User extends Sequelize.Model {}
 
 User.init({
   uuid: { type: Sequelize.DataTypes.UUID, unique: true },
-  google_id: { type: Sequelize.DataTypes.STRING, unique: true },
-  pdf_result: Sequelize.DataTypes.STRING,
+  googleId: { type: Sequelize.DataTypes.STRING, unique: true },
+  pdfResult: Sequelize.DataTypes.STRING,
 }, {
   sequelize,
   modelName: 'user',
   indexes: [
     { unique: true, fields: ['uuid'] },
-    { unique: true, fields: ['google_id'] },
+    { unique: true, fields: ['googleId'] },
   ],
 });
 
