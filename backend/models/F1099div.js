@@ -2,6 +2,7 @@
 
 const Sequelize = require('sequelize');
 const { sequelize } = require('./database.js');
+const Taxinfo = require('./Taxinfo.js');
 
 class F1099div extends Sequelize.Model {}
 
@@ -14,7 +15,7 @@ F1099div.init({
 }, {
   sequelize,
   modelName: 'f1099div',
-  indexes: [ { unique: true, fields: 'uuid' } ],
+  indexes: [{ unique: true, fields: 'uuid' }],
 });
 
 F1099div.belongsTo(Taxinfo);

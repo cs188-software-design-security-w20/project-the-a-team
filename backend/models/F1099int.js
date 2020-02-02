@@ -2,6 +2,7 @@
 
 const Sequelize = require('sequelize');
 const { sequelize } = require('./database.js');
+const Taxinfo = require('./Taxinfo.js');
 
 class F1099int extends Sequelize.Model {}
 
@@ -15,8 +16,8 @@ F1099int.init({
 }, {
   sequelize,
   modelName: 'f1099int',
-  indexes: [ { unique: true, fields: 'uuid' } ],
-})
+  indexes: [{ unique: true, fields: 'uuid' }],
+});
 
 F1099int.belongsTo(Taxinfo);
 

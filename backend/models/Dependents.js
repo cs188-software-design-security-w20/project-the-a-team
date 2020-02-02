@@ -2,8 +2,9 @@
 
 const Sequelize = require('sequelize');
 const { sequelize } = require('./database.js');
+const Taxinfo = require('./Taxinfo.js');
 
-class Dependents extends Sequelize.Model {} 
+class Dependents extends Sequelize.Model {}
 
 Dependents.init({
   uuid: { type: Sequelize.DataTypes.UUID, unique: true },
@@ -14,7 +15,7 @@ Dependents.init({
 }, {
   sequelize,
   modelName: 'dependents',
-  indexes: [ { unique: true, fields: 'uuid' } ],
+  indexes: [{ unique: true, fields: 'uuid' }],
 });
 
 Dependents.belongsTo(Taxinfo);
