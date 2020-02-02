@@ -3,6 +3,7 @@
 const { URL } = require('url');
 const express = require('express');
 const cookieSession = require('cookie-session');
+const cors = require('cors');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const uuid = require('uuid');
@@ -34,6 +35,10 @@ passport.use(
   }),
 );
 
+app.use(cors({
+  origin: [new URL(config.frontendURL).origin],
+  credentials: true,
+}));
 app.use(cookieSession({
   secret: config.credentials.cookieSecret,
   maxAge: 15 * 60 * 1000, // 15 min
