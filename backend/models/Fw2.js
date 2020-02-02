@@ -19,7 +19,7 @@ Fw2.init({
 
 Fw2.belongsTo(Taxinfo);
 
-Taxinfo.sync().catch((err) => {
+Fw2.sync().catch((err) => {
   process.nextTick(() => {
     console.error('Failed to sync Taxinfo db'); // eslint-disable-line no-console
     throw err;

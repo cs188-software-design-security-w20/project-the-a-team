@@ -20,7 +20,7 @@ F1099div.init({
 
 F1099div.belongsTo(Taxinfo);
 
-Taxinfo.sync().catch((err) => {
+F1099div.sync().catch((err) => {
   process.nextTick(() => {
     console.error('Failed to sync Taxinfo db'); // eslint-disable-line no-console
     throw err;

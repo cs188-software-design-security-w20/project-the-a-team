@@ -21,7 +21,7 @@ F1099b.init({
 
 F1099b.belongsTo(Taxinfo);
 
-Taxinfo.sync().catch((err) => {
+F1099b.sync().catch((err) => {
   process.nextTick(() => {
     console.error('Failed to sync Taxinfo db'); // eslint-disable-line no-console
     throw err;
