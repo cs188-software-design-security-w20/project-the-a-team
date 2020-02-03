@@ -39,16 +39,12 @@ const useStyles = makeStyles(({
   },
 }));
 
-const arrW2 = [];
-const arr1099INT = [];
-const arr1099B = [];
-
 export default function HomePage() {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
-  const [FW2, setW2] = React.useState([]);
-  const [F1099INT, set1099INT] = React.useState([]);
-  const [F1099B, set1099B] = React.useState([]);
+  const [arrW2, setW2] = React.useState([]);
+  const [arr1099INT, set1099INT] = React.useState([]);
+  const [arr1099B, set1099B] = React.useState([]);
 
   const handleFinishClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -79,8 +75,7 @@ export default function HomePage() {
         </ExpansionPanelDetails>
       </ExpansionPanel>
     );
-    arrW2.push(panel);
-    setW2([...arrW2]);
+    setW2((orig) => [...orig, panel]);
   };
 
   const addNew1099INT = () => {
@@ -100,8 +95,7 @@ export default function HomePage() {
         </ExpansionPanelDetails>
       </ExpansionPanel>
     );
-    arr1099INT.push(panel);
-    set1099INT([...arr1099INT]);
+    set1099INT((orig) => [...orig, panel]);
   };
 
   const addNew1099B = () => {
@@ -121,8 +115,7 @@ export default function HomePage() {
         </ExpansionPanelDetails>
       </ExpansionPanel>
     );
-    arr1099B.push(panel);
-    set1099B([...arr1099B]);
+    set1099B((orig) => [...orig, panel]);
   };
 
   const open = Boolean(anchorEl);
@@ -208,7 +201,7 @@ export default function HomePage() {
           </ExpansionPanelDetails>
         </ExpansionPanel>
 
-        {FW2.map((point) => point)}
+        {arrW2.map((point) => point)}
         <Button
           variant="contained"
           style={{
@@ -223,7 +216,7 @@ export default function HomePage() {
         </Button>
 
         <Box mr={1} mx="auto">
-          {F1099INT.map((point) => point)}
+          {arr1099INT.map((point) => point)}
           <Button
             variant="contained"
             style={{
@@ -238,7 +231,7 @@ export default function HomePage() {
           </Button>
         </Box>
 
-        {F1099B.map((point) => point)}
+        {arr1099B.map((point) => point)}
         <Button
           variant="contained"
           style={{
@@ -280,18 +273,12 @@ export default function HomePage() {
               <Typography variant="h5" className={classes.typography} inline>
                 Congratulations! You have completed your
               </Typography>
-            </Box>
-            <Box ml={2} mr={2}>
               <Typography variant="h5" className={classes.typography} inline>
                 Taximus Maximus submission. You can
               </Typography>
-            </Box>
-            <Box ml={2} mr={2}>
               <Typography variant="h5" className={classes.typography} inline>
                 either download your filled in tax form as
               </Typography>
-            </Box>
-            <Box ml={2} mr={2}>
               <Typography variant="h5" className={classes.typography} inline>
                 a PDF, or go back and edit your information.
               </Typography>
