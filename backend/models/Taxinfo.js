@@ -12,7 +12,11 @@ Taxinfo.init({
   bankAccount: Sequelize.DataTypes.STRING,
   bankRouting: Sequelize.DataTypes.STRING,
   bankIsChecking: Sequelize.DataTypes.BOOLEAN,
-}, { sequelize, modelName: 'taxinfo' });
+}, {
+  sequelize,
+  modelName: 'taxinfo',
+  indexes: [{ unique: true, fields: ['userId'] }],
+});
 
 Taxinfo.belongsTo(User);
 

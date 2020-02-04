@@ -11,11 +11,11 @@ Dependents.init({
   name: Sequelize.DataTypes.STRING,
   ssn: Sequelize.DataTypes.STRING,
   relation: Sequelize.DataTypes.STRING,
-  child_credit: Sequelize.DataTypes.BOOLEAN,
+  childCredit: Sequelize.DataTypes.BOOLEAN,
 }, {
   sequelize,
   modelName: 'dependents',
-  indexes: [{ unique: true, fields: 'uuid' }],
+  indexes: [{ unique: true, fields: ['taxinfoId', 'uuid'] }],
 });
 
 Dependents.belongsTo(Taxinfo);

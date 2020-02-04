@@ -10,11 +10,11 @@ Fw2.init({
   uuid: { type: Sequelize.DataTypes.UUID, unique: true },
   employer: Sequelize.DataTypes.STRING,
   income: Sequelize.DataTypes.BIGINT,
-  tax_withheld: Sequelize.DataTypes.BIGINT,
+  taxWithheld: Sequelize.DataTypes.BIGINT,
 }, {
   sequelize,
   modelName: 'fw2',
-  indexes: [{ unique: true, fields: 'uuid' }],
+  indexes: [{ unique: true, fields: ['taxinfoId', 'uuid'] }],
 });
 
 Fw2.belongsTo(Taxinfo);

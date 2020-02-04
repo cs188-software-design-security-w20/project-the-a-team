@@ -8,6 +8,7 @@
     "sourceType": "script"
   },
   "rules": {
-    "strict": ["error", "global"]
+    "strict": ["error", "global"],
+    "no-restricted-syntax": "off"
   }
 }

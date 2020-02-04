@@ -11,12 +11,12 @@ F1099b.init({
   desc: Sequelize.DataTypes.STRING,
   proceeds: Sequelize.DataTypes.BIGINT,
   basis: Sequelize.DataTypes.BIGINT,
-  is_long_term: Sequelize.DataTypes.BOOLEAN,
-  tax_withheld: Sequelize.DataTypes.BIGINT,
+  isLongTerm: Sequelize.DataTypes.BOOLEAN,
+  taxWithheld: Sequelize.DataTypes.BIGINT,
 }, {
   sequelize,
   modelName: 'f1099b',
-  indexes: [{ unique: true, fields: 'uuid' }],
+  indexes: [{ unique: true, fields: ['taxinfoId', 'uuid'] }],
 });
 
 F1099b.belongsTo(Taxinfo);

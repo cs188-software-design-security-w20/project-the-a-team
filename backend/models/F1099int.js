@@ -10,13 +10,13 @@ F1099int.init({
   uuid: { type: Sequelize.DataTypes.UUID, unique: true },
   payer: Sequelize.DataTypes.STRING,
   income: Sequelize.DataTypes.BIGINT,
-  us_saving_treas_interest: Sequelize.DataTypes.BIGINT,
-  tax_withheld: Sequelize.DataTypes.BIGINT,
-  tax_exempt_interest: Sequelize.DataTypes.BIGINT,
+  usSavingTreasInterest: Sequelize.DataTypes.BIGINT,
+  taxWithheld: Sequelize.DataTypes.BIGINT,
+  taxExemptInterest: Sequelize.DataTypes.BIGINT,
 }, {
   sequelize,
   modelName: 'f1099int',
-  indexes: [{ unique: true, fields: 'uuid' }],
+  indexes: [{ unique: true, fields: ['taxinfoId', 'uuid'] }],
 });
 
 F1099int.belongsTo(Taxinfo);

@@ -9,13 +9,13 @@ class F1099div extends Sequelize.Model {}
 F1099div.init({
   uuid: { type: Sequelize.DataTypes.UUID, unique: true },
   payer: Sequelize.DataTypes.STRING,
-  ord_dividends: Sequelize.DataTypes.BIGINT,
-  qual_dividends: Sequelize.DataTypes.BIGINT,
-  tax_withheld: Sequelize.DataTypes.BIGINT,
+  ordDividends: Sequelize.DataTypes.BIGINT,
+  qualDividends: Sequelize.DataTypes.BIGINT,
+  taxWithheld: Sequelize.DataTypes.BIGINT,
 }, {
   sequelize,
   modelName: 'f1099div',
-  indexes: [{ unique: true, fields: 'uuid' }],
+  indexes: [{ unique: true, fields: ['taxinfoId', 'uuid'] }],
 });
 
 F1099div.belongsTo(Taxinfo);
