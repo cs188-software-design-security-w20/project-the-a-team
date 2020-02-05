@@ -2,56 +2,81 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
+
+const { sequelize } = require('../models/database.js');
 const Taxinfo = require('../models/Taxinfo.js');
 const Fw2 = require('../models/Fw2.js');
 const F1099int = require('../models/F1099int.js');
-const F1099div = require('../models/F1099div.js');
 const F1099b = require('../models/F1099b.js');
+const F1099div = require('../models/F1099div.js');
 const Dependents = require('../models/Dependents.js');
 
 const router = new express.Router();
 
 router.get('/', async (req, res) => {
   try {
-    const [taxinfo] = await Taxinfo.findOrCreate({
-      where: { userId: req.user.id },
-      attributes: { exclude: ['id', 'userId', 'createdAt', 'updatedAt'] },
-    });
-    const [
+    const {
+      taxinfo,
       fw2,
       f1099int,
       f1099div,
       f1099b,
       dependents,
-    ] = await Promise.all([
-      Fw2.findAll({
-        where: { taxinfoId: taxinfo.id },
-        attributes: { exclude: ['id', 'taxinfoId', 'createdAt', 'updatedAt'] },
-      }),
-      F1099int.findAll({
-        where: { taxinfoId: taxinfo.id },
-        attributes: { exclude: ['id', 'taxinfoId', 'createdAt', 'updatedAt'] },
-      }),
-      F1099div.findAll({
-        where: { taxinfoId: taxinfo.id },
-        attributes: { exclude: ['id', 'taxinfoId', 'createdAt', 'updatedAt'] },
-      }),
-      F1099b.findAll({
-        where: { taxinfoId: taxinfo.id },
-        attributes: { exclude: ['id', 'taxinfoId', 'createdAt', 'updatedAt'] },
-      }),
-      Dependents.findAll({
-        where: { taxinfoId: taxinfo.id },
-        attributes: { exclude: ['id', 'taxinfoId', 'createdAt', 'updatedAt'] },
-      }),
-    ]);
-
+    } = await sequelize.transaction(async (t) => {
+      const ttaxinfo = await Taxinfo.findOne({
+        where: { userId: req.user.id },
+        attributes: { exclude: ['userId', 'createdAt', 'updatedAt'] },
+        transaction: t,
+      });
+      const [
+        tfw2,
+        tf1099int,
+        tf1099div,
+        tf1099b,
+        tdependents,
+      ] = await Promise.all([
+        Fw2.findAll({
+          where: { taxinfoId: ttaxinfo.id },
+          attributes: { exclude: ['id', 'taxinfoId', 'createdAt', 'updatedAt'] },
+          transaction: t,
+        }),
+        F1099int.findAll({
+          where: { taxinfoId: ttaxinfo.id },
+          attributes: { exclude: ['id', 'taxinfoId', 'createdAt', 'updatedAt'] },
+          transaction: t,
+        }),
+        F1099b.findAll({
+          where: { taxinfoId: ttaxinfo.id },
+          attributes: { exclude: ['id', 'taxinfoId', 'createdAt', 'updatedAt'] },
+          transaction: t,
+        }),
+        F1099div.findAll({
+          where: { taxinfoId: ttaxinfo.id },
+          attributes: { exclude: ['id', 'taxinfoId', 'createdAt', 'updatedAt'] },
+          transaction: t,
+        }),
+        Dependents.findAll({
+          where: { taxinfoId: ttaxinfo.id },
+          attributes: { exclude: ['id', 'taxinfoId', 'createdAt', 'updatedAt'] },
+          transaction: t,
+        }),
+      ]);
+      return {
+        taxinfo: ttaxinfo,
+        fw2: tfw2,
+        f1099int: tf1099int,
+        f1099div: tf1099div,
+        f1099b: tf1099b,
+        dependents: tdependents,
+      };
+    });
     const taxinfoJson = taxinfo.toJSON();
+    delete taxinfoJson.id;
     const modelObjs = {
       fw2,
       f1099int,
-      f1099div,
       f1099b,
+      f1099div,
       dependents,
     };
     for (const key of Object.keys(modelObjs)) {
@@ -59,7 +84,7 @@ router.get('/', async (req, res) => {
     }
     res.json(taxinfoJson);
   } catch (err) {
-    console.log(err);
+    console.log(err); // eslint-disable-line no-console
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -78,7 +103,7 @@ router.post('/', bodyParser.json(), async (req, res) => {
         res.status(400).json({ message: 'SSN should be string' });
         return;
       }
-      if (!ssn.match(/^\d{9}$/)) {
+      if (ssn && !ssn.match(/^\d{9}$/)) {
         res.status(400).json({ message: 'SSN should be 9 digits' });
         return;
       }
@@ -127,19 +152,22 @@ router.post('/', bodyParser.json(), async (req, res) => {
         return;
       }
     }
-    const [taxinfo] = await Taxinfo.findOrCreate({
-      where: { userId: req.user.id },
-    });
-    taxinfo.update({
-      ssn,
-      address,
-      bankAccount,
-      bankRouting,
-      bankIsChecking,
+    await sequelize.transaction(async (t) => {
+      const taxinfo = await Taxinfo.findOne({
+        where: { userId: req.user.id },
+        transaction: t,
+      });
+      await taxinfo.update({
+        ssn,
+        address,
+        bankAccount,
+        bankRouting,
+        bankIsChecking,
+      }, { transaction: t });
     });
     res.status(204).end();
   } catch (err) {
-    console.log(err);
+    console.log(err); // eslint-disable-line no-console
     res.status(500).json({ message: 'Server error' });
   }
 });

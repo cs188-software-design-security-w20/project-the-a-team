@@ -7,7 +7,7 @@ const Taxinfo = require('./Taxinfo.js');
 class Dependents extends Sequelize.Model {}
 
 Dependents.init({
-  uuid: { type: Sequelize.DataTypes.UUID, unique: true },
+  uuid: { type: Sequelize.DataTypes.UUID, unique: true, allowNull: false },
   name: Sequelize.DataTypes.STRING,
   ssn: Sequelize.DataTypes.STRING,
   relation: Sequelize.DataTypes.STRING,
@@ -19,12 +19,5 @@ Dependents.init({
 });
 
 Dependents.belongsTo(Taxinfo);
-
-Dependents.sync().catch((err) => {
-  process.nextTick(() => {
-    console.error('Failed to sync Dependents table'); // eslint-disable-line no-console
-    throw err;
-  });
-});
 
 module.exports = Dependents;

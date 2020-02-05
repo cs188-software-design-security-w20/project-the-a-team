@@ -9,7 +9,9 @@ const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const uuid = require('uuid');
 
 const config = require('./config.json');
+const { sequelize } = require('./models/database.js');
 const User = require('./models/User.js');
+const Taxinfo = require('./models/Taxinfo.js');
 const authRouter = require('./routes/auth.js');
 const taxRouter = require('./routes/tax.js');
 
@@ -23,11 +25,18 @@ passport.use(
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
-      const [user, created] = await User.findOrCreate({
-        where: { googleId: profile.id },
-        defaults: { uuid: uuid.v4() },
+      const user = await sequelize.transaction(async (t) => {
+        const [tuser, created] = await User.findOrCreate({
+          where: { googleId: profile.id },
+          defaults: { uuid: uuid.v4() },
+          transaction: t,
+        });
+        if (created) {
+          await Taxinfo.create({ userId: tuser.id }, { transaction: t });
+        }
+        console.log('logged in with google id', profile.id, 'created', created);
+        return tuser;
       });
-      console.log('logged in with google id', profile.id, 'created', created);
       done(null, user);
     } catch (err) {
       done(err);
@@ -55,8 +64,10 @@ passport.serializeUser((userObj, done) => {
 
 passport.deserializeUser(async (userId, done) => {
   try {
-    const userObj = await User.findOne({ where: { uuid: userId } });
-    // console.log('deserialize user');
+    const userObj = await sequelize.transaction(async (t) => User.findOne({
+      where: { uuid: userId },
+      transaction: t,
+    }));
     done(null, userObj);
   } catch (err) {
     done(err);
@@ -113,5 +124,5 @@ app.use((req, res) => {
 });
 
 app.listen(8080, () => {
-  console.log('Listening on port 8080');
+  console.log('Listening on port 8080'); // eslint-disable-line no-console
 });

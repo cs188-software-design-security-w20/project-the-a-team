@@ -20,11 +20,4 @@ Taxinfo.init({
 
 Taxinfo.belongsTo(User);
 
-Taxinfo.sync().catch((err) => {
-  process.nextTick(() => {
-    console.error('Failed to sync Taxinfo table'); // eslint-disable-line no-console
-    throw err;
-  });
-});
-
 module.exports = Taxinfo;

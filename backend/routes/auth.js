@@ -5,6 +5,10 @@ const passport = require('passport');
 
 const router = new express.Router();
 
+router.get('/', (req, res) => {
+  res.json(Boolean(req.user));
+});
+
 router.get(
   '/google',
   passport.authenticate('google', {

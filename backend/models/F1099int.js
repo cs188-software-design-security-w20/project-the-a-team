@@ -7,7 +7,7 @@ const Taxinfo = require('./Taxinfo.js');
 class F1099int extends Sequelize.Model {}
 
 F1099int.init({
-  uuid: { type: Sequelize.DataTypes.UUID, unique: true },
+  uuid: { type: Sequelize.DataTypes.UUID, unique: true, allowNull: false },
   payer: Sequelize.DataTypes.STRING,
   income: Sequelize.DataTypes.BIGINT,
   usSavingTreasInterest: Sequelize.DataTypes.BIGINT,
@@ -20,12 +20,5 @@ F1099int.init({
 });
 
 F1099int.belongsTo(Taxinfo);
-
-F1099int.sync().catch((err) => {
-  process.nextTick(() => {
-    console.error('Failed to sync F1099int table'); // eslint-disable-line no-console
-    throw err;
-  });
-});
 
 module.exports = F1099int;
