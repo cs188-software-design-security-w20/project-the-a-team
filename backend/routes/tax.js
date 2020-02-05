@@ -19,8 +19,8 @@ router.get('/', async (req, res) => {
       taxinfo,
       fw2,
       f1099int,
-      f1099div,
       f1099b,
+      f1099div,
       dependents,
     } = await sequelize.transaction(async (t) => {
       const ttaxinfo = await Taxinfo.findOne({
@@ -31,8 +31,8 @@ router.get('/', async (req, res) => {
       const [
         tfw2,
         tf1099int,
-        tf1099div,
         tf1099b,
+        tf1099div,
         tdependents,
       ] = await Promise.all([
         Fw2.findAll({
@@ -65,8 +65,8 @@ router.get('/', async (req, res) => {
         taxinfo: ttaxinfo,
         fw2: tfw2,
         f1099int: tf1099int,
-        f1099div: tf1099div,
         f1099b: tf1099b,
+        f1099div: tf1099div,
         dependents: tdependents,
       };
     });
