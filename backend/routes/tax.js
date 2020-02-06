@@ -97,6 +97,7 @@ router.post('/', bodyParser.json(), async (req, res) => {
       bankAccount,
       bankRouting,
       bankIsChecking,
+      fw2,
     } = req.body;
     if (ssn !== undefined) {
       if (typeof ssn !== 'string') {
@@ -164,6 +165,20 @@ router.post('/', bodyParser.json(), async (req, res) => {
         bankRouting,
         bankIsChecking,
       }, { transaction: t });
+      const fw2s = [];
+      for (const key of Object.keys(fw2)) {
+        fw2s.push(Fw2.findOne({
+          where: { taxinfoId: taxinfo.id, uuid: key },
+          transaction: t,
+        }));
+      }
+      for (const form of await Promise.all(fw2s)) {
+        form.update({
+          employer: fw2.employer,
+          income: fw2.income,
+          taxWithheld: fw2.taxWithheld,
+        }, { transaction: t });
+      }
     });
     res.status(204).end();
   } catch (err) {
