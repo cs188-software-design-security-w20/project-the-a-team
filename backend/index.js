@@ -28,7 +28,7 @@ passport.use(
       const user = await sequelize.transaction(async (t) => {
         const [tuser, created] = await User.findOrCreate({
           where: { googleId: profile.id },
-          defaults: { uuid: uuid.v4() },
+          defaults: { uuid: uuid.v4().toLowerCase() },
           transaction: t,
         });
         if (created) {

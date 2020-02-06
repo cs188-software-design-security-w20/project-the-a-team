@@ -7,7 +7,7 @@ const isNonNegativeInteger = (obj) => Number.isInteger(obj) && obj >= 0;
 const isInLengthLimit = (s) => s.length <= 255;
 const isDigitOnly = (s) => s.match(/^\d*$/);
 const isValidSSN = (s) => s.match(/^\d{9}$/);
-const isValidUUID = (s) => s.match(/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/);
+const isValidUUID = (s) => s.match(/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i);
 
 class ValidationError {
   constructor(message) {
