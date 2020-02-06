@@ -8,6 +8,12 @@ services:
       # POSTGRES_PASSWORD: assign during production
     logging:
       driver: none
+    restart: "always"
+    ulimits:
+      nproc: 500
+      nofile:
+        soft: 2048
+        hard: 4096
   backend:
     build: ./backend
     ports:
@@ -15,4 +21,10 @@ services:
     links:
       - db_postgres
     volumes:
-      - ./backend:/opt/app/
+      - ./backend:/opt/app:ro
+    restart: "always"
+    ulimits:
+      nproc: 500
+      nofile:
+        soft: 2048
+        hard: 4096
