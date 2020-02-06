@@ -10,6 +10,7 @@ const F1099int = require('../models/F1099int.js');
 const F1099b = require('../models/F1099b.js');
 const F1099div = require('../models/F1099div.js');
 const Dependents = require('../models/Dependents.js');
+const validator = require('../utils/validation.js');
 
 const router = new express.Router();
 
@@ -100,57 +101,46 @@ router.post('/', bodyParser.json(), async (req, res) => {
       fw2,
     } = req.body;
     if (ssn !== undefined) {
-      if (typeof ssn !== 'string') {
-        res.status(400).json({ message: 'SSN should be string' });
-        return;
+      if (!validator.isString(ssn)) {
+        throw new validator.ValidationError('SSN should be string');
       }
-      if (ssn && !ssn.match(/^\d{9}$/)) {
-        res.status(400).json({ message: 'SSN should be 9 digits' });
-        return;
+      if (ssn && !validator.isValidSSN(ssn)) {
+        throw new validator.ValidationError('SSN should be 9 digits');
       }
     }
     if (address !== undefined) {
-      if (typeof address !== 'string') {
-        res.status(400).json({ message: 'Address should be string' });
-        return;
+      if (!validator.isString(address)) {
+        throw new validator.ValidationError('Address should be string');
       }
-      if (address.length > 255) {
-        res.status(400).json({ message: 'Address too long' });
-        return;
+      if (!validator.isInLengthLimit(address)) {
+        throw new validator.ValidationError('Address too long');
       }
     }
     if (bankAccount !== undefined) {
-      if (typeof bankAccount !== 'string') {
-        res.status(400).json({ message: 'Bank account should be string' });
-        return;
+      if (!validator.isString(bankAccount)) {
+        throw new validator.ValidationError('Bank account should be string');
       }
-      if (!bankAccount.match(/^\d*$/)) {
-        res.status(400).json({ message: 'Bank account should only contain digits' });
-        return;
+      if (!validator.isDigitOnly(bankAccount)) {
+        throw new validator.ValidationError('Bank account should only contain digits');
       }
-      if (bankAccount.length > 255) { // TODO: further verify length?
-        res.status(400).json({ message: 'Bank account too long' });
-        return;
+      if (!validator.isInLengthLimit(bankAccount)) { // TODO: further verify length?
+        throw new validator.ValidationError('Bank account too long');
       }
     }
     if (bankRouting !== undefined) {
-      if (typeof bankRouting !== 'string') {
-        res.status(400).json({ message: 'Bank routing should be string' });
-        return;
+      if (!validator.isString(bankRouting)) {
+        throw new validator.ValidationError('Bank routing should be string');
       }
-      if (!bankRouting.match(/^\d*$/)) {
-        res.status(400).json({ message: 'Bank routing should only contain digits' });
-        return;
+      if (!validator.isDigitOnly(bankRouting)) {
+        throw new validator.ValidationError('Bank routing should only contain digits');
       }
-      if (bankRouting.length > 255) { // TODO: further verify length?
-        res.status(400).json({ message: 'Bank routing too long' });
-        return;
+      if (!validator.isInLengthLimit(bankRouting)) { // TODO: further verify length?
+        throw new validator.ValidationError('Bank routing too long');
       }
     }
     if (bankIsChecking !== undefined) {
-      if (typeof bankIsChecking !== 'boolean') {
-        res.status(400).json({ message: 'Bank is checking should be boolean' });
-        return;
+      if (!validator.isBoolean(bankIsChecking)) {
+        throw new validator.ValidationError('Bank is checking should be boolean');
       }
     }
     await sequelize.transaction(async (t) => {
@@ -182,6 +172,10 @@ router.post('/', bodyParser.json(), async (req, res) => {
     });
     res.status(204).end();
   } catch (err) {
+    if (validator.isValidationError(err)) {
+      res.status(400).json({ message: err.message });
+      return;
+    }
     console.log(err); // eslint-disable-line no-console
     res.status(500).json({ message: 'Server error' });
   }
