@@ -14,7 +14,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'top center',
-    display: 'flex',
   },
 
   container: {
@@ -38,8 +37,6 @@ const useStyles = makeStyles((theme) => ({
 
   loginButton: {
     marginTop: theme.spacing(2),
-    // width: '20vw',
-    // fontSize: '1vw',
   },
 }));
 
