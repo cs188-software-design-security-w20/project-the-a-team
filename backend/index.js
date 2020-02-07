@@ -81,7 +81,7 @@ const checkLogin = (req, res, next) => {
   if (req.user) {
     next();
   } else if (isPageView(req)) { // Page view
-    res.redirect('/');
+    res.redirect(config.frontendURL);
   } else { // API request
     res.status(401).json({ message: 'Please login' });
   }
@@ -117,7 +117,7 @@ app.use('/tax', checkLogin, taxRouter);
 // 404 handler, should be the last handler
 app.use((req, res) => {
   if (isPageView(req)) { // Page view
-    res.redirect('/');
+    res.redirect(config.frontendURL);
   } else { // API request
     res.status(404).json({ message: 'Invalid API endpoint or method' });
   }

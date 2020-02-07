@@ -2,6 +2,8 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import loginImg from './images/login.png';
 
+import config from './config';
+
 const useStyles = makeStyles((theme) => ({
   login: {
     height: '100vh',
@@ -47,7 +49,15 @@ function LoginPage() {
       <div className={classes.container}>
         <h2 className={classes.subtitle}>The easiest way to do easy taxes.</h2>
         <h1 className={classes.title}>Taximus Maximus</h1>
-        <button type="button" className={classes.loginButton}>Sign in with Google</button>
+        <button
+          type="button"
+          className={classes.loginButton}
+          onClick={() => {
+            window.location = new URL('/auth/google', config.backendURL);
+          }}
+        >
+          Sign in with Google
+        </button>
       </div>
     </div>
   );
