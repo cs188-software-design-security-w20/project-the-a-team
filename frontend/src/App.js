@@ -2,7 +2,8 @@ import React from 'react';
 import { createMuiTheme, responsiveFontSizes, ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import yellow from '@material-ui/core/colors/yellow';
-import LoginPage from './LoginPage';
+// import LoginPage from './LoginPage';
+import HomePage from './HomePage';
 
 const theme = responsiveFontSizes(createMuiTheme({
   palette: {
@@ -15,7 +16,7 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <LoginPage />
+      <HomePage />
     </ThemeProvider>
   );
 }
