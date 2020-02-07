@@ -1,7 +1,9 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
-import loginImg from './images/login.png';
+import Button from '@material-ui/core/Button';
 
+import GoogleLogo from './images/GoogleLogo';
+import loginImg from './images/login.png';
 import config from './config';
 
 const useStyles = makeStyles((theme) => ({
@@ -36,8 +38,8 @@ const useStyles = makeStyles((theme) => ({
 
   loginButton: {
     marginTop: theme.spacing(2),
-    width: '20vw',
-    fontSize: '1vw',
+    // width: '20vw',
+    // fontSize: '1vw',
   },
 }));
 
@@ -49,15 +51,17 @@ function LoginPage() {
       <div className={classes.container}>
         <h2 className={classes.subtitle}>The easiest way to do easy taxes.</h2>
         <h1 className={classes.title}>Taximus Maximus</h1>
-        <button
-          type="button"
+        <Button
           className={classes.loginButton}
+          variant="contained"
+          size="large"
           onClick={() => {
             window.location = new URL('/auth/google', config.backendURL);
           }}
+          startIcon={<GoogleLogo />}
         >
           Sign in with Google
-        </button>
+        </Button>
       </div>
     </div>
   );
