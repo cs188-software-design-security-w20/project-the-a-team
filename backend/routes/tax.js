@@ -10,6 +10,7 @@ const F1099int = require('../models/F1099int.js');
 const F1099b = require('../models/F1099b.js');
 const F1099div = require('../models/F1099div.js');
 const Dependents = require('../models/Dependents.js');
+const converter = require('../utils/conversion.js');
 const validator = require('../utils/validation.js');
 
 const router = new express.Router();
@@ -83,6 +84,12 @@ router.get('/', async (req, res) => {
     for (const key of Object.keys(modelObjs)) {
       taxinfoJson[key] = modelObjs[key].map((form) => form.toJSON());
     }
+    taxinfoJson.fw2.forEach((value) => {
+      // eslint-disable-next-line no-param-reassign
+      value.income = converter.bigintToFloat(value.income);
+      // eslint-disable-next-line no-param-reassign
+      value.taxWithheld = converter.bigintToFloat(value.taxWithheld);
+    });
     res.json(taxinfoJson);
   } catch (err) {
     console.log(err); // eslint-disable-line no-console
@@ -92,83 +99,40 @@ router.get('/', async (req, res) => {
 
 router.post('/', bodyParser.json(), async (req, res) => {
   try {
-    const {
-      ssn,
-      address,
-      bankAccount,
-      bankRouting,
-      bankIsChecking,
-      fw2,
-    } = req.body;
-    if (ssn !== undefined) {
-      if (!validator.isString(ssn)) {
-        throw new validator.ValidationError('SSN should be string');
-      }
-      if (ssn && !validator.isValidSSN(ssn)) {
-        throw new validator.ValidationError('SSN should be 9 digits');
-      }
-    }
-    if (address !== undefined) {
-      if (!validator.isString(address)) {
-        throw new validator.ValidationError('Address should be string');
-      }
-      if (!validator.isInLengthLimit(address)) {
-        throw new validator.ValidationError('Address too long');
-      }
-    }
-    if (bankAccount !== undefined) {
-      if (!validator.isString(bankAccount)) {
-        throw new validator.ValidationError('Bank account should be string');
-      }
-      if (!validator.isDigitOnly(bankAccount)) {
-        throw new validator.ValidationError('Bank account should only contain digits');
-      }
-      if (!validator.isInLengthLimit(bankAccount)) { // TODO: further verify length?
-        throw new validator.ValidationError('Bank account too long');
-      }
-    }
-    if (bankRouting !== undefined) {
-      if (!validator.isString(bankRouting)) {
-        throw new validator.ValidationError('Bank routing should be string');
-      }
-      if (!validator.isDigitOnly(bankRouting)) {
-        throw new validator.ValidationError('Bank routing should only contain digits');
-      }
-      if (!validator.isInLengthLimit(bankRouting)) { // TODO: further verify length?
-        throw new validator.ValidationError('Bank routing too long');
-      }
-    }
-    if (bankIsChecking !== undefined) {
-      if (!validator.isBoolean(bankIsChecking)) {
-        throw new validator.ValidationError('Bank is checking should be boolean');
-      }
-    }
+    validator.validateTaxinfoInput(req.body);
     await sequelize.transaction(async (t) => {
       const taxinfo = await Taxinfo.findOne({
         where: { userId: req.user.id },
         transaction: t,
       });
       await taxinfo.update({
-        ssn,
-        address,
-        bankAccount,
-        bankRouting,
-        bankIsChecking,
+        ssn: req.body.ssn,
+        address: req.body.address,
+        bankAccount: req.body.bankAccount,
+        bankRouting: req.body.bankRouting,
+        bankIsChecking: req.body.bankIsChecking,
       }, { transaction: t });
-      const fw2s = [];
-      for (const key of Object.keys(fw2)) {
-        fw2s.push(Fw2.findOne({
-          where: { taxinfoId: taxinfo.id, uuid: key },
-          transaction: t,
-        }));
+      const fw2Promises = [];
+      for (const key of Object.keys(req.body.fw2)) {
+        fw2Promises.push((async () => {
+          if (req.body.fw2[key] === null) {
+            return Fw2.destroy({
+              where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
+              transaction: t,
+            });
+          }
+          const [form] = await Fw2.findOrCreate({
+            where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
+            transaction: t,
+          });
+          return form.update({
+            employer: req.body.fw2[key].employer,
+            income: converter.floatToBigint(req.body.fw2[key].income),
+            taxWithheld: converter.floatToBigint(req.body.fw2[key].taxWithheld),
+          }, { transaction: t });
+        })());
       }
-      for (const form of await Promise.all(fw2s)) {
-        form.update({
-          employer: fw2.employer,
-          income: fw2.income,
-          taxWithheld: fw2.taxWithheld,
-        }, { transaction: t });
-      }
+      return Promise.all(fw2Promises);
     });
     res.status(204).end();
   } catch (err) {

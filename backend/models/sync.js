@@ -10,7 +10,7 @@ require('./F1099div.js');
 require('./Dependents');
 
 // sync all tables
-sequelize.sync({ force: true }).then(() => {
+sequelize.sync().then(() => {
   console.log('Database synchronized'); // eslint-disable-line no-console
 }).catch((err) => {
   process.nextTick(() => {

@@ -34,7 +34,7 @@ passport.use(
         if (created) {
           await Taxinfo.create({ userId: tuser.id }, { transaction: t });
         }
-        console.log('logged in with google id', profile.id, 'created', created);
+        console.log('logged in with google id', profile.id, 'created', created); // eslint-disable-line no-console
         return tuser;
       });
       done(null, user);
