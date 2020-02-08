@@ -131,16 +131,16 @@ router.post('/', bodyParser.json(), async (req, res) => {
         where: { userId: req.user.id },
         transaction: t,
       });
-      await taxinfo.update({
+      const promises = [];
+      promises.push(taxinfo.update({
         ssn: req.body.ssn,
         address: req.body.address,
         bankAccount: req.body.bankAccount,
         bankRouting: req.body.bankRouting,
         bankIsChecking: req.body.bankIsChecking,
-      }, { transaction: t });
-      const fw2Promises = [];
+      }, { transaction: t }));
       for (const key of Object.keys(req.body.fw2)) {
-        fw2Promises.push((async () => {
+        promises.push((async () => {
           if (req.body.fw2[key] === null) {
             return Fw2.destroy({
               where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
@@ -158,10 +158,8 @@ router.post('/', bodyParser.json(), async (req, res) => {
           }, { transaction: t });
         })());
       }
-      await Promise.all(fw2Promises);
-      const f1099intPromises = [];
       for (const key of Object.keys(req.body.f1099int)) {
-        f1099intPromises.push((async () => {
+        promises.push((async () => {
           if (req.body.f1099int[key] === null) {
             return F1099int.destroy({
               where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
@@ -182,10 +180,8 @@ router.post('/', bodyParser.json(), async (req, res) => {
           }, { transaction: t });
         })());
       }
-      await Promise.all(f1099intPromises);
-      const f1099bPromises = [];
       for (const key of Object.keys(req.body.f1099b)) {
-        f1099bPromises.push((async () => {
+        promises.push((async () => {
           if (req.body.f1099b[key] === null) {
             return F1099b.destroy({
               where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
@@ -205,10 +201,8 @@ router.post('/', bodyParser.json(), async (req, res) => {
           }, { transaction: t });
         })());
       }
-      await Promise.all(f1099bPromises);
-      const f1099divPromises = [];
       for (const key of Object.keys(req.body.f1099div)) {
-        f1099divPromises.push((async () => {
+        promises.push((async () => {
           if (req.body.f1099div[key] === null) {
             return F1099div.destroy({
               where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
@@ -227,10 +221,8 @@ router.post('/', bodyParser.json(), async (req, res) => {
           }, { transaction: t });
         })());
       }
-      await Promise.all(f1099divPromises);
-      const dependentsPromises = [];
       for (const key of Object.keys(req.body.dependents)) {
-        dependentsPromises.push((async () => {
+        promises.push((async () => {
           if (req.body.dependents[key] === null) {
             return Dependents.destroy({
               where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
@@ -249,7 +241,7 @@ router.post('/', bodyParser.json(), async (req, res) => {
           }, { transaction: t });
         })());
       }
-      await Promise.all(dependentsPromises);
+      return Promise.all(promises);
     });
     res.status(204).end();
   } catch (err) {
