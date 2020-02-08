@@ -7,8 +7,15 @@ const User = require('./User.js');
 class Taxinfo extends Sequelize.Model {}
 
 Taxinfo.init({
+  lastName: Sequelize.DataTypes.STRING,
+  firstName: sequelize.DataTypes.STRING,
+  middleName: sequelize.DataTypes.STRING,
   ssn: Sequelize.DataTypes.STRING,
-  address: Sequelize.DataTypes.STRING,
+  spouseName: Sequelize.DataTypes.STRING,
+  spouseSSN: Sequelize.DataTypes.STRING,
+  addr1: Sequelize.DataTypes.STRING,
+  addr2: Sequelize.DataTypes.STRING,
+  addr3: Sequelize.DataTypes.STRING,
   bankAccount: Sequelize.DataTypes.STRING,
   bankRouting: Sequelize.DataTypes.STRING,
   bankIsChecking: Sequelize.DataTypes.BOOLEAN,
