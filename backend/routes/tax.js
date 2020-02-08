@@ -90,6 +90,32 @@ router.get('/', async (req, res) => {
       // eslint-disable-next-line no-param-reassign
       value.taxWithheld = converter.bigintToFloat(value.taxWithheld);
     });
+    taxinfoJson.f1099int.forEach((value) => {
+      // eslint-disable-next-line no-param-reassign
+      value.income = converter.bigintToFloat(value.income);
+      // eslint-disable-next-line no-param-reassign
+      value.usSavingTreasInterest = converter.bigintToFloat(value.usSavingTreasInterest);
+      // eslint-disable-next-line no-param-reassign
+      value.taxWithheld = converter.bigintToFloat(value.taxWithheld);
+      // eslint-disable-next-line no-param-reassign
+      value.taxExemptInterest = converter.bigintToFloat(value.taxExemptInterest);
+    });
+    taxinfoJson.f1099b.forEach((value) => {
+      // eslint-disable-next-line no-param-reassign
+      value.proceeds = converter.bigintToFloat(value.proceeds);
+      // eslint-disable-next-line no-param-reassign
+      value.basis = converter.bigintToFloat(value.basis);
+      // eslint-disable-next-line no-param-reassign
+      value.taxWithheld = converter.bigintToFloat(value.taxWithheld);
+    });
+    taxinfoJson.f1099div.forEach((value) => {
+      // eslint-disable-next-line no-param-reassign
+      value.ordDividends = converter.bigintToFloat(value.ordDividends);
+      // eslint-disable-next-line no-param-reassign
+      value.qualDividends = converter.bigintToFloat(value.qualDividends);
+      // eslint-disable-next-line no-param-reassign
+      value.taxWithheld = converter.bigintToFloat(value.taxWithheld);
+    });
     res.json(taxinfoJson);
   } catch (err) {
     console.log(err); // eslint-disable-line no-console
@@ -132,7 +158,98 @@ router.post('/', bodyParser.json(), async (req, res) => {
           }, { transaction: t });
         })());
       }
-      return Promise.all(fw2Promises);
+      await Promise.all(fw2Promises);
+      const f1099intPromises = [];
+      for (const key of Object.keys(req.body.f1099int)) {
+        f1099intPromises.push((async () => {
+          if (req.body.f1099int[key] === null) {
+            return F1099int.destroy({
+              where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
+              transaction: t,
+            });
+          }
+          const [form] = await F1099int.findOrCreate({
+            where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
+            transaction: t,
+          });
+          return form.update({
+            payer: req.body.f1099int[key].payer,
+            income: converter.floatToBigint(req.body.f1099int[key].income),
+            // eslint-disable-next-line max-len
+            usSavingTreasInterest: converter.floatToBigint(req.body.f1099int[key].usSavingTreasInterest),
+            taxWithheld: converter.floatToBigint(req.body.f1099int[key].taxWithheld),
+            taxExemptInterest: converter.floatToBigint(req.body.f1099int[key].taxExemptInterest),
+          }, { transaction: t });
+        })());
+      }
+      await Promise.all(f1099intPromises);
+      const f1099bPromises = [];
+      for (const key of Object.keys(req.body.f1099b)) {
+        f1099bPromises.push((async () => {
+          if (req.body.f1099b[key] === null) {
+            return F1099b.destroy({
+              where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
+              transaction: t,
+            });
+          }
+          const [form] = await F1099b.findOrCreate({
+            where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
+            transaction: t,
+          });
+          return form.update({
+            desc: req.body.f1099b[key].desc,
+            proceeds: converter.floatToBigint(req.body.f1099b[key].proceeds),
+            basis: converter.floatToBigint(req.body.f1099b[key].basis),
+            isLongTerm: req.body.f1099b[key].isLongTerm,
+            taxWithheld: converter.floatToBigint(req.body.f1099b[key].taxWithheld),
+          }, { transaction: t });
+        })());
+      }
+      await Promise.all(f1099bPromises);
+      const f1099divPromises = [];
+      for (const key of Object.keys(req.body.f1099div)) {
+        f1099divPromises.push((async () => {
+          if (req.body.f1099div[key] === null) {
+            return F1099div.destroy({
+              where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
+              transaction: t,
+            });
+          }
+          const [form] = await F1099div.findOrCreate({
+            where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
+            transaction: t,
+          });
+          return form.update({
+            payer: req.body.f1099div[key].payer,
+            ordDividends: converter.floatToBigint(req.body.f1099div[key].ordDividends),
+            qualDividends: converter.floatToBigint(req.body.f1099div[key].qualDividends),
+            taxWithheld: converter.floatToBigint(req.body.f1099div[key].taxWithheld),
+          }, { transaction: t });
+        })());
+      }
+      await Promise.all(f1099divPromises);
+      const dependentsPromises = [];
+      for (const key of Object.keys(req.body.dependents)) {
+        dependentsPromises.push((async () => {
+          if (req.body.dependents[key] === null) {
+            return Dependents.destroy({
+              where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
+              transaction: t,
+            });
+          }
+          const [form] = await Dependents.findOrCreate({
+            where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
+            transaction: t,
+          });
+          return form.update({
+            name: req.body.dependents[key].name,
+            ssn: req.body.dependents[key].ssn,
+            relation: req.body.dependents[key].relation,
+            childCredit: req.body.dependents[key].childCredit,
+          }, { transaction: t });
+        })());
+      }
+      await Promise.all(dependentsPromises);
     });
     res.status(204).end();
   } catch (err) {

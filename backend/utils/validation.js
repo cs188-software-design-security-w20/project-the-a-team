@@ -93,6 +93,54 @@ const validateEmployer = (employer, paramName) => {
   }
 };
 
+const validatePayer = (payer, paramName) => {
+  if (payer === undefined) {
+    return;
+  }
+  if (!isString(payer)) {
+    throw new ValidationError(`${paramName} should be string`);
+  }
+  if (!isInStringLimit(payer)) {
+    throw new ValidationError(`${paramName} is too long`);
+  }
+};
+
+const validateDesc = (desc, paramName) => {
+  if (desc === undefined) {
+    return;
+  }
+  if (!isString(desc)) {
+    throw new ValidationError(`${paramName} should be string`);
+  }
+  if (!isInStringLimit(desc)) {
+    throw new ValidationError(`${paramName} is too long`);
+  }
+};
+
+const validateName = (name, paramName) => {
+  if (name === undefined) {
+    return;
+  }
+  if (!isString(name)) {
+    throw new ValidationError(`${paramName} should be string`);
+  }
+  if (!isInStringLimit(name)) {
+    throw new ValidationError(`${paramName} is too long`);
+  }
+};
+
+const validateRelation = (relation, paramName) => {
+  if (relation === undefined) {
+    return;
+  }
+  if (!isString(relation)) {
+    throw new ValidationError(`${paramName} should be string`);
+  }
+  if (!isInStringLimit(relation)) {
+    throw new ValidationError(`${paramName} is too long`);
+  }
+};
+
 const validateMoney = (money, paramName) => {
   if (money === undefined) {
     return;
@@ -117,21 +165,75 @@ const validateFw2Item = (fw2Item) => {
   validateMoney(fw2Item.taxWithheld, 'Fw2 tax withheld');
 };
 
-const validateFw2Input = (fw2Input) => {
-  if (fw2Input === undefined) {
+const validateF1099intItem = (f1099intItem) => {
+  if (f1099intItem === null) {
     return;
   }
-  if (!isObject(fw2Input)) {
-    throw new ValidationError('Fw2 should be an object');
+  if (!isObject(f1099intItem)) {
+    throw new ValidationError('F1099int value should be an object or null');
   }
-  for (const key of Object.keys(fw2Input)) {
+  validatePayer(f1099intItem.payer, 'F1099int payer');
+  validateMoney(f1099intItem.income, 'F1099int income');
+  validateMoney(f1099intItem.usSavingTreasInterest, 'F1099int Interest on U.S. Savings Bonds and Treas. obligations');
+  validateMoney(f1099intItem.taxWithheld, 'F1099int tax withheld');
+  validateMoney(f1099intItem.taxExemptInterest, 'F1099int tax-exempt interest');
+};
+
+const validateF1099bItem = (f1099bItem) => {
+  if (f1099bItem === null) {
+    return;
+  }
+  if (!isObject(f1099bItem)) {
+    throw new ValidationError('F1099b value should be an object or null');
+  }
+  validateDesc(f1099bItem.desc, 'F1099b desc');
+  validateMoney(f1099bItem.proceeds, 'F1099b proceeds');
+  validateMoney(f1099bItem.basis, 'F1099b basis');
+  validateBoolean(f1099bItem.isLongTerm, 'F1099b is long term');
+  validateMoney(f1099bItem.taxWithheld, 'F1099b tax withheld');
+};
+
+const validateF1099divItem = (f1099divItem) => {
+  if (f1099divItem === null) {
+    return;
+  }
+  if (!isObject(f1099divItem)) {
+    throw new ValidationError('F1099div value should be an object or null');
+  }
+  validatePayer(f1099divItem.payer, 'F1099div payer');
+  validateMoney(f1099divItem.ordDividends, 'F1099div ord dividends');
+  validateMoney(f1099divItem.qualDividends, 'F1099div qual dividends');
+  validateMoney(f1099divItem.taxWithheld, 'F1099div tax withheld');
+};
+
+const validateDependentsItem = (dependentsItem) => {
+  if (dependentsItem === null) {
+    return;
+  }
+  if (!isObject(dependentsItem)) {
+    throw new ValidationError('Dependents value should be an object or null');
+  }
+  validateName(dependentsItem.name, 'Dependents name');
+  validateSSN(dependentsItem.ssn, 'Dependents SSN');
+  validateRelation(dependentsItem.relation, 'Dependents relation');
+  validateBoolean(dependentsItem.childCredit, 'Dependents child credit');
+};
+
+const validateSubitemInput = (subInput, paramName, subValidator) => {
+  if (subInput === undefined) {
+    return;
+  }
+  if (!isObject(subInput)) {
+    throw new ValidationError(`${paramName} should be an object`);
+  }
+  for (const key of Object.keys(subInput)) {
     if (!isString(key)) {
-      throw new ValidationError('Fw2 key should be string');
+      throw new ValidationError(`${paramName} key should be string`);
     }
     if (!isValidUUID(key)) {
-      throw new ValidationError('Fw2 key is not valid UUID');
+      throw new ValidationError(`${paramName} key is not valid UUID`);
     }
-    validateFw2Item(fw2Input[key]);
+    subValidator(subInput[key]);
   }
 };
 
@@ -141,7 +243,11 @@ const validateTaxinfoInput = (taxinfoInput) => {
   validateBankAccount(taxinfoInput.bankAccount);
   validateBankRouting(taxinfoInput.bankRouting);
   validateBoolean(taxinfoInput.bankIsChecking, 'Bank is checking');
-  validateFw2Input(taxinfoInput.fw2);
+  validateSubitemInput(taxinfoInput.fw2, 'Fw2', validateFw2Item);
+  validateSubitemInput(taxinfoInput.f1099int, 'F1099int', validateF1099intItem);
+  validateSubitemInput(taxinfoInput.f1099b, 'F1099b', validateF1099bItem);
+  validateSubitemInput(taxinfoInput.f1099div, 'F1099div', validateF1099divItem);
+  validateSubitemInput(taxinfoInput.dependents, 'Dependents', validateDependentsItem);
 };
 
 module.exports = {
