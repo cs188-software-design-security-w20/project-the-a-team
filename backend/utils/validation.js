@@ -19,19 +19,19 @@ class ValidationError {
 const isValidationError = (obj) => obj instanceof ValidationError;
 
 const validateSSN = (ssn, paramName = 'SSN') => {
-  if (ssn === undefined) {
+  if ([undefined, null, ''].includes(ssn)) {
     return;
   }
   if (!isString(ssn)) {
     throw new ValidationError(`${paramName} should be string`);
   }
-  if (ssn && !isValidSSN(ssn)) {
+  if (!isValidSSN(ssn)) {
     throw new ValidationError(`${paramName} should be 9 digits`);
   }
 };
 
 const validateAddress = (address, paramName = 'Address') => {
-  if (address === undefined) {
+  if ([undefined, null].includes(address)) {
     return;
   }
   if (!isString(address)) {
@@ -43,7 +43,7 @@ const validateAddress = (address, paramName = 'Address') => {
 };
 
 const validateBankAccount = (bankAccount, paramName = 'Bank account') => {
-  if (bankAccount === undefined) {
+  if ([undefined, null].includes(bankAccount)) {
     return;
   }
   if (!isString(bankAccount)) {
@@ -58,7 +58,7 @@ const validateBankAccount = (bankAccount, paramName = 'Bank account') => {
 };
 
 const validateBankRouting = (bankRouting, paramName = 'Bank routing') => {
-  if (bankRouting === undefined) {
+  if ([undefined, null].includes(bankRouting)) {
     return;
   }
   if (!isString(bankRouting)) {
@@ -73,7 +73,7 @@ const validateBankRouting = (bankRouting, paramName = 'Bank routing') => {
 };
 
 const validateBoolean = (obj, paramName) => {
-  if (obj === undefined) {
+  if ([undefined, null].includes(obj)) {
     return;
   }
   if (!isBoolean(obj)) {
@@ -82,7 +82,7 @@ const validateBoolean = (obj, paramName) => {
 };
 
 const validateEmployer = (employer, paramName) => {
-  if (employer === undefined) {
+  if ([undefined, null].includes(employer)) {
     return;
   }
   if (!isString(employer)) {
@@ -94,7 +94,7 @@ const validateEmployer = (employer, paramName) => {
 };
 
 const validatePayer = (payer, paramName) => {
-  if (payer === undefined) {
+  if ([undefined, null].includes(payer)) {
     return;
   }
   if (!isString(payer)) {
@@ -106,7 +106,7 @@ const validatePayer = (payer, paramName) => {
 };
 
 const validateDesc = (desc, paramName) => {
-  if (desc === undefined) {
+  if ([undefined, null].includes(desc)) {
     return;
   }
   if (!isString(desc)) {
@@ -118,7 +118,7 @@ const validateDesc = (desc, paramName) => {
 };
 
 const validateName = (name, paramName) => {
-  if (name === undefined) {
+  if ([undefined, null].includes(name)) {
     return;
   }
   if (!isString(name)) {
@@ -130,7 +130,7 @@ const validateName = (name, paramName) => {
 };
 
 const validateRelation = (relation, paramName) => {
-  if (relation === undefined) {
+  if ([undefined, null].includes(relation)) {
     return;
   }
   if (!isString(relation)) {
@@ -142,7 +142,7 @@ const validateRelation = (relation, paramName) => {
 };
 
 const validateMoney = (money, paramName) => {
-  if (money === undefined) {
+  if ([undefined, null].includes(money)) {
     return;
   }
   if (!isNumber(money)) {
