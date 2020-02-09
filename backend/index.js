@@ -6,12 +6,9 @@ const cookieSession = require('cookie-session');
 const cors = require('cors');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-const uuid = require('uuid');
 
 const config = require('./config.json');
-const { sequelize } = require('./models/database.js');
-const User = require('./models/User.js');
-const Taxinfo = require('./models/Taxinfo.js');
+const query = require('./service/query.js');
 const authRouter = require('./routes/auth.js');
 const taxRouter = require('./routes/tax.js');
 
@@ -25,24 +22,15 @@ passport.use(
   },
   async (accessToken, refreshToken, profile, done) => {
     try {
-      const user = await sequelize.transaction(async (t) => {
-        const [tuser, created] = await User.findOrCreate({
-          where: { googleId: profile.id },
-          defaults: { uuid: uuid.v4().toLowerCase() },
-          transaction: t,
-        });
-        if (created) {
-          await Taxinfo.create({ userId: tuser.id }, { transaction: t });
-        }
-        console.log('logged in with google id', profile.id, 'created', created); // eslint-disable-line no-console
-        return tuser;
-      });
-      done(null, user);
+      const userObj = await query.ensureUserTaxinfo(profile.id);
+      done(null, userObj);
     } catch (err) {
       done(err);
     }
   }),
 );
+
+app.set('trust proxy', 'loopback, linklocal, uniquelocal');
 
 app.use(cors({
   origin: [new URL(config.frontendURL).origin],
@@ -64,10 +52,7 @@ passport.serializeUser((userObj, done) => {
 
 passport.deserializeUser(async (userId, done) => {
   try {
-    const userObj = await sequelize.transaction(async (t) => User.findOne({
-      where: { uuid: userId },
-      transaction: t,
-    }));
+    const userObj = await query.getUserByUUID(userId);
     done(null, userObj);
   } catch (err) {
     done(err);

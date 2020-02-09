@@ -8,8 +8,8 @@ class Taxinfo extends Sequelize.Model {}
 
 Taxinfo.init({
   lastName: Sequelize.DataTypes.STRING,
-  firstName: sequelize.DataTypes.STRING,
-  middleName: sequelize.DataTypes.STRING,
+  firstName: Sequelize.DataTypes.STRING,
+  middleName: Sequelize.DataTypes.STRING,
   ssn: Sequelize.DataTypes.STRING,
   spouseName: Sequelize.DataTypes.STRING,
   spouseSSN: Sequelize.DataTypes.STRING,

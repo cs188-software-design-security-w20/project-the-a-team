@@ -10,67 +10,14 @@ const isDigitOnly = (s) => s.match(/^\d*$/);
 const isValidSSN = (s) => s.match(/^\d{9}$/);
 const isValidUUID = (s) => s.match(/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i);
 
-class ValidationError {
+class ValidationError extends Error {
   constructor(message) {
+    super(message);
     this.message = message;
   }
 }
 
 const isValidationError = (obj) => obj instanceof ValidationError;
-
-const validateSSN = (ssn, paramName = 'SSN') => {
-  if ([undefined, null, ''].includes(ssn)) {
-    return;
-  }
-  if (!isString(ssn)) {
-    throw new ValidationError(`${paramName} should be string`);
-  }
-  if (!isValidSSN(ssn)) {
-    throw new ValidationError(`${paramName} should be 9 digits`);
-  }
-};
-
-const validateAddress = (address, paramName = 'Address') => {
-  if ([undefined, null].includes(address)) {
-    return;
-  }
-  if (!isString(address)) {
-    throw new ValidationError(`${paramName} should be string`);
-  }
-  if (!isInStringLimit(address)) {
-    throw new ValidationError(`${paramName} is too long`);
-  }
-};
-
-const validateBankAccount = (bankAccount, paramName = 'Bank account') => {
-  if ([undefined, null].includes(bankAccount)) {
-    return;
-  }
-  if (!isString(bankAccount)) {
-    throw new ValidationError(`${paramName} should be string`);
-  }
-  if (!isDigitOnly(bankAccount)) {
-    throw new ValidationError(`${paramName} should only contain digits`);
-  }
-  if (!isInStringLimit(bankAccount)) { // TODO: further verify length?
-    throw new ValidationError(`${paramName} is too long`);
-  }
-};
-
-const validateBankRouting = (bankRouting, paramName = 'Bank routing') => {
-  if ([undefined, null].includes(bankRouting)) {
-    return;
-  }
-  if (!isString(bankRouting)) {
-    throw new ValidationError(`${paramName} should be string`);
-  }
-  if (!isDigitOnly(bankRouting)) {
-    throw new ValidationError(`${paramName} should only contain digits`);
-  }
-  if (!isInStringLimit(bankRouting)) { // TODO: further verify length?
-    throw new ValidationError(`${paramName} is too long`);
-  }
-};
 
 const validateBoolean = (obj, paramName) => {
   if ([undefined, null].includes(obj)) {
@@ -81,62 +28,14 @@ const validateBoolean = (obj, paramName) => {
   }
 };
 
-const validateEmployer = (employer, paramName) => {
-  if ([undefined, null].includes(employer)) {
+const validateString = (str, paramName) => {
+  if ([undefined, null].includes(str)) {
     return;
   }
-  if (!isString(employer)) {
+  if (!isString(str)) {
     throw new ValidationError(`${paramName} should be string`);
   }
-  if (!isInStringLimit(employer)) {
-    throw new ValidationError(`${paramName} is too long`);
-  }
-};
-
-const validatePayer = (payer, paramName) => {
-  if ([undefined, null].includes(payer)) {
-    return;
-  }
-  if (!isString(payer)) {
-    throw new ValidationError(`${paramName} should be string`);
-  }
-  if (!isInStringLimit(payer)) {
-    throw new ValidationError(`${paramName} is too long`);
-  }
-};
-
-const validateDesc = (desc, paramName) => {
-  if ([undefined, null].includes(desc)) {
-    return;
-  }
-  if (!isString(desc)) {
-    throw new ValidationError(`${paramName} should be string`);
-  }
-  if (!isInStringLimit(desc)) {
-    throw new ValidationError(`${paramName} is too long`);
-  }
-};
-
-const validateName = (name, paramName) => {
-  if ([undefined, null].includes(name)) {
-    return;
-  }
-  if (!isString(name)) {
-    throw new ValidationError(`${paramName} should be string`);
-  }
-  if (!isInStringLimit(name)) {
-    throw new ValidationError(`${paramName} is too long`);
-  }
-};
-
-const validateRelation = (relation, paramName) => {
-  if ([undefined, null].includes(relation)) {
-    return;
-  }
-  if (!isString(relation)) {
-    throw new ValidationError(`${paramName} should be string`);
-  }
-  if (!isInStringLimit(relation)) {
+  if (!isInStringLimit(str)) {
     throw new ValidationError(`${paramName} is too long`);
   }
 };
@@ -153,6 +52,57 @@ const validateMoney = (money, paramName) => {
   }
 };
 
+const validateGoogleId = (googleId) => {
+  if (!isString(googleId)) {
+    throw new ValidationError('Google id should be string');
+  }
+  if (!isInStringLimit(googleId)) {
+    throw new ValidationError('Google id is too long');
+  }
+};
+
+const validateSSN = (ssn, paramName = 'SSN') => {
+  if ([undefined, null, ''].includes(ssn)) {
+    return;
+  }
+  if (!isString(ssn)) {
+    throw new ValidationError(`${paramName} should be string`);
+  }
+  if (!isValidSSN(ssn)) {
+    throw new ValidationError(`${paramName} should be 9 digits`);
+  }
+};
+
+const validateBankAccount = (bankAccount, paramName = 'Bank account') => {
+  if ([undefined, null].includes(bankAccount)) {
+    return;
+  }
+  if (!isString(bankAccount)) {
+    throw new ValidationError(`${paramName} should be string`);
+  }
+  if (!isDigitOnly(bankAccount)) {
+    throw new ValidationError(`${paramName} should only contain digits`);
+  }
+  if (bankAccount.length > 17) {
+    throw new ValidationError(`${paramName} is too long`);
+  }
+};
+
+const validateBankRouting = (bankRouting, paramName = 'Bank routing') => {
+  if ([undefined, null].includes(bankRouting)) {
+    return;
+  }
+  if (!isString(bankRouting)) {
+    throw new ValidationError(`${paramName} should be string`);
+  }
+  if (!isDigitOnly(bankRouting)) {
+    throw new ValidationError(`${paramName} should only contain digits`);
+  }
+  if (bankRouting.length > 9) {
+    throw new ValidationError(`${paramName} is too long`);
+  }
+};
+
 const validateFw2Item = (fw2Item) => {
   if (fw2Item === null) {
     return;
@@ -160,7 +110,7 @@ const validateFw2Item = (fw2Item) => {
   if (!isObject(fw2Item)) {
     throw new ValidationError('Fw2 value should be an object or null');
   }
-  validateEmployer(fw2Item.employer, 'Fw2 employer');
+  validateString(fw2Item.employer, 'Fw2 employer');
   validateMoney(fw2Item.income, 'Fw2 income');
   validateMoney(fw2Item.taxWithheld, 'Fw2 tax withheld');
 };
@@ -172,7 +122,7 @@ const validateF1099intItem = (f1099intItem) => {
   if (!isObject(f1099intItem)) {
     throw new ValidationError('F1099int value should be an object or null');
   }
-  validatePayer(f1099intItem.payer, 'F1099int payer');
+  validateString(f1099intItem.payer, 'F1099int payer');
   validateMoney(f1099intItem.income, 'F1099int income');
   validateMoney(f1099intItem.usSavingTreasInterest, 'F1099int Interest on U.S. Savings Bonds and Treas. obligations');
   validateMoney(f1099intItem.taxWithheld, 'F1099int tax withheld');
@@ -186,7 +136,7 @@ const validateF1099bItem = (f1099bItem) => {
   if (!isObject(f1099bItem)) {
     throw new ValidationError('F1099b value should be an object or null');
   }
-  validateDesc(f1099bItem.desc, 'F1099b desc');
+  validateString(f1099bItem.desc, 'F1099b desc');
   validateMoney(f1099bItem.proceeds, 'F1099b proceeds');
   validateMoney(f1099bItem.basis, 'F1099b basis');
   validateBoolean(f1099bItem.isLongTerm, 'F1099b is long term');
@@ -200,10 +150,11 @@ const validateF1099divItem = (f1099divItem) => {
   if (!isObject(f1099divItem)) {
     throw new ValidationError('F1099div value should be an object or null');
   }
-  validatePayer(f1099divItem.payer, 'F1099div payer');
+  validateString(f1099divItem.payer, 'F1099div payer');
   validateMoney(f1099divItem.ordDividends, 'F1099div ord dividends');
   validateMoney(f1099divItem.qualDividends, 'F1099div qual dividends');
   validateMoney(f1099divItem.taxWithheld, 'F1099div tax withheld');
+  validateMoney(f1099divItem.exemptInterestDiv, 'F1099div exempt interest div');
 };
 
 const validateDependentsItem = (dependentsItem) => {
@@ -213,9 +164,9 @@ const validateDependentsItem = (dependentsItem) => {
   if (!isObject(dependentsItem)) {
     throw new ValidationError('Dependents value should be an object or null');
   }
-  validateName(dependentsItem.name, 'Dependents name');
+  validateString(dependentsItem.name, 'Dependents name');
   validateSSN(dependentsItem.ssn, 'Dependents SSN');
-  validateRelation(dependentsItem.relation, 'Dependents relation');
+  validateString(dependentsItem.relation, 'Dependents relation');
   validateBoolean(dependentsItem.childCredit, 'Dependents child credit');
 };
 
@@ -238,8 +189,15 @@ const validateSubitemInput = (subInput, paramName, subValidator) => {
 };
 
 const validateTaxinfoInput = (taxinfoInput) => {
+  validateString(taxinfoInput.lastName, 'Last name');
+  validateString(taxinfoInput.firstName, 'First name');
+  validateString(taxinfoInput.middleName, 'Middle name');
   validateSSN(taxinfoInput.ssn);
-  validateAddress(taxinfoInput.address);
+  validateString(taxinfoInput.spouseName, 'Spouse name');
+  validateSSN(taxinfoInput.spouseSSN, 'Spouse SSN');
+  validateString(taxinfoInput.addr1, 'Address 1');
+  validateString(taxinfoInput.addr2, 'Address 2');
+  validateString(taxinfoInput.addr3, 'Address 3');
   validateBankAccount(taxinfoInput.bankAccount);
   validateBankRouting(taxinfoInput.bankRouting);
   validateBoolean(taxinfoInput.bankIsChecking, 'Bank is checking');
@@ -251,6 +209,7 @@ const validateTaxinfoInput = (taxinfoInput) => {
 };
 
 module.exports = {
+  validateGoogleId,
   isValidationError,
   validateTaxinfoInput,
 };
