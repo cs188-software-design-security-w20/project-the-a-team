@@ -48,6 +48,16 @@ app.use(cookieSession({
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Cookie refresher
+// Update a value in the cookie so that the set-cookie will be sent.
+// Only changes every minute so that it's not sent with every request.
+app.use((req, res, next) => {
+  if (req.user) {
+    req.session.nowInMinutes = Math.floor(Date.now() / 60e3);
+  }
+  next();
+});
+
 passport.serializeUser((userObj, done) => {
   done(null, userObj.uuid);
 });
