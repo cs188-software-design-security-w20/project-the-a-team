@@ -81,7 +81,7 @@ const updateUserData = async (user, data) => {
       transaction: t,
     });
     const promises = [];
-    promises.push(taxinfo.update(converter.stripUndefinedValues({
+    promises.push(taxinfo.update({
       lastName: data.lastName,
       firstName: data.firstName,
       middleName: data.middleName,
@@ -94,7 +94,7 @@ const updateUserData = async (user, data) => {
       bankAccount: cryptor.encryptData(data.bankAccount),
       bankRouting: data.bankRouting,
       bankIsChecking: data.bankIsChecking,
-    }), { transaction: t }));
+    }, { transaction: t }));
     for (const key of Object.keys(data.fw2)) {
       const queryOptions = {
         where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
@@ -105,11 +105,11 @@ const updateUserData = async (user, data) => {
           return Fw2.destroy(queryOptions);
         }
         const [form] = await Fw2.findOrCreate(queryOptions);
-        return form.update(converter.stripUndefinedValues({
+        return form.update({
           employer: data.fw2[key].employer,
           income: converter.floatToBigint(data.fw2[key].income),
           taxWithheld: converter.floatToBigint(data.fw2[key].taxWithheld),
-        }), { transaction: t });
+        }, { transaction: t });
       })());
     }
     for (const key of Object.keys(data.f1099int)) {
@@ -122,13 +122,13 @@ const updateUserData = async (user, data) => {
           return F1099int.destroy(queryOptions);
         }
         const [form] = await F1099int.findOrCreate(queryOptions);
-        return form.update(converter.stripUndefinedValues({
+        return form.update({
           payer: data.f1099int[key].payer,
           income: converter.floatToBigint(data.f1099int[key].income),
           usSavingTreasInterest: converter.floatToBigint(data.f1099int[key].usSavingTreasInterest),
           taxWithheld: converter.floatToBigint(data.f1099int[key].taxWithheld),
           taxExemptInterest: converter.floatToBigint(data.f1099int[key].taxExemptInterest),
-        }), { transaction: t });
+        }, { transaction: t });
       })());
     }
     for (const key of Object.keys(data.f1099b)) {
@@ -141,13 +141,13 @@ const updateUserData = async (user, data) => {
           return F1099b.destroy(queryOptions);
         }
         const [form] = await F1099b.findOrCreate(queryOptions);
-        return form.update(converter.stripUndefinedValues({
+        return form.update({
           desc: data.f1099b[key].desc,
           proceeds: converter.floatToBigint(data.f1099b[key].proceeds),
           basis: converter.floatToBigint(data.f1099b[key].basis),
           isLongTerm: data.f1099b[key].isLongTerm,
           taxWithheld: converter.floatToBigint(data.f1099b[key].taxWithheld),
-        }), { transaction: t });
+        }, { transaction: t });
       })());
     }
     for (const key of Object.keys(data.f1099div)) {
@@ -160,13 +160,13 @@ const updateUserData = async (user, data) => {
           return F1099div.destroy(queryOptions);
         }
         const [form] = await F1099div.findOrCreate(queryOptions);
-        return form.update(converter.stripUndefinedValues({
+        return form.update({
           payer: data.f1099div[key].payer,
           ordDividends: converter.floatToBigint(data.f1099div[key].ordDividends),
           qualDividends: converter.floatToBigint(data.f1099div[key].qualDividends),
           taxWithheld: converter.floatToBigint(data.f1099div[key].taxWithheld),
           exemptInterestDiv: converter.floatToBigint(data.f1099div[key].exemptInterestDiv),
-        }), { transaction: t });
+        }, { transaction: t });
       })());
     }
     for (const key of Object.keys(data.dependents)) {
@@ -179,12 +179,12 @@ const updateUserData = async (user, data) => {
           return Dependents.destroy(queryOptions);
         }
         const [form] = await Dependents.findOrCreate(queryOptions);
-        return form.update(converter.stripUndefinedValues({
+        return form.update({
           name: data.dependents[key].name,
           ssn: cryptor.encryptData(data.dependents[key].ssn),
           relation: data.dependents[key].relation,
           childCredit: data.dependents[key].childCredit,
-        }), { transaction: t });
+        }, { transaction: t });
       })());
     }
     return Promise.all(promises);

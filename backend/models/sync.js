@@ -10,11 +10,12 @@ require('./F1099div.js');
 require('./Dependents');
 
 // sync all tables
-sequelize.sync().then(() => {
-  console.log('Database synchronized'); // eslint-disable-line no-console
-}).catch((err) => {
-  process.nextTick(() => {
+(async () => {
+  try {
+    await sequelize.sync();
+    console.log('Database synchronized'); // eslint-disable-line no-console
+  } catch (err) {
     console.error('Failed to sync database'); // eslint-disable-line no-console
     throw err;
-  });
-});
+  }
+})();

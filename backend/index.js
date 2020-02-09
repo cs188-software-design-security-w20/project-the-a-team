@@ -1,5 +1,7 @@
 'use strict';
 
+require('./models/sync.js');
+
 const { URL } = require('url');
 const express = require('express');
 const cookieSession = require('cookie-session');

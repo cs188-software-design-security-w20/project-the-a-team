@@ -54,7 +54,7 @@ router.get('/', async (req, res) => {
     }
     res.json(taxinfoJson);
   } catch (err) {
-    console.log(err); // eslint-disable-line no-console
+    console.error(err); // eslint-disable-line no-console
     res.status(500).json({ message: 'Server error' });
   }
 });
@@ -68,7 +68,7 @@ router.post('/', bodyParser.json(), async (req, res) => {
       res.status(400).json({ message: err.message });
       return;
     }
-    console.log(err); // eslint-disable-line no-console
+    console.error(err); // eslint-disable-line no-console
     res.status(500).json({ message: 'Server error' });
   }
 });
