@@ -95,97 +95,108 @@ const updateUserData = async (user, data) => {
       bankRouting: data.bankRouting,
       bankIsChecking: data.bankIsChecking,
     }, { transaction: t }));
-    for (const key of Object.keys(data.fw2)) {
-      const queryOptions = {
-        where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
-        transaction: t,
-      };
-      promises.push((async () => {
-        if (data.fw2[key] === null) {
-          return Fw2.destroy(queryOptions);
-        }
-        const [form] = await Fw2.findOrCreate(queryOptions);
-        return form.update({
-          employer: data.fw2[key].employer,
-          income: converter.floatToBigint(data.fw2[key].income),
-          taxWithheld: converter.floatToBigint(data.fw2[key].taxWithheld),
-        }, { transaction: t });
-      })());
+    if (data.fw2 !== undefined) {
+      for (const key of Object.keys(data.fw2)) {
+        const queryOptions = {
+          where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
+          transaction: t,
+        };
+        promises.push((async () => {
+          if (data.fw2[key] === null) {
+            return Fw2.destroy(queryOptions);
+          }
+          const [form] = await Fw2.findOrCreate(queryOptions);
+          return form.update({
+            employer: data.fw2[key].employer,
+            income: converter.floatToBigint(data.fw2[key].income),
+            taxWithheld: converter.floatToBigint(data.fw2[key].taxWithheld),
+          }, { transaction: t });
+        })());
+      }
     }
-    for (const key of Object.keys(data.f1099int)) {
-      const queryOptions = {
-        where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
-        transaction: t,
-      };
-      promises.push((async () => {
-        if (data.f1099int[key] === null) {
-          return F1099int.destroy(queryOptions);
-        }
-        const [form] = await F1099int.findOrCreate(queryOptions);
-        return form.update({
-          payer: data.f1099int[key].payer,
-          income: converter.floatToBigint(data.f1099int[key].income),
-          usSavingTreasInterest: converter.floatToBigint(data.f1099int[key].usSavingTreasInterest),
-          taxWithheld: converter.floatToBigint(data.f1099int[key].taxWithheld),
-          taxExemptInterest: converter.floatToBigint(data.f1099int[key].taxExemptInterest),
-        }, { transaction: t });
-      })());
+    if (data.f1099int !== undefined) {
+      for (const key of Object.keys(data.f1099int)) {
+        const queryOptions = {
+          where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
+          transaction: t,
+        };
+        promises.push((async () => {
+          if (data.f1099int[key] === null) {
+            return F1099int.destroy(queryOptions);
+          }
+          const [form] = await F1099int.findOrCreate(queryOptions);
+          return form.update({
+            payer: data.f1099int[key].payer,
+            income: converter.floatToBigint(data.f1099int[key].income),
+            // eslint-disable-next-line max-len
+            usSavingTreasInterest: converter.floatToBigint(data.f1099int[key].usSavingTreasInterest),
+            taxWithheld: converter.floatToBigint(data.f1099int[key].taxWithheld),
+            taxExemptInterest: converter.floatToBigint(data.f1099int[key].taxExemptInterest),
+          }, { transaction: t });
+        })());
+      }
     }
-    for (const key of Object.keys(data.f1099b)) {
-      const queryOptions = {
-        where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
-        transaction: t,
-      };
-      promises.push((async () => {
-        if (data.f1099b[key] === null) {
-          return F1099b.destroy(queryOptions);
-        }
-        const [form] = await F1099b.findOrCreate(queryOptions);
-        return form.update({
-          desc: data.f1099b[key].desc,
-          proceeds: converter.floatToBigint(data.f1099b[key].proceeds),
-          basis: converter.floatToBigint(data.f1099b[key].basis),
-          isLongTerm: data.f1099b[key].isLongTerm,
-          taxWithheld: converter.floatToBigint(data.f1099b[key].taxWithheld),
-        }, { transaction: t });
-      })());
+    if (data.f1099b !== undefined) {
+      for (const key of Object.keys(data.f1099b)) {
+        const queryOptions = {
+          where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
+          transaction: t,
+        };
+        promises.push((async () => {
+          if (data.f1099b[key] === null) {
+            return F1099b.destroy(queryOptions);
+          }
+          const [form] = await F1099b.findOrCreate(queryOptions);
+          return form.update({
+            desc: data.f1099b[key].desc,
+            proceeds: converter.floatToBigint(data.f1099b[key].proceeds),
+            basis: converter.floatToBigint(data.f1099b[key].basis),
+            isLongTerm: data.f1099b[key].isLongTerm,
+            taxWithheld: converter.floatToBigint(data.f1099b[key].taxWithheld),
+          }, { transaction: t });
+        })());
+      }
     }
-    for (const key of Object.keys(data.f1099div)) {
-      const queryOptions = {
-        where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
-        transaction: t,
-      };
-      promises.push((async () => {
-        if (data.f1099div[key] === null) {
-          return F1099div.destroy(queryOptions);
-        }
-        const [form] = await F1099div.findOrCreate(queryOptions);
-        return form.update({
-          payer: data.f1099div[key].payer,
-          ordDividends: converter.floatToBigint(data.f1099div[key].ordDividends),
-          qualDividends: converter.floatToBigint(data.f1099div[key].qualDividends),
-          taxWithheld: converter.floatToBigint(data.f1099div[key].taxWithheld),
-          exemptInterestDiv: converter.floatToBigint(data.f1099div[key].exemptInterestDiv),
-        }, { transaction: t });
-      })());
+    if (data.f1099div !== undefined) {
+      for (const key of Object.keys(data.f1099div)) {
+        const queryOptions = {
+          where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
+          transaction: t,
+        };
+        promises.push((async () => {
+          if (data.f1099div[key] === null) {
+            return F1099div.destroy(queryOptions);
+          }
+          const [form] = await F1099div.findOrCreate(queryOptions);
+          return form.update({
+            payer: data.f1099div[key].payer,
+            ordDividends: converter.floatToBigint(data.f1099div[key].ordDividends),
+            qualDividends: converter.floatToBigint(data.f1099div[key].qualDividends),
+            taxWithheld: converter.floatToBigint(data.f1099div[key].taxWithheld),
+            exemptInterestDiv: converter.floatToBigint(data.f1099div[key].exemptInterestDiv),
+          }, { transaction: t });
+        })());
+      }
     }
-    for (const key of Object.keys(data.dependents)) {
-      const queryOptions = {
-        where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
-        transaction: t,
-      };
-      promises.push((async () => {
-        if (data.dependents[key] === null) {
-          return Dependents.destroy(queryOptions);
-        }
-        const [form] = await Dependents.findOrCreate(queryOptions);
-        return form.update({
-          name: data.dependents[key].name,
-          ssn: cryptor.encryptData(data.dependents[key].ssn),
-          relation: data.dependents[key].relation,
-          childCredit: data.dependents[key].childCredit,
-        }, { transaction: t });
-      })());
+    if (data.dependents !== undefined) {
+      for (const key of Object.keys(data.dependents)) {
+        const queryOptions = {
+          where: { taxinfoId: taxinfo.id, uuid: key.toLowerCase() },
+          transaction: t,
+        };
+        promises.push((async () => {
+          if (data.dependents[key] === null) {
+            return Dependents.destroy(queryOptions);
+          }
+          const [form] = await Dependents.findOrCreate(queryOptions);
+          return form.update({
+            name: data.dependents[key].name,
+            ssn: cryptor.encryptData(data.dependents[key].ssn),
+            relation: data.dependents[key].relation,
+            childCredit: data.dependents[key].childCredit,
+          }, { transaction: t });
+        })());
+      }
     }
     return Promise.all(promises);
   });

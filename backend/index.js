@@ -39,8 +39,9 @@ app.use(cors({
   credentials: true,
 }));
 app.use(cookieSession({
+  name: 'session',
   secret: config.credentials.cookieSecret,
-  maxAge: 15 * 60 * 1000, // 15 min
+  maxAge: config.cookieExpireMinutes * 60 * 1000,
   secure: new URL(config.backendURL).protocol !== 'http:',
   sameSite: 'strict',
 }));
@@ -53,7 +54,13 @@ app.use(passport.session());
 // Only changes every minute so that it's not sent with every request.
 app.use((req, res, next) => {
   if (req.user) {
-    req.session.nowInMinutes = Math.floor(Date.now() / 60e3);
+    const nowInMinutes = Math.floor(Date.now() / 60e3);
+    if (process.env.NODE_ENV === 'production' && req.session.nowInMinutes
+        && nowInMinutes - req.session.nowInMinutes > config.cookieExpireMinutes) {
+      req.logout(); // force logout old sessions
+    } else {
+      req.session.nowInMinutes = nowInMinutes;
+    }
   }
   next();
 });
