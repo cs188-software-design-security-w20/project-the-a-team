@@ -19,9 +19,11 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
 import PersonalInfo from './PersonalInfo';
+import Dependent from './Dependent';
 import FormW2 from './FormW2';
 import Form1099INT from './Form1099INT';
 import Form1099B from './Form1099B';
+import Form1099Div from './Form1099Div';
 
 const useStyles = makeStyles(({
   root: {
@@ -52,10 +54,27 @@ export default function HomePage() {
     firstName: '',
     middleName: '',
     lastName: '',
+    ssn: '',
+    filingStatus: '',
+    address: '',
+    spouseFirstName: '',
+    spouseMiddleName: '',
+    spouseLastName: '',
+    spouseSSN: '',
+    bankAcctNum: '',
+    bankRoutingNum: '',
+    bankIsChecking: false,
   });
+
+  const [arrDependents, setDependent] = React.useState([]);
+
   const [arrW2, setW2] = React.useState([]);
+
   const [arr1099INT, set1099INT] = React.useState([]);
+
   const [arr1099B, set1099B] = React.useState([]);
+
+  const [arr1099Div, set1099Div] = React.useState([]);
 
   const [open, setOpen] = React.useState(false);
 
@@ -67,64 +86,60 @@ export default function HomePage() {
     setOpen(false);
   };
 
+  const addNewDependent = () => {
+    setDependent((orig) => [...orig, {
+      firstName: '',
+      middleName: '',
+      lastName: '',
+      ssn: '',
+      relation: '',
+      childTaxCredit: false,
+    }]);
+  };
+
   const addNewW2 = () => {
     setW2((orig) => [...orig, {
+      uuid: '',
       employer: '',
+      income: '',
+      taxWithheld: '',
     }]);
   };
 
   const addNew1099INT = () => {
     set1099INT((orig) => [...orig, {
+      uuid: '',
       payer: '',
+      income: '',
+      savingsInterest: '',
+      taxExemptInterest: '',
+      taxWithheld: '',
+
     }]);
   };
 
   const addNew1099B = () => {
     set1099B((orig) => [...orig, {
+      uuid: '',
+      description: '',
       proceeds: '',
+      basis: '',
+      longTerm: false,
+      taxWithheld: '',
     }]);
   };
 
-
-  /*  const addNew1099INT = () => {
-    const panel = (
-      <ExpansionPanel>
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel2a-content"
-          id="panel2a-header"
-        >
-          <Typography variant="h4">1099INT Information</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <Typography>
-            1099INT
-          </Typography>
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
-    );
-    set1099INT((orig) => [...orig, panel]);
+  const addNew1099Div = () => {
+    set1099Div((orig) => [...orig, {
+      uuid: '',
+      payer: '',
+      ordinaryDividends: '',
+      qualifiedDividends: '',
+      taxWithheld: '',
+      exemptInterestDiv: '',
+    }]);
   };
 
-  const addNew1099B = () => {
-    const panel = (
-      <ExpansionPanel>
-        <ExpansionPanelSummary
-          expandIcon={<ExpandMoreIcon />}
-          aria-controls="panel2a-content"
-          id="panel2a-header"
-        >
-          <Typography variant="h4">1099B Information</Typography>
-        </ExpansionPanelSummary>
-        <ExpansionPanelDetails>
-          <Typography>
-            1099B
-          </Typography>
-        </ExpansionPanelDetails>
-      </ExpansionPanel>
-    );
-    set1099B((orig) => [...orig, panel]);
-  };  */
 
   return (
     <Container>
@@ -157,25 +172,27 @@ export default function HomePage() {
           </ExpansionPanelDetails>
         </ExpansionPanel>
 
-        {arrW2.map((fw2, index) => (
+        {arrDependents.map((fdependent, index) => (
           <ExpansionPanel>
             <ExpansionPanelSummary
               expandIcon={<ExpandMoreIcon />}
               aria-controls="panel2a-content"
               id="panel2a-header"
             >
-              <Typography variant="h4">Form W-2 Income Information</Typography>
+              <Typography variant="h4">
+                Dependent Information
+              </Typography>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
-              <FormW2
-                fw2={fw2}
-                setFw2={(newFw2) => {
-                  setW2((origArray) => {
+              <Dependent
+                fdependent={fdependent}
+                setFDependent={(newFDependent) => {
+                  setDependent((origArray) => {
                     const copy = [...origArray];
-                    if (typeof newFw2 === 'function') {
-                      newFw2 = newFw2(copy[index]);
+                    if (typeof newFDependent === 'function') {
+                      newFDependent = newFDependent(copy[index]);
                     }
-                    copy[index] = newFw2;
+                    copy[index] = newFDependent;
                     return copy;
                   });
                 }}
@@ -187,6 +204,50 @@ export default function HomePage() {
           variant="contained"
           style={{
             backgroundColor: '#f6f930',
+            padding: '9px 18px',
+          }}
+          className={classes.button}
+          startIcon={<AddCircleIcon fontSize="large" />}
+          onClick={() => addNewDependent()}
+        >
+          <Typography variant="h4">Add Dependent</Typography>
+        </Button>
+
+        <Box mr={1} mx="auto">
+          {arrW2.map((fw2, index) => (
+            <ExpansionPanel>
+              <ExpansionPanelSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel2a-content"
+                id="panel2a-header"
+              >
+                <Typography variant="h4">
+                  Form W-2 Income Information
+                </Typography>
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails>
+                <FormW2
+                  fw2={fw2}
+                  setFw2={(newFw2) => {
+                    setW2((origArray) => {
+                      const copy = [...origArray];
+                      if (typeof newFw2 === 'function') {
+                        newFw2 = newFw2(copy[index]);
+                      }
+                      copy[index] = newFw2;
+                      return copy;
+                    });
+                  }}
+                />
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
+          ))}
+        </Box>
+        <Button
+          variant="contained"
+          style={{
+            backgroundColor: '#f6f930',
+
             padding: '9px 18px',
           }}
           className={classes.button}
@@ -204,7 +265,9 @@ export default function HomePage() {
                 aria-controls="panel2a-content"
                 id="panel2a-header"
               >
-                <Typography variant="h4">Form 1099INT Information</Typography>
+                <Typography variant="h4">
+                  Form 1099INT Information
+                </Typography>
               </ExpansionPanelSummary>
               <ExpansionPanelDetails>
                 <Form1099INT
@@ -245,7 +308,9 @@ export default function HomePage() {
                 aria-controls="panel2a-content"
                 id="panel2a-header"
               >
-                <Typography variant="h4">Form 1099B Information</Typography>
+                <Typography variant="h4">
+                  Form 1099B Information
+                </Typography>
               </ExpansionPanelSummary>
               <ExpansionPanelDetails>
                 <Form1099B
@@ -276,6 +341,49 @@ export default function HomePage() {
           onClick={() => addNew1099B()}
         >
           <Typography variant="h4">Add 1099-B Section</Typography>
+        </Button>
+
+        <Box mr={1} mx="auto">
+          {arr1099Div.map((f1099div, index) => (
+            <ExpansionPanel>
+              <ExpansionPanelSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel2a-content"
+                id="panel2a-header"
+              >
+                <Typography variant="h4">
+                  Form 1099Div Information
+                </Typography>
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails>
+                <Form1099Div
+                  f1099div={f1099div}
+                  setF1099Div={(newF1099Div) => {
+                    set1099Div((origArray) => {
+                      const copy = [...origArray];
+                      if (typeof newF1099Div === 'function') {
+                        newF1099Div = newF1099Div(copy[index]);
+                      }
+                      copy[index] = newF1099Div;
+                      return copy;
+                    });
+                  }}
+                />
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
+          ))}
+        </Box>
+        <Button
+          variant="contained"
+          style={{
+            backgroundColor: '#f6f930',
+            padding: '9px 18px',
+          }}
+          className={classes.button}
+          startIcon={<AddCircleIcon fontSize="large" />}
+          onClick={() => addNew1099Div()}
+        >
+          <Typography variant="h4">Add 1099Div Section</Typography>
         </Button>
 
         <div className={classes.unaffected}>
@@ -309,7 +417,7 @@ export default function HomePage() {
                   Go Back
                 </Button>
                 <Button onClick={handleClose} color="textSecondary">
-                  Subscribe
+                  Download
                 </Button>
               </DialogActions>
             </Dialog>

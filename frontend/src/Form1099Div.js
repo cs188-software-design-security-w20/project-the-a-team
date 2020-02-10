@@ -12,17 +12,21 @@ const useStyles = makeStyles((theme) => ({
       marginRight: theme.spacing(2),
     },
   },
+  formControl: {
+    marginRight: theme.spacing(2),
+    minWidth: 250,
+  },
 }));
 
-export default function Form1099INT({
-  f1099int,
-  setF1099INT,
+export default function Form1099Div({
+  f1099div,
+  setF1099Div,
 }) {
   const classes = useStyles();
 
   const setField = (field) => (e) => {
     const { value } = e.target;
-    setF1099INT((orig) => ({
+    setF1099Div((orig) => ({
       ...orig,
       [field]: value,
     }));
@@ -32,50 +36,26 @@ export default function Form1099INT({
     <List className={classes.root}>
       <ListItem>
         <TextField
-          value={f1099int.uuid}
+          value={f1099div.uuid}
           onChange={setField('uuid')}
           label="UUID"
           size="medium"
           variant="outlined"
         />
         <TextField
-          value={f1099int.payer}
+          value={f1099div.payer}
           onChange={setField('payer')}
           label="Payer"
           size="medium"
           variant="outlined"
         />
-        <TextField
-          value={f1099int.income}
-          onChange={setField('income')}
-          label="Income"
-          size="medium"
-          variant="outlined"
-          InputProps={{
-            startAdornment:
-  <InputAdornment position="start">$</InputAdornment>,
-          }}
-        />
       </ListItem>
 
       <ListItem>
         <TextField
-          value={f1099int.savingsInterest}
-          onChange={setField('savingsInterest')}
-          label="US Savings Interest"
-          size="medium"
-          variant="outlined"
-          I
-          InputProps={{
-            startAdornment:
-  <InputAdornment position="start">$</InputAdornment>,
-          }}
-        />
-
-        <TextField
-          value={f1099int.taxExemptInterest}
-          onChange={setField('taxExemptInterest')}
-          label="Tax Exempt Interest"
+          value={f1099div.ordinaryDividends}
+          onChange={setField('ordinaryDividends')}
+          label="Total Ordinary Dividends"
           size="medium"
           variant="outlined"
           InputProps={{
@@ -83,10 +63,21 @@ export default function Form1099INT({
   <InputAdornment position="start">$</InputAdornment>,
           }}
         />
+        <TextField
+          value={f1099div.qualifiedDividends}
+          onChange={setField('qualifiedDividends')}
+          label="Total Qualified Dividends"
+          size="medium"
+          variant="outlined"
+          InputProps={{
+            startAdornment:
+  <InputAdornment position="start">$</InputAdornment>,
+          }}
+        />
 
         <TextField
-          value={f1099int.taxWithheld}
-          onChange={setField('taxWithheld')}
+          value={f1099div.taxWithheld}
+          onChange={setField('taxWithhed')}
           label="Tax Income Withheld"
           size="medium"
           variant="outlined"
@@ -96,21 +87,31 @@ export default function Form1099INT({
           }}
         />
 
+        <TextField
+          value={f1099div.exemptInterestDiv}
+          onChange={setField('exemptInterestDiv')}
+          label="Exempt Interest Dividends"
+          size="medium"
+          variant="outlined"
+          InputProps={{
+            startAdornment:
+  <InputAdornment position="start">$</InputAdornment>,
+          }}
+        />
       </ListItem>
-
     </List>
   );
 }
 
-Form1099INT.propTypes = {
-  f1099int: PropTypes.shape({
+Form1099Div.propTypes = {
+  f1099div: PropTypes.shape({
     uuid: PropTypes.string,
     payer: PropTypes.string,
-    income: PropTypes.string,
-    savingsInterest: PropTypes.string,
-    taxExemptInterest: PropTypes.string,
+    ordinaryDividends: PropTypes.string,
+    qualifiedDividends: PropTypes.string,
     taxWithheld: PropTypes.string,
+    exemptInterestDiv: PropTypes.string,
   }).isRequired,
 
-  setF1099INT: PropTypes.func.isRequired,
+  setF1099Div: PropTypes.func.isRequired,
 };
