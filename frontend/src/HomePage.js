@@ -32,6 +32,7 @@ const useStyles = makeStyles(({
   heading: {
   },
   customizeToolbar: {
+    textTransform: 'uppercase',
     minHeight: 150,
     textAlign: 'right',
   },
@@ -150,9 +151,9 @@ export default function HomePage() {
             <Grid container alignItems="flex-start" justify="flex-end" direction="row">
               <Box mt={2}>
                 <Typography color="textSecondary" variant="h3" className={classes.customizeToolbar} inline>
-                  <b>TAXIMUS</b>
+                  <b>Taximus</b>
                   <br />
-                  <b>MAXIMUS</b>
+                  <b>Maximus</b>
                 </Typography>
               </Box>
             </Grid>

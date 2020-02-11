@@ -1,6 +1,10 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+
+import GoogleLogo from './images/GoogleLogo';
 import loginImg from './images/login.png';
+import config from './config';
 
 const useStyles = makeStyles((theme) => ({
   login: {
@@ -10,7 +14,6 @@ const useStyles = makeStyles((theme) => ({
     backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'top center',
-    display: 'flex',
   },
 
   container: {
@@ -34,8 +37,6 @@ const useStyles = makeStyles((theme) => ({
 
   loginButton: {
     marginTop: theme.spacing(2),
-    width: '20vw',
-    fontSize: '1vw',
   },
 }));
 
@@ -47,7 +48,17 @@ function LoginPage() {
       <div className={classes.container}>
         <h2 className={classes.subtitle}>The easiest way to do easy taxes.</h2>
         <h1 className={classes.title}>Taximus Maximus</h1>
-        <button type="button" className={classes.loginButton}>Sign in with Google</button>
+        <Button
+          className={classes.loginButton}
+          variant="contained"
+          size="large"
+          onClick={() => {
+            window.location = new URL('/auth/google', config.backendURL);
+          }}
+          startIcon={<GoogleLogo />}
+        >
+          Sign in with Google
+        </Button>
       </div>
     </div>
   );

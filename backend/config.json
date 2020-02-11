@@ -1,9 +1,11 @@
 {
   "backendURL": "http://localhost:8080/",
   "frontendURL": "http://localhost:3000/",
+  "cookieExpireMinutes": 15,
   "credentials": {
     "googleClientId": "793727643432-tod94uova6eff4ojqqmnpdc3kunsrj9g.apps.googleusercontent.com",
     "googleClientSecret": "GDH3uh2ounBBF7wMm51Y8vDd",
-    "cookieSecret": "Qyr4XSH8rECvHWc8qo19uQ"
+    "cookieSecret": "Qyr4XSH8rECvHWc8qo19uQ",
+    "cellEncryptionSecret": "igfW97eNZOA2AQoNnjCY0WZaHOgPRUOt+SwTA1bHQos="
   }
 }

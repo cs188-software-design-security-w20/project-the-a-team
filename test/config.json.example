@@ -1,0 +1,7 @@
+{
+    "backend_url_base": "http://localhost:8080",
+    "cookies": {
+        "session": "xxx",
+        "session.sig": "xxx"
+    }
+}
