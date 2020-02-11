@@ -54,8 +54,8 @@ export default function Form1099B({
           variant="outlined"
         />
         <TextField
-          value={f1099b.description}
-          onChange={setField('description')}
+          value={f1099b.desc}
+          onChange={setField('desc')}
           label="Description"
           size="medium"
           variant="outlined"
@@ -81,8 +81,8 @@ export default function Form1099B({
           <InputLabel>Long-Term Capital Gain/Loss</InputLabel>
           <Select
             label="Long-Term Capital Gain/Loss"
-            value={f1099b.longTerm}
-            onChange={setField('longTerm')}
+            value={f1099b.isLongTerm}
+            onChange={setField('isLongTerm')}
           >
             <MenuItem value>Yes</MenuItem>
             <MenuItem value={false}>No</MenuItem>
@@ -107,11 +107,11 @@ export default function Form1099B({
 Form1099B.propTypes = {
   f1099b: PropTypes.shape({
     uuid: PropTypes.string,
-    description: PropTypes.string,
-    proceeds: PropTypes.string,
-    basis: PropTypes.string,
-    longTerm: PropTypes.bool,
-    taxWithheld: PropTypes.string,
+    desc: PropTypes.string,
+    proceeds: PropTypes.number,
+    basis: PropTypes.number,
+    isLongTerm: PropTypes.bool,
+    taxWithheld: PropTypes.number,
   }).isRequired,
 
   setF1099B: PropTypes.func.isRequired,

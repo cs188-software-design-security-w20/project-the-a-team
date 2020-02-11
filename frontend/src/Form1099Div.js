@@ -53,8 +53,8 @@ export default function Form1099Div({
 
       <ListItem>
         <TextField
-          value={f1099div.ordinaryDividends}
-          onChange={setField('ordinaryDividends')}
+          value={f1099div.ordDividends}
+          onChange={setField('ordDividends')}
           label="Total Ordinary Dividends"
           size="medium"
           variant="outlined"
@@ -64,8 +64,8 @@ export default function Form1099Div({
           }}
         />
         <TextField
-          value={f1099div.qualifiedDividends}
-          onChange={setField('qualifiedDividends')}
+          value={f1099div.qualDividends}
+          onChange={setField('qualDividends')}
           label="Total Qualified Dividends"
           size="medium"
           variant="outlined"
@@ -107,10 +107,10 @@ Form1099Div.propTypes = {
   f1099div: PropTypes.shape({
     uuid: PropTypes.string,
     payer: PropTypes.string,
-    ordinaryDividends: PropTypes.string,
-    qualifiedDividends: PropTypes.string,
-    taxWithheld: PropTypes.string,
-    exemptInterestDiv: PropTypes.string,
+    ordDividends: PropTypes.number,
+    qualDividends: PropTypes.number,
+    taxWithheld: PropTypes.number,
+    exemptInterestDiv: PropTypes.number,
   }).isRequired,
 
   setF1099Div: PropTypes.func.isRequired,

@@ -106,10 +106,10 @@ Form1099INT.propTypes = {
   f1099int: PropTypes.shape({
     uuid: PropTypes.string,
     payer: PropTypes.string,
-    income: PropTypes.string,
-    savingsInterest: PropTypes.string,
-    taxExemptInterest: PropTypes.string,
-    taxWithheld: PropTypes.string,
+    income: PropTypes.number,
+    savingsInterest: PropTypes.number,
+    taxExemptInterest: PropTypes.number,
+    taxWithheld: PropTypes.number,
   }).isRequired,
 
   setF1099INT: PropTypes.func.isRequired,

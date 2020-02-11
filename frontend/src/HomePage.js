@@ -57,13 +57,14 @@ export default function HomePage() {
     lastName: '',
     ssn: '',
     filingStatus: '',
-    address: '',
+    addr1: '',
+    addr2: '',
+    addr3: '',
     spouseFirstName: '',
-    spouseMiddleName: '',
     spouseLastName: '',
     spouseSSN: '',
-    bankAcctNum: '',
-    bankRoutingNum: '',
+    bankAccount: '',
+    bankRouting: '',
     bankIsChecking: false,
   });
 
@@ -102,8 +103,8 @@ export default function HomePage() {
     setW2((orig) => [...orig, {
       uuid: '',
       employer: '',
-      income: '',
-      taxWithheld: '',
+      income: 0,
+      taxWithheld: 0,
     }]);
   };
 
@@ -111,22 +112,21 @@ export default function HomePage() {
     set1099INT((orig) => [...orig, {
       uuid: '',
       payer: '',
-      income: '',
-      savingsInterest: '',
-      taxExemptInterest: '',
-      taxWithheld: '',
-
+      income: 0,
+      usSavingTreasInterest: 0,
+      taxExemptInterest: 0,
+      taxWithheld: 0,
     }]);
   };
 
   const addNew1099B = () => {
     set1099B((orig) => [...orig, {
       uuid: '',
-      description: '',
-      proceeds: '',
-      basis: '',
-      longTerm: false,
-      taxWithheld: '',
+      desc: '',
+      proceeds: 0,
+      basis: 0,
+      isLongTerm: false,
+      taxWithheld: 0,
     }]);
   };
 
@@ -134,13 +134,12 @@ export default function HomePage() {
     set1099Div((orig) => [...orig, {
       uuid: '',
       payer: '',
-      ordinaryDividends: '',
-      qualifiedDividends: '',
-      taxWithheld: '',
-      exemptInterestDiv: '',
+      ordDividends: 0,
+      qualDividends: 0,
+      taxWithheld: 0,
+      exemptInterestDiv: 0,
     }]);
   };
-
 
   return (
     <Container>
