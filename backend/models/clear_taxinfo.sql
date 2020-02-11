@@ -1,0 +1,19 @@
+delete from "fw2s";
+delete from "f1099ints";
+delete from "f1099bs";
+delete from "f1099divs";
+delete from "dependents";
+update "taxinfos" set
+"lastName" = null,
+"firstName" = null,
+"middleName" = null,
+"ssn" = null,
+"spouseName" = null,
+"spouseSSN" = null,
+"addr1" = null,
+"addr2" = null,
+"addr3" = null,
+"bankAccount" = null,
+"bankRouting" = null,
+"bankIsChecking" = null;
+update "users" set "pdfResult" = null;
