@@ -132,7 +132,7 @@ export default function HomePage() {
                 <Typography color="textSecondary" variant="h3" className={classes.customizeToolbar} inline>
                   Taximus
                   <br />
-Maximus
+                  Maximus
                 </Typography>
               </Box>
             </Grid>
