@@ -1,7 +1,5 @@
 'use strict';
 
-require('./models/sync.js');
-
 const { URL } = require('url');
 const express = require('express');
 const cookieSession = require('cookie-session');
@@ -10,6 +8,7 @@ const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
 const config = require('./config.json');
+const syncAllTables = require('./models/sync.js');
 const query = require('./service/query.js');
 const authRouter = require('./routes/auth.js');
 const taxRouter = require('./routes/tax.js');
@@ -127,6 +126,12 @@ app.use((req, res) => {
   }
 });
 
-app.listen(8080, () => {
-  console.log('Listening on port 8080'); // eslint-disable-line no-console
-});
+const port = 8080;
+const mode = process.env.NODE_ENV === 'production' ? 'production' : 'development';
+
+(async () => {
+  await syncAllTables();
+  app.listen(port, () => {
+    console.log(`Listening on port ${port} in ${mode} mode`); // eslint-disable-line no-console
+  });
+})();

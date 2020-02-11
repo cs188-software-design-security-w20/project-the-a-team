@@ -9,8 +9,7 @@ require('./F1099b.js');
 require('./F1099div.js');
 require('./Dependents');
 
-// sync all tables
-(async () => {
+const syncAllTables = async () => {
   try {
     await sequelize.sync();
     console.log('Database synchronized'); // eslint-disable-line no-console
@@ -18,4 +17,6 @@ require('./Dependents');
     console.error('Failed to sync database'); // eslint-disable-line no-console
     throw err;
   }
-})();
+};
+
+module.exports = syncAllTables;
