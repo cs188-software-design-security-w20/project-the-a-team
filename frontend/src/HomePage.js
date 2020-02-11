@@ -49,6 +49,10 @@ const useStyles = makeStyles(({
   },
 }));
 
+function addColon(str) {
+  return str ? `: ${str}` : '';
+}
+
 export default function HomePage() {
   const classes = useStyles();
 
@@ -141,6 +145,53 @@ export default function HomePage() {
     }]);
   };
 
+  function setSubfield(setter, index) {
+    return (newObj) => {
+      setter((origArray) => {
+        const copy = [...origArray];
+        if (typeof newObj === 'function') {
+          newObj = newObj(copy[index]);
+        }
+        copy[index] = newObj;
+        return copy;
+      });
+    };
+  }
+
+  function formBlock(title, shortTitle, getComponent, array, addNew, summaryProp) {
+    return (
+      <>
+        <Box mr={1} mx="auto">
+          {array.map((obj, index) => (
+            <ExpansionPanel>
+              <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
+                <Typography variant="h4">
+                  {title + addColon(obj[summaryProp])}
+                </Typography>
+              </ExpansionPanelSummary>
+              <ExpansionPanelDetails>
+                {getComponent(obj, index)}
+              </ExpansionPanelDetails>
+            </ExpansionPanel>
+          ))}
+        </Box>
+        <Button
+          variant="contained"
+          style={{
+            backgroundColor: '#f6f930',
+
+            padding: '9px 18px',
+          }}
+          className={classes.button}
+          startIcon={<AddCircleIcon fontSize="large" />}
+          onClick={addNew}
+        >
+          <Typography variant="h4">{`Add ${shortTitle}`}</Typography>
+        </Button>
+      </>
+    );
+  }
+
   return (
     <Container>
       <div className={classes.root}>
@@ -160,11 +211,7 @@ export default function HomePage() {
         </AppBar>
 
         <ExpansionPanel>
-          <ExpansionPanelSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1a-content"
-            id="panel1a-header"
-          >
+          <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
             <Typography variant="h4">Personal and Family Information</Typography>
           </ExpansionPanelSummary>
           <ExpansionPanelDetails>
@@ -172,219 +219,58 @@ export default function HomePage() {
           </ExpansionPanelDetails>
         </ExpansionPanel>
 
-        {arrDependents.map((fdependent, index) => (
-          <ExpansionPanel>
-            <ExpansionPanelSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel2a-content"
-              id="panel2a-header"
-            >
-              <Typography variant="h4">
-                Dependent Information
-              </Typography>
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
-              <Dependent
-                fdependent={fdependent}
-                setFDependent={(newFDependent) => {
-                  setDependent((origArray) => {
-                    const copy = [...origArray];
-                    if (typeof newFDependent === 'function') {
-                      newFDependent = newFDependent(copy[index]);
-                    }
-                    copy[index] = newFDependent;
-                    return copy;
-                  });
-                }}
-              />
-            </ExpansionPanelDetails>
-          </ExpansionPanel>
-        ))}
-        <Button
-          variant="contained"
-          style={{
-            backgroundColor: '#f6f930',
-            padding: '9px 18px',
-          }}
-          className={classes.button}
-          startIcon={<AddCircleIcon fontSize="large" />}
-          onClick={() => addNewDependent()}
-        >
-          <Typography variant="h4">Add Dependent</Typography>
-        </Button>
+        {formBlock(
+          'Dependent Information',
+          'Dependent',
+          (dependent, index) => (
+            <Dependent dependent={dependent} setDependent={setSubfield(setDependent, index)} />
+          ),
+          arrDependents,
+          addNewDependent,
+          'firstName',
+        )}
 
-        <Box mr={1} mx="auto">
-          {arrW2.map((fw2, index) => (
-            <ExpansionPanel>
-              <ExpansionPanelSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel2a-content"
-                id="panel2a-header"
-              >
-                <Typography variant="h4">
-                  Form W-2 Income Information
-                </Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <FormW2
-                  fw2={fw2}
-                  setFw2={(newFw2) => {
-                    setW2((origArray) => {
-                      const copy = [...origArray];
-                      if (typeof newFw2 === 'function') {
-                        newFw2 = newFw2(copy[index]);
-                      }
-                      copy[index] = newFw2;
-                      return copy;
-                    });
-                  }}
-                />
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
-          ))}
-        </Box>
-        <Button
-          variant="contained"
-          style={{
-            backgroundColor: '#f6f930',
+        {formBlock(
+          'Form W-2 Income Information',
+          'Form W-2',
+          (fw2, index) => <FormW2 fw2={fw2} setFw2={setSubfield(setW2, index)} />,
+          arrW2,
+          addNewW2,
+          'employer',
+        )}
 
-            padding: '9px 18px',
-          }}
-          className={classes.button}
-          startIcon={<AddCircleIcon fontSize="large" />}
-          onClick={() => addNewW2()}
-        >
-          <Typography variant="h4">Add W-2 Section</Typography>
-        </Button>
+        {formBlock(
+          'Form 1099-INT Information',
+          'Form 1099-INT',
+          (f1099int, index) => (
+            <Form1099INT f1099int={f1099int} setF1099INT={setSubfield(set1099INT, index)} />
+          ),
+          arr1099INT,
+          addNew1099INT,
+          'payer',
+        )}
 
-        <Box mr={1} mx="auto">
-          {arr1099INT.map((f1099int, index) => (
-            <ExpansionPanel>
-              <ExpansionPanelSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel2a-content"
-                id="panel2a-header"
-              >
-                <Typography variant="h4">
-                  Form 1099INT Information
-                </Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <Form1099INT
-                  f1099int={f1099int}
-                  setF1099INT={(newF1099int) => {
-                    set1099INT((origArray) => {
-                      const copy = [...origArray];
-                      if (typeof newF1099int === 'function') {
-                        newF1099int = newF1099int(copy[index]);
-                      }
-                      copy[index] = newF1099int;
-                      return copy;
-                    });
-                  }}
-                />
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
-          ))}
-        </Box>
-        <Button
-          variant="contained"
-          style={{
-            backgroundColor: '#f6f930',
-            padding: '9px 18px',
-          }}
-          className={classes.button}
-          startIcon={<AddCircleIcon fontSize="large" />}
-          onClick={() => addNew1099INT()}
-        >
-          <Typography variant="h4">Add 1099INT Section</Typography>
-        </Button>
+        {formBlock(
+          'Form 1099-B Information',
+          'Form 1099-B',
+          (f1099b, index) => (
+            <Form1099B f1099b={f1099b} setF1099B={setSubfield(set1099B, index)} />
+          ),
+          arr1099B,
+          addNew1099B,
+          'description',
+        )}
 
-        <Box mr={1} mx="auto">
-          {arr1099B.map((f1099b, index) => (
-            <ExpansionPanel>
-              <ExpansionPanelSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel2a-content"
-                id="panel2a-header"
-              >
-                <Typography variant="h4">
-                  Form 1099B Information
-                </Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <Form1099B
-                  f1099b={f1099b}
-                  setF1099B={(newF1099b) => {
-                    set1099B((origArray) => {
-                      const copy = [...origArray];
-                      if (typeof newF1099b === 'function') {
-                        newF1099b = newF1099b(copy[index]);
-                      }
-                      copy[index] = newF1099b;
-                      return copy;
-                    });
-                  }}
-                />
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
-          ))}
-        </Box>
-        <Button
-          variant="contained"
-          style={{
-            backgroundColor: '#f6f930',
-            padding: '9px 18px',
-          }}
-          className={classes.button}
-          startIcon={<AddCircleIcon fontSize="large" />}
-          onClick={() => addNew1099B()}
-        >
-          <Typography variant="h4">Add 1099-B Section</Typography>
-        </Button>
-
-        <Box mr={1} mx="auto">
-          {arr1099Div.map((f1099div, index) => (
-            <ExpansionPanel>
-              <ExpansionPanelSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel2a-content"
-                id="panel2a-header"
-              >
-                <Typography variant="h4">
-                  Form 1099Div Information
-                </Typography>
-              </ExpansionPanelSummary>
-              <ExpansionPanelDetails>
-                <Form1099Div
-                  f1099div={f1099div}
-                  setF1099Div={(newF1099Div) => {
-                    set1099Div((origArray) => {
-                      const copy = [...origArray];
-                      if (typeof newF1099Div === 'function') {
-                        newF1099Div = newF1099Div(copy[index]);
-                      }
-                      copy[index] = newF1099Div;
-                      return copy;
-                    });
-                  }}
-                />
-              </ExpansionPanelDetails>
-            </ExpansionPanel>
-          ))}
-        </Box>
-        <Button
-          variant="contained"
-          style={{
-            backgroundColor: '#f6f930',
-            padding: '9px 18px',
-          }}
-          className={classes.button}
-          startIcon={<AddCircleIcon fontSize="large" />}
-          onClick={() => addNew1099Div()}
-        >
-          <Typography variant="h4">Add 1099Div Section</Typography>
-        </Button>
+        {formBlock(
+          'Form 1099-DIV Information',
+          'Form 1099-DIV',
+          (f1099div, index) => (
+            <Form1099Div f1099div={f1099div} setF1099Div={setSubfield(set1099Div, index)} />
+          ),
+          arr1099Div,
+          addNew1099Div,
+          'payer',
+        )}
 
         <div className={classes.unaffected}>
           <Box mt={2}>

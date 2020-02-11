@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Dependent({
-  fdependent,
+  dependent,
   setDependent,
 }) {
   const classes = useStyles();
@@ -40,10 +40,9 @@ export default function Dependent({
 
       <ListItem>
         <TextField
-          value={fdependent.name}
+          value={dependent.name}
           onChange={setField('name')}
           label="Full Name"
-          size="medium"
           variant="outlined"
           fullWidth
         />
@@ -51,7 +50,7 @@ export default function Dependent({
 
       <ListItem>
         <TextField
-          value={fdependent.ssn}
+          value={dependent.ssn}
           onChange={setField('ssn')}
           label="Social Security Number"
           size="medium"
@@ -64,7 +63,7 @@ export default function Dependent({
           <InputLabel>Dependent Relation</InputLabel>
           <Select
             label="Dependent Relation"
-            value={fdependent.relation}
+            value={dependent.relation}
             onChange={setField('relation')}
           >
             <MenuItem value="child">
@@ -91,7 +90,7 @@ export default function Dependent({
           <InputLabel>Child Tax Credit</InputLabel>
           <Select
             label="Child Tax Credit"
-            value={fdependent.childCredit}
+            value={dependent.childCredit}
             onChange={setField('childCredit')}
           >
             <MenuItem value>Yes</MenuItem>
@@ -105,7 +104,7 @@ export default function Dependent({
 }
 
 Dependent.propTypes = {
-  fdependent: PropTypes.shape({
+  dependent: PropTypes.shape({
     name: PropTypes.string,
     ssn: PropTypes.string,
     relation: PropTypes.string,
