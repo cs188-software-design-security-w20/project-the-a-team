@@ -1,4 +1,5 @@
 import React from 'react';
+import uuidv4 from 'uuid/v4';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
@@ -90,18 +91,17 @@ export default function HomePage() {
 
   const addNewDependent = () => {
     setDependent((orig) => [...orig, {
-      firstName: '',
-      middleName: '',
-      lastName: '',
+      uuid: uuidv4(),
+      name: '',
       ssn: '',
       relation: '',
-      childTaxCredit: false,
+      childCredit: false,
     }]);
   };
 
   const addNewW2 = () => {
     setW2((orig) => [...orig, {
-      uuid: '',
+      uuid: uuidv4(),
       employer: '',
       income: 0,
       taxWithheld: 0,
@@ -110,7 +110,7 @@ export default function HomePage() {
 
   const addNew1099INT = () => {
     set1099INT((orig) => [...orig, {
-      uuid: '',
+      uuid: uuidv4(),
       payer: '',
       income: 0,
       usSavingTreasInterest: 0,
@@ -121,7 +121,7 @@ export default function HomePage() {
 
   const addNew1099B = () => {
     set1099B((orig) => [...orig, {
-      uuid: '',
+      uuid: uuidv4(),
       desc: '',
       proceeds: 0,
       basis: 0,
@@ -132,7 +132,7 @@ export default function HomePage() {
 
   const addNew1099Div = () => {
     set1099Div((orig) => [...orig, {
-      uuid: '',
+      uuid: uuidv4(),
       payer: '',
       ordDividends: 0,
       qualDividends: 0,

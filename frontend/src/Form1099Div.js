@@ -36,13 +36,6 @@ export default function Form1099Div({
     <List className={classes.root}>
       <ListItem>
         <TextField
-          value={f1099div.uuid}
-          onChange={setField('uuid')}
-          label="UUID"
-          size="medium"
-          variant="outlined"
-        />
-        <TextField
           value={f1099div.payer}
           onChange={setField('payer')}
           label="Payer"
@@ -105,7 +98,6 @@ export default function Form1099Div({
 
 Form1099Div.propTypes = {
   f1099div: PropTypes.shape({
-    uuid: PropTypes.string,
     payer: PropTypes.string,
     ordDividends: PropTypes.number,
     qualDividends: PropTypes.number,
