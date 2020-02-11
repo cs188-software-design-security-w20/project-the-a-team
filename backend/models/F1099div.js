@@ -12,6 +12,7 @@ F1099div.init({
   ordDividends: Sequelize.DataTypes.BIGINT,
   qualDividends: Sequelize.DataTypes.BIGINT,
   taxWithheld: Sequelize.DataTypes.BIGINT,
+  exemptInterestDiv: Sequelize.DataTypes.BIGINT,
 }, {
   sequelize,
   modelName: 'f1099div',
