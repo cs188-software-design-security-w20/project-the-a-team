@@ -90,6 +90,7 @@ const checkLogin = (req, res, next) => {
   }
 };
 
+// TODO: remove these debug endpoints or set to development only
 app.get('/', (req, res) => {
   res.set('Content-Type', 'text/html');
   if (req.user) {
