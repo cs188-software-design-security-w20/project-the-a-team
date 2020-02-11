@@ -5,7 +5,6 @@ import {
 import Backdrop from '@material-ui/core/Backdrop';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import yellow from '@material-ui/core/colors/yellow';
 
 import config from './config';
 import LoginPage from './LoginPage';
@@ -13,8 +12,12 @@ import HomePage from './HomePage';
 
 const theme = responsiveFontSizes(createMuiTheme({
   palette: {
-    primary: yellow,
-    secondary: yellow,
+    primary: {
+      main: '#f6f930',
+    },
+    secondary: {
+      main: '#f6f930',
+    },
   },
 }));
 
