@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function Dependent({
-  fdependent,
+  dependent,
   setDependent,
 }) {
   const classes = useStyles();
@@ -40,28 +40,28 @@ export default function Dependent({
 
       <ListItem>
         <TextField
-          value={fdependent.firstName}
+          value={dependent.firstName}
           onChange={setField('firstName')}
           label="First Name"
           size="medium"
           variant="outlined"
         />
         <TextField
-          value={fdependent.middleName}
+          value={dependent.middleName}
           onChange={setField('middleName')}
           label="Middle Name"
           size="medium"
           variant="outlined"
         />
         <TextField
-          value={fdependent.lastName}
+          value={dependent.lastName}
           onChange={setField('lastMame')}
           label="Last Name"
           size="medium"
           variant="outlined"
         />
         <TextField
-          value={fdependent.ssn}
+          value={dependent.ssn}
           onChange={setField('ssm')}
           label="Social Security Number"
           size="medium"
@@ -77,7 +77,7 @@ export default function Dependent({
           <InputLabel>Dependent Relation</InputLabel>
           <Select
             label="Dependent Relation"
-            value={fdependent.relation}
+            value={dependent.relation}
             onChange={setField('relation')}
           >
             <MenuItem value="child">
@@ -104,7 +104,7 @@ export default function Dependent({
           <InputLabel>Child Tax Credit</InputLabel>
           <Select
             label="Child Tax Credit"
-            value={fdependent.childTaxCredit}
+            value={dependent.childTaxCredit}
             onChange={setField('childTaxCredit')}
           >
             <MenuItem value>Yes</MenuItem>
@@ -118,7 +118,7 @@ export default function Dependent({
 }
 
 Dependent.propTypes = {
-  fdependent: PropTypes.shape({
+  dependent: PropTypes.shape({
     firstName: PropTypes.string,
     middleName: PropTypes.string,
     lastName: PropTypes.string,
