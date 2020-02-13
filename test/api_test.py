@@ -1,10 +1,14 @@
 import base64
+import copy
 import json
+import math
 import os
 import pathlib
-import secrets
+import random
+import string
 import sys
 import unittest
+import uuid
 
 import requests
 
@@ -15,12 +19,18 @@ backend_url_base = config['backend_url_base']
 cookies = config['cookies']
 
 BROWSER_ACCEPT = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
+MAX_MONEY = 90071992547409.9
+MAX_STRING = 255
+
+
+rnd = random.SystemRandom()
 
 
 def transform_taxinfo_output(taxinfo):
+    result = copy.deepcopy(taxinfo)
     for form_name in ['fw2', 'f1099int', 'f1099b', 'f1099div', 'dependents']:
-        taxinfo[form_name] = {form['uuid']: form for form in taxinfo[form_name]}
-    return taxinfo
+        result[form_name] = {form['uuid']: form for form in taxinfo[form_name]}
+    return result
 
 
 def is_deep_subset(haystack, needle):
@@ -30,14 +40,178 @@ def is_deep_subset(haystack, needle):
         if isinstance(value, dict):
             if not is_deep_subset(haystack[key], value):
                 return False
+        elif isinstance(haystack[key], float) and isinstance(value, float):
+            if not math.isclose(haystack[key], value):
+                return False
         elif haystack[key] != value:
             return False
     return True
 
 
+def uuid_lower(taxinfo):
+    result = copy.deepcopy(taxinfo)
+    for form_name in ['fw2', 'f1099int', 'f1099b', 'f1099div', 'dependents']:
+        result[form_name] = {key.lower(): value for key, value in taxinfo.get(form_name, {}).items()}
+    return result
+
+
+def random_string(length=32):
+    return ''.join(rnd.choice(string.printable) for _ in range(length))
+
+
+def random_digits(length):
+    return ''.join(rnd.choice(string.digits) for _ in range(length))
+
+
+def random_money(scale=MAX_MONEY):
+    return round(rnd.uniform(-scale, scale), 2)
+
+
 class TestTaximus(unittest.TestCase):
     @classmethod
-    def setUpClass(self):
+    def boolean_success_cases(cls):
+        yield from [True, False, None]
+
+    @classmethod
+    def boolean_fail_cases(cls):
+        yield from [
+            (1, 'should be boolean'),
+            (1.1, 'should be boolean'),
+            ('', 'should be boolean'),
+            ([], 'should be boolean'),
+            ({}, 'should be boolean'),
+        ]
+
+    @classmethod
+    def money_success_cases(cls):
+        yield random_money()
+        yield random_money(10e9)
+        yield random_money(10e7)
+        yield random_money(10e5)
+        yield random_money(10e3)
+        yield int(random_money())
+        yield int(random_money(10e9))
+        yield int(random_money(10e7))
+        yield int(random_money(10e5))
+        yield int(random_money(10e3))
+        yield -MAX_MONEY
+        yield MAX_MONEY
+        yield None
+
+    @classmethod
+    def money_fail_cases(cls):
+        yield from [
+            (False, 'should be a number'),
+            ('', 'should be a number'),
+            ([], 'should be a number'),
+            ({}, 'should be a number'),
+            (MAX_MONEY + 0.02, 'out of range'),
+            (-MAX_MONEY - 0.02, 'out of range'),
+        ]
+
+    @classmethod
+    def string_success_cases(cls):
+        yield from ['', '\'"', 'A' * MAX_STRING, None]
+        yield random_string()
+
+    @classmethod
+    def string_fail_cases(cls):
+        yield from [
+            (False, 'should be string'),
+            (1, 'should be string'),
+            (1.1, 'should be string'),
+            ([], 'should be string'),
+            ({}, 'should be string'),
+            ('A' * (MAX_STRING + 1), 'is too long'),
+        ]
+
+    @classmethod
+    def object_fail_cases(cls):
+        yield from [
+            (None, 'should be an object'),
+            (False, 'should be an object'),
+            (1, 'should be an object'),
+            (1.1, 'should be an object'),
+            ('', 'should be an object'),
+            ([], 'should be an object'),
+        ]
+
+    @classmethod
+    def object_value_fail_cases(cls):
+        yield from [
+            (False, 'should be an object or null'),
+            (1, 'should be an object or null'),
+            (1.1, 'should be an object or null'),
+            ('', 'should be an object or null'),
+            ([], 'should be an object or null'),
+        ]
+
+    @classmethod
+    def uuid_success_cases(cls):
+        yield str(uuid.uuid4())
+        yield str(uuid.uuid4()).upper()
+
+    @classmethod
+    def uuid_fail_cases(cls):
+        yield from [
+            ('', 'is not valid UUID'),
+            ('xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx', 'is not valid UUID'),
+        ]
+
+    @classmethod
+    def ssn_success_cases(cls):
+        yield from ['', None]
+        yield random_digits(9)
+
+    @classmethod
+    def ssn_fail_cases(cls):
+        yield from [
+            (False, 'should be string'),
+            (1, 'should be string'),
+            (1.1, 'should be string'),
+            ([], 'should be string'),
+            ({}, 'should be string'),
+            ('nopenopex', 'should be 9 digits'),
+        ]
+
+    @classmethod
+    def bank_account_success_cases(cls):
+        yield from ['', None]
+        yield random_digits(9)
+        yield random_digits(17)
+
+    @classmethod
+    def bank_account_fail_cases(cls):
+        yield from [
+            (False, 'should be string'),
+            (1, 'should be string'),
+            (1.1, 'should be string'),
+            ([], 'should be string'),
+            ({}, 'should be string'),
+            ('nope', 'should only contain digits'),
+            (random_digits(18), 'is too long'),
+        ]
+
+    @classmethod
+    def bank_routing_success_cases(cls):
+        yield from ['', None]
+        yield random_digits(8)
+        yield random_digits(9)
+
+    @classmethod
+    def bank_routing_fail_cases(cls):
+        yield from [
+            (False, 'should be string'),
+            (1, 'should be string'),
+            (1.1, 'should be string'),
+            ([], 'should be string'),
+            ({}, 'should be string'),
+            ('nope', 'should only contain digits'),
+            (random_digits(10), 'is too long'),
+        ]
+
+    @classmethod
+    def setUpClass(cls):
         r = requests.get(backend_url_base + '/auth', cookies=cookies)
         if not r.json():
             raise RuntimeError('Authentication failed, check your cookies')
@@ -60,17 +234,245 @@ class TestTaximus(unittest.TestCase):
         self.assertEqual(r.status_code, 302)
         self.assertEqual(json.loads(base64.b64decode(r.cookies['session']).decode('ascii'))['passport'], {})
 
-    def test_GET_POST_tax(self):
-        # TODO: add more test cases
-        success_cases = [
-            {'lastName': ''},
-            {'lastName': None},
-            {'fw2': {'11111111-1111-1111-1111-111111111111': {'income': 12.34}}},
-        ]
+    def test_POST_tax(self):
+        success_cases = []
 
-        fail_cases = [
-            ({'lastName': 'A' * 256}, 'Last name is too long'),
-        ]
+        for sc in self.string_success_cases():
+            success_cases.append({'lastName': sc})
+        for sc in self.string_success_cases():
+            success_cases.append({'firstName': sc})
+        for sc in self.string_success_cases():
+            success_cases.append({'middleName': sc})
+        for sc in self.ssn_success_cases():
+            success_cases.append({'ssn': sc})
+        for sc in self.string_success_cases():
+            success_cases.append({'spouseName': sc})
+        for sc in self.ssn_success_cases():
+            success_cases.append({'spouseSSN': sc})
+        for sc in self.string_success_cases():
+            success_cases.append({'addr1': sc})
+        for sc in self.string_success_cases():
+            success_cases.append({'addr2': sc})
+        for sc in self.string_success_cases():
+            success_cases.append({'addr3': sc})
+        for sc in self.bank_account_success_cases():
+            success_cases.append({'bankAccount': sc})
+        for sc in self.bank_routing_success_cases():
+            success_cases.append({'bankRouting': sc})
+        for sc in self.boolean_success_cases():
+            success_cases.append({'bankIsChecking': sc})
+        for sc in self.uuid_success_cases():
+            success_cases.append({'fw2': {sc: {}}})
+        for sc in self.uuid_success_cases():
+            success_cases.append({'f1099int': {sc: {}}})
+        for sc in self.uuid_success_cases():
+            success_cases.append({'f1099b': {sc: {}}})
+        for sc in self.uuid_success_cases():
+            success_cases.append({'f1099div': {sc: {}}})
+        for sc in self.uuid_success_cases():
+            success_cases.append({'dependents': {sc: {}}})
+        for sc in self.string_success_cases():
+            success_cases.append({'fw2': {str(uuid.uuid4()): {'employer': sc}}})
+        for sc in self.money_success_cases():
+            success_cases.append({'fw2': {str(uuid.uuid4()): {'income': sc}}})
+        for sc in self.money_success_cases():
+            success_cases.append({'fw2': {str(uuid.uuid4()): {'taxWithheld': sc}}})
+        for sc in self.string_success_cases():
+            success_cases.append({'f1099int': {str(uuid.uuid4()): {'payer': sc}}})
+        for sc in self.money_success_cases():
+            success_cases.append({'f1099int': {str(uuid.uuid4()): {'income': sc}}})
+        for sc in self.money_success_cases():
+            success_cases.append({'f1099int': {str(uuid.uuid4()): {'usSavingTreasInterest': sc}}})
+        for sc in self.money_success_cases():
+            success_cases.append({'f1099int': {str(uuid.uuid4()): {'taxWithheld': sc}}})
+        for sc in self.money_success_cases():
+            success_cases.append({'f1099int': {str(uuid.uuid4()): {'taxExemptInterest': sc}}})
+        for sc in self.string_success_cases():
+            success_cases.append({'f1099b': {str(uuid.uuid4()): {'desc': sc}}})
+        for sc in self.money_success_cases():
+            success_cases.append({'f1099b': {str(uuid.uuid4()): {'proceeds': sc}}})
+        for sc in self.money_success_cases():
+            success_cases.append({'f1099b': {str(uuid.uuid4()): {'basis': sc}}})
+        for sc in self.boolean_success_cases():
+            success_cases.append({'f1099b': {str(uuid.uuid4()): {'isLongTerm': sc}}})
+        for sc in self.money_success_cases():
+            success_cases.append({'f1099b': {str(uuid.uuid4()): {'taxWithheld': sc}}})
+        for sc in self.string_success_cases():
+            success_cases.append({'f1099div': {str(uuid.uuid4()): {'payer': sc}}})
+        for sc in self.money_success_cases():
+            success_cases.append({'f1099div': {str(uuid.uuid4()): {'ordDividends': sc}}})
+        for sc in self.money_success_cases():
+            success_cases.append({'f1099div': {str(uuid.uuid4()): {'qualDividends': sc}}})
+        for sc in self.money_success_cases():
+            success_cases.append({'f1099div': {str(uuid.uuid4()): {'taxWithheld': sc}}})
+        for sc in self.money_success_cases():
+            success_cases.append({'f1099div': {str(uuid.uuid4()): {'exemptInterestDiv': sc}}})
+        for sc in self.string_success_cases():
+            success_cases.append({'dependents': {str(uuid.uuid4()): {'name': sc}}})
+        for sc in self.ssn_success_cases():
+            success_cases.append({'dependents': {str(uuid.uuid4()): {'ssn': sc}}})
+        for sc in self.string_success_cases():
+            success_cases.append({'dependents': {str(uuid.uuid4()): {'relation': sc}}})
+        for sc in self.boolean_success_cases():
+            success_cases.append({'dependents': {str(uuid.uuid4()): {'childCredit': sc}}})
+
+        rand_uuid1 = str(uuid.uuid4())
+        rand_uuid2 = str(uuid.uuid4())
+        success_cases.append({
+            "lastName": random_string(),
+            "firstName": random_string(),
+            "middleName": random_string(),
+            "ssn": random_digits(9),
+            "spouseName": random_string(),
+            "addr1": random_string(),
+            "addr2": None,
+            "addr3": random_string(),
+            "bankAccount": random_digits(9),
+            "bankRouting": random_digits(9),
+            "bankIsChecking": None,
+            "fw2": {
+                rand_uuid1: {
+                    "employer": random_string(),
+                    "income": None,
+                    "taxWithheld": random_money()
+                }
+            },
+            "f1099int": {
+                rand_uuid2: {
+                    "payer": None,
+                    "usSavingTreasInterest": random_money(10e9),
+                    "taxWithheld": random_money(10e7),
+                    "taxExemptInterest": None
+                }
+            },
+            "f1099b": {
+                rand_uuid1: {
+                    "desc": random_string(),
+                    "proceeds": None,
+                    "basis": random_money(),
+                    "isLongTerm": True,
+                    "taxWithheld": random_money()
+                }
+            },
+            "f1099div": {
+                rand_uuid2.upper(): {
+                    "payer": "",
+                    "ordDividends": random_money(),
+                    "qualDividends": random_money(10e5),
+                    "taxWithheld": random_money(),
+                    "exemptInterestDiv": random_money(10e3)
+                }
+            },
+            "dependents": {
+                rand_uuid1.upper(): {
+                    "name": random_string(),
+                    "ssn": None,
+                    "relation": "",
+                    "childCredit": False
+                }
+            }
+        })
+
+        fail_cases = []
+
+        for fc in self.string_fail_cases():
+            fail_cases.append(({'lastName': fc[0]}, 'Last name {}'.format(fc[1])))
+        for fc in self.string_fail_cases():
+            fail_cases.append(({'firstName': fc[0]}, 'First name {}'.format(fc[1])))
+        for fc in self.string_fail_cases():
+            fail_cases.append(({'middleName': fc[0]}, 'Middle name {}'.format(fc[1])))
+        for fc in self.ssn_fail_cases():
+            fail_cases.append(({'ssn': fc[0]}, 'SSN {}'.format(fc[1])))
+        for fc in self.string_fail_cases():
+            fail_cases.append(({'spouseName': fc[0]}, 'Spouse name {}'.format(fc[1])))
+        for fc in self.ssn_fail_cases():
+            fail_cases.append(({'spouseSSN': fc[0]}, 'Spouse SSN {}'.format(fc[1])))
+        for fc in self.string_fail_cases():
+            fail_cases.append(({'addr1': fc[0]}, 'Address 1 {}'.format(fc[1])))
+        for fc in self.string_fail_cases():
+            fail_cases.append(({'addr2': fc[0]}, 'Address 2 {}'.format(fc[1])))
+        for fc in self.string_fail_cases():
+            fail_cases.append(({'addr3': fc[0]}, 'Address 3 {}'.format(fc[1])))
+        for fc in self.bank_account_fail_cases():
+            fail_cases.append(({'bankAccount': fc[0]}, 'Bank account {}'.format(fc[1])))
+        for fc in self.bank_routing_fail_cases():
+            fail_cases.append(({'bankRouting': fc[0]}, 'Bank routing {}'.format(fc[1])))
+        for fc in self.boolean_fail_cases():
+            fail_cases.append(({'bankIsChecking': fc[0]}, 'Bank is checking {}'.format(fc[1])))
+        for fc in self.object_fail_cases():
+            fail_cases.append(({'fw2': fc[0]}, 'Fw2 {}'.format(fc[1])))
+        for fc in self.object_fail_cases():
+            fail_cases.append(({'f1099int': fc[0]}, 'F1099int {}'.format(fc[1])))
+        for fc in self.object_fail_cases():
+            fail_cases.append(({'f1099b': fc[0]}, 'F1099b {}'.format(fc[1])))
+        for fc in self.object_fail_cases():
+            fail_cases.append(({'f1099div': fc[0]}, 'F1099div {}'.format(fc[1])))
+        for fc in self.object_fail_cases():
+            fail_cases.append(({'dependents': fc[0]}, 'Dependents {}'.format(fc[1])))
+        for fc in self.uuid_fail_cases():
+            fail_cases.append(({'fw2': {fc[0]: {}}}, 'Fw2 key {}'.format(fc[1])))
+        for fc in self.uuid_fail_cases():
+            fail_cases.append(({'f1099int': {fc[0]: {}}}, 'F1099int key {}'.format(fc[1])))
+        for fc in self.uuid_fail_cases():
+            fail_cases.append(({'f1099b': {fc[0]: {}}}, 'F1099b key {}'.format(fc[1])))
+        for fc in self.uuid_fail_cases():
+            fail_cases.append(({'f1099div': {fc[0]: {}}}, 'F1099div key {}'.format(fc[1])))
+        for fc in self.uuid_fail_cases():
+            fail_cases.append(({'dependents': {fc[0]: {}}}, 'Dependents key {}'.format(fc[1])))
+        for fc in self.object_value_fail_cases():
+            fail_cases.append(({'fw2': {str(uuid.uuid4()): fc[0]}}, 'Fw2 value {}'.format(fc[1])))
+        for fc in self.object_value_fail_cases():
+            fail_cases.append(({'f1099int': {str(uuid.uuid4()): fc[0]}}, 'F1099int value {}'.format(fc[1])))
+        for fc in self.object_value_fail_cases():
+            fail_cases.append(({'f1099b': {str(uuid.uuid4()): fc[0]}}, 'F1099b value {}'.format(fc[1])))
+        for fc in self.object_value_fail_cases():
+            fail_cases.append(({'f1099div': {str(uuid.uuid4()): fc[0]}}, 'F1099div value {}'.format(fc[1])))
+        for fc in self.object_value_fail_cases():
+            fail_cases.append(({'dependents': {str(uuid.uuid4()): fc[0]}}, 'Dependents value {}'.format(fc[1])))
+        for fc in self.string_fail_cases():
+            fail_cases.append(({'fw2': {str(uuid.uuid4()): {'employer': fc[0]}}}, 'Fw2 employer {}'.format(fc[1])))
+        for fc in self.money_fail_cases():
+            fail_cases.append(({'fw2': {str(uuid.uuid4()): {'income': fc[0]}}}, 'Fw2 income {}'.format(fc[1])))
+        for fc in self.money_fail_cases():
+            fail_cases.append(({'fw2': {str(uuid.uuid4()): {'taxWithheld': fc[0]}}}, 'Fw2 tax withheld {}'.format(fc[1])))
+        for fc in self.string_fail_cases():
+            fail_cases.append(({'f1099int': {str(uuid.uuid4()): {'payer': fc[0]}}}, 'F1099int payer {}'.format(fc[1])))
+        for fc in self.money_fail_cases():
+            fail_cases.append(({'f1099int': {str(uuid.uuid4()): {'income': fc[0]}}}, 'F1099int income {}'.format(fc[1])))
+        for fc in self.money_fail_cases():
+            fail_cases.append(({'f1099int': {str(uuid.uuid4()): {'usSavingTreasInterest': fc[0]}}}, 'F1099int Interest on U.S. Savings Bonds and Treas. obligations {}'.format(fc[1])))
+        for fc in self.money_fail_cases():
+            fail_cases.append(({'f1099int': {str(uuid.uuid4()): {'taxWithheld': fc[0]}}}, 'F1099int tax withheld {}'.format(fc[1])))
+        for fc in self.money_fail_cases():
+            fail_cases.append(({'f1099int': {str(uuid.uuid4()): {'taxExemptInterest': fc[0]}}}, 'F1099int tax-exempt interest {}'.format(fc[1])))
+        for fc in self.string_fail_cases():
+            fail_cases.append(({'f1099b': {str(uuid.uuid4()): {'desc': fc[0]}}}, 'F1099b desc {}'.format(fc[1])))
+        for fc in self.money_fail_cases():
+            fail_cases.append(({'f1099b': {str(uuid.uuid4()): {'proceeds': fc[0]}}}, 'F1099b proceeds {}'.format(fc[1])))
+        for fc in self.money_fail_cases():
+            fail_cases.append(({'f1099b': {str(uuid.uuid4()): {'basis': fc[0]}}}, 'F1099b basis {}'.format(fc[1])))
+        for fc in self.boolean_fail_cases():
+            fail_cases.append(({'f1099b': {str(uuid.uuid4()): {'isLongTerm': fc[0]}}}, 'F1099b is long term {}'.format(fc[1])))
+        for fc in self.money_fail_cases():
+            fail_cases.append(({'f1099b': {str(uuid.uuid4()): {'taxWithheld': fc[0]}}}, 'F1099b tax withheld {}'.format(fc[1])))
+        for fc in self.string_fail_cases():
+            fail_cases.append(({'f1099div': {str(uuid.uuid4()): {'payer': fc[0]}}}, 'F1099div payer {}'.format(fc[1])))
+        for fc in self.money_fail_cases():
+            fail_cases.append(({'f1099div': {str(uuid.uuid4()): {'ordDividends': fc[0]}}}, 'F1099div ord dividends {}'.format(fc[1])))
+        for fc in self.money_fail_cases():
+            fail_cases.append(({'f1099div': {str(uuid.uuid4()): {'qualDividends': fc[0]}}}, 'F1099div qual dividends {}'.format(fc[1])))
+        for fc in self.money_fail_cases():
+            fail_cases.append(({'f1099div': {str(uuid.uuid4()): {'taxWithheld': fc[0]}}}, 'F1099div tax withheld {}'.format(fc[1])))
+        for fc in self.money_fail_cases():
+            fail_cases.append(({'f1099div': {str(uuid.uuid4()): {'exemptInterestDiv': fc[0]}}}, 'F1099div exempt interest div {}'.format(fc[1])))
+        for fc in self.string_fail_cases():
+            fail_cases.append(({'dependents': {str(uuid.uuid4()): {'name': fc[0]}}}, 'Dependents name {}'.format(fc[1])))
+        for fc in self.ssn_fail_cases():
+            fail_cases.append(({'dependents': {str(uuid.uuid4()): {'ssn': fc[0]}}}, 'Dependents SSN {}'.format(fc[1])))
+        for fc in self.string_fail_cases():
+            fail_cases.append(({'dependents': {str(uuid.uuid4()): {'relation': fc[0]}}}, 'Dependents relation {}'.format(fc[1])))
+        for fc in self.boolean_fail_cases():
+            fail_cases.append(({'dependents': {str(uuid.uuid4()): {'childCredit': fc[0]}}}, 'Dependents child credit {}'.format(fc[1])))
 
         for test_case in success_cases:
             with self.subTest(test_case=test_case):
@@ -78,7 +480,9 @@ class TestTaximus(unittest.TestCase):
                 self.assertEqual(r.status_code, 204)
                 r = requests.get(backend_url_base + '/tax', cookies=cookies)
                 self.assertEqual(r.status_code, 200)
-                self.assertTrue(is_deep_subset(transform_taxinfo_output(r.json()), test_case))
+                result = transform_taxinfo_output(r.json())
+                expected = uuid_lower(test_case)
+                self.assertTrue(is_deep_subset(result, expected))
 
         for test_case in fail_cases:
             data, message = test_case
@@ -87,22 +491,66 @@ class TestTaximus(unittest.TestCase):
                 self.assertEqual(r.status_code, 400)
                 self.assertEqual(r.json()['message'], message)
 
-    def test_GET_POST_tax_ignore_invalid_keys(self):
-        r = requests.get(backend_url_base + '/tax', cookies=cookies)
-        self.assertEqual(r.status_code, 200)
-        ret1 = r.json()
-        r = requests.post(backend_url_base + '/tax', cookies=cookies, json={'foo': 'bar'})
+        with self.subTest(test_case='ignore_invalid_keys'):
+            r = requests.get(backend_url_base + '/tax', cookies=cookies)
+            self.assertEqual(r.status_code, 200)
+            ret1 = r.json()
+            r = requests.post(backend_url_base + '/tax', cookies=cookies, json={'foo': 'bar'})
+            self.assertEqual(r.status_code, 204)
+            r = requests.get(backend_url_base + '/tax', cookies=cookies)
+            self.assertEqual(r.status_code, 200)
+            ret2 = r.json()
+            self.assertEqual(ret1, ret2)
+            rand_string = random_string()
+            r = requests.post(backend_url_base + '/tax', cookies=cookies, json={'foo': 'bar', 'lastName': rand_string})
+            self.assertEqual(r.status_code, 204)
+            r = requests.get(backend_url_base + '/tax', cookies=cookies)
+            self.assertEqual(r.status_code, 200)
+            self.assertEqual(r.json()['lastName'], rand_string)
+
+        with self.subTest(test_case='undefined_does_not_change_value'):
+            rand_string1 = random_string()
+            r = requests.post(backend_url_base + '/tax', cookies=cookies, json={'addr1': rand_string1})
+            self.assertEqual(r.status_code, 204)
+            r = requests.get(backend_url_base + '/tax', cookies=cookies)
+            self.assertEqual(r.status_code, 200)
+            ret1 = r.json()
+            rand_string2 = random_string()
+            r = requests.post(backend_url_base + '/tax', cookies=cookies, json={'addr2': rand_string2})
+            self.assertEqual(r.status_code, 204)
+            r = requests.get(backend_url_base + '/tax', cookies=cookies)
+            self.assertEqual(r.status_code, 200)
+            ret2 = r.json()
+            self.assertEqual(ret1['addr1'], rand_string1)
+            self.assertEqual(ret1['addr1'], ret2['addr1'])
+            self.assertEqual(ret2['addr2'], rand_string2)
+
+        with self.subTest(test_case='null_subitem_deletion'):
+            for form_name in ['fw2', 'f1099int', 'f1099b', 'f1099div', 'dependents']:
+                rand_uuid = str(uuid.uuid4())
+                r = requests.post(backend_url_base + '/tax', cookies=cookies, json={form_name: {rand_uuid: {}}})
+                self.assertEqual(r.status_code, 204)
+                r = requests.get(backend_url_base + '/tax', cookies=cookies)
+                self.assertEqual(r.status_code, 200)
+                self.assertEqual(sum(item['uuid'] == rand_uuid for item in r.json()[form_name]), 1)
+                r = requests.post(backend_url_base + '/tax', cookies=cookies, json={form_name: {rand_uuid: None}})
+                self.assertEqual(r.status_code, 204)
+                r = requests.get(backend_url_base + '/tax', cookies=cookies)
+                self.assertEqual(r.status_code, 200)
+                self.assertEqual(sum(item['uuid'] == rand_uuid for item in r.json()[form_name]), 0)
+
+    def test_prototype_pollution(self):
+        r = requests.post(backend_url_base + '/tax', cookies=cookies, json={
+            'constructor': {},
+            '__proto__': {
+                'toString': {}
+            },
+            'toString': {}
+        })
         self.assertEqual(r.status_code, 204)
-        r = requests.get(backend_url_base + '/tax', cookies=cookies)
-        self.assertEqual(r.status_code, 200)
-        ret2 = r.json()
-        self.assertEqual(ret1, ret2)
-        rand_string = secrets.token_urlsafe(8)
-        r = requests.post(backend_url_base + '/tax', cookies=cookies, json={'foo': 'bar', 'lastName': rand_string})
-        self.assertEqual(r.status_code, 204)
-        r = requests.get(backend_url_base + '/tax', cookies=cookies)
-        self.assertEqual(r.status_code, 200)
-        self.assertEqual(r.json()['lastName'], rand_string)
+
+    def test_pdf(self):
+        pass  # TODO
 
     def test_404(self):
         r = requests.get(backend_url_base + '/nope')
