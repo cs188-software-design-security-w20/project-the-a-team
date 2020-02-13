@@ -1,4 +1,5 @@
 import React from 'react';
+import config from './config';
 import uuidv4 from 'uuid/v4';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -41,8 +42,8 @@ const useStyles = makeStyles(({
     textAlign: 'right',
   },
   unaffected: {
-    flip: false,
     textAlign: 'right',
+    marginLeft: 'auto',
   },
   wrapper: {
     position: 'relative',
@@ -227,7 +228,7 @@ export default function HomePage() {
           ),
           arrDependents,
           addNewDependent,
-          'firstName',
+          'name',
         )}
 
         {formBlock(
@@ -272,8 +273,20 @@ export default function HomePage() {
           'payer',
         )}
 
-        <div className={classes.unaffected}>
-          <Box mt={2}>
+        <Box ml={-3}>
+        <Toolbar>
+          <br/>
+          <Button
+            size="large"
+            variant="outlined"
+            onClick={() => {
+              window.location = new URL('/auth/logout', config.backendURL);
+            }}
+          >
+            <Typography variant="h4">LOGOUT</Typography>
+          </Button>
+
+          <div className={classes.unaffected}>  
             <Button size="large" variant="outlined">
               <Typography variant="h4">SAVE</Typography>
             </Button>
@@ -307,9 +320,9 @@ export default function HomePage() {
                 </Button>
               </DialogActions>
             </Dialog>
-          </Box>
-
-        </div>
+          </div> 
+        </Toolbar>
+        </Box>
       </div>
     </Container>
   );
