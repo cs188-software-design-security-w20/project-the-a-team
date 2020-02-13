@@ -1,5 +1,4 @@
 import React from 'react';
-import config from './config';
 import uuidv4 from 'uuid/v4';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
@@ -19,6 +18,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import config from './config';
 
 import PersonalInfo from './PersonalInfo';
 import Dependent from './Dependent';
@@ -274,54 +274,54 @@ export default function HomePage() {
         )}
 
         <Box ml={-3}>
-        <Toolbar>
-          <br/>
-          <Button
-            size="large"
-            variant="outlined"
-            onClick={() => {
-              window.location = new URL('/auth/logout', config.backendURL);
-            }}
-          >
-            <Typography variant="h4">LOGOUT</Typography>
-          </Button>
-
-          <div className={classes.unaffected}>  
-            <Button size="large" variant="outlined">
-              <Typography variant="h4">SAVE</Typography>
-            </Button>
-
-            <Button size="large" variant="outlined" onClick={handleClickOpen}>
-              <Typography variant="h4">FINISH</Typography>
-            </Button>
-
-            <Dialog
-              open={open}
-              onClose={handleClose}
+          <Toolbar>
+            <br />
+            <Button
+              size="large"
+              variant="outlined"
+              onClick={() => {
+                window.location = new URL('/auth/logout', config.backendURL);
+              }}
             >
-              <DialogTitle>
-                Congratulations!
-              </DialogTitle>
-              <DialogContent>
-                <DialogContentText>
-                  You have completed your Taximus Maximus submission.
-                  <br />
-                  You can either download your filled in tax form as
-                  <br />
-                  a PDF, or go back and edit your information.
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button autoFocus onClick={handleClose} color="textSecondary">
-                  Go Back
-                </Button>
-                <Button onClick={handleClose} color="textSecondary">
-                  Download
-                </Button>
-              </DialogActions>
-            </Dialog>
-          </div> 
-        </Toolbar>
+              <Typography variant="h4">LOGOUT</Typography>
+            </Button>
+
+            <div className={classes.unaffected}>
+              <Button size="large" variant="outlined">
+                <Typography variant="h4">SAVE</Typography>
+              </Button>
+
+              <Button size="large" variant="outlined" onClick={handleClickOpen}>
+                <Typography variant="h4">FINISH</Typography>
+              </Button>
+
+              <Dialog
+                open={open}
+                onClose={handleClose}
+              >
+                <DialogTitle>
+                  Congratulations!
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText>
+                    You have completed your Taximus Maximus submission.
+                    <br />
+                    You can either download your filled in tax form as
+                    <br />
+                    a PDF, or go back and edit your information.
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button autoFocus onClick={handleClose} color="textSecondary">
+                    Go Back
+                  </Button>
+                  <Button onClick={handleClose} color="textSecondary">
+                    Download
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </div>
+          </Toolbar>
         </Box>
       </div>
     </Container>
