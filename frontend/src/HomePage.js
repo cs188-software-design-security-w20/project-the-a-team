@@ -1,4 +1,5 @@
 import React from 'react';
+import uuidv4 from 'uuid/v4';
 import ExpansionPanel from '@material-ui/core/ExpansionPanel';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
@@ -17,6 +18,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import config from './config';
 
 import PersonalInfo from './PersonalInfo';
 import Dependent from './Dependent';
@@ -40,8 +42,8 @@ const useStyles = makeStyles(({
     textAlign: 'right',
   },
   unaffected: {
-    flip: false,
     textAlign: 'right',
+    marginLeft: 'auto',
   },
   wrapper: {
     position: 'relative',
@@ -61,13 +63,14 @@ export default function HomePage() {
     lastName: '',
     ssn: '',
     filingStatus: '',
-    address: '',
+    addr1: '',
+    addr2: '',
+    addr3: '',
     spouseFirstName: '',
-    spouseMiddleName: '',
     spouseLastName: '',
     spouseSSN: '',
-    bankAcctNum: '',
-    bankRoutingNum: '',
+    bankAccount: '',
+    bankRouting: '',
     bankIsChecking: false,
   });
 
@@ -93,55 +96,53 @@ export default function HomePage() {
 
   const addNewDependent = () => {
     setDependent((orig) => [...orig, {
-      firstName: '',
-      middleName: '',
-      lastName: '',
+      uuid: uuidv4(),
+      name: '',
       ssn: '',
       relation: '',
-      childTaxCredit: false,
+      childCredit: false,
     }]);
   };
 
   const addNewW2 = () => {
     setW2((orig) => [...orig, {
-      uuid: '',
+      uuid: uuidv4(),
       employer: '',
-      income: '',
-      taxWithheld: '',
+      income: 0,
+      taxWithheld: 0,
     }]);
   };
 
   const addNew1099INT = () => {
     set1099INT((orig) => [...orig, {
-      uuid: '',
+      uuid: uuidv4(),
       payer: '',
-      income: '',
-      savingsInterest: '',
-      taxExemptInterest: '',
-      taxWithheld: '',
-
+      income: 0,
+      usSavingTreasInterest: 0,
+      taxExemptInterest: 0,
+      taxWithheld: 0,
     }]);
   };
 
   const addNew1099B = () => {
     set1099B((orig) => [...orig, {
-      uuid: '',
-      description: '',
-      proceeds: '',
-      basis: '',
-      longTerm: false,
-      taxWithheld: '',
+      uuid: uuidv4(),
+      desc: '',
+      proceeds: 0,
+      basis: 0,
+      isLongTerm: false,
+      taxWithheld: 0,
     }]);
   };
 
   const addNew1099Div = () => {
     set1099Div((orig) => [...orig, {
-      uuid: '',
+      uuid: uuidv4(),
       payer: '',
-      ordinaryDividends: '',
-      qualifiedDividends: '',
-      taxWithheld: '',
-      exemptInterestDiv: '',
+      ordDividends: 0,
+      qualDividends: 0,
+      taxWithheld: 0,
+      exemptInterestDiv: 0,
     }]);
   };
 
@@ -227,7 +228,7 @@ export default function HomePage() {
           ),
           arrDependents,
           addNewDependent,
-          'firstName',
+          'name',
         )}
 
         {formBlock(
@@ -272,44 +273,56 @@ export default function HomePage() {
           'payer',
         )}
 
-        <div className={classes.unaffected}>
-          <Box mt={2}>
-            <Button size="large" variant="outlined">
-              <Typography variant="h4">SAVE</Typography>
-            </Button>
-
-            <Button size="large" variant="outlined" onClick={handleClickOpen}>
-              <Typography variant="h4">FINISH</Typography>
-            </Button>
-
-            <Dialog
-              open={open}
-              onClose={handleClose}
+        <Box ml={-3}>
+          <Toolbar>
+            <br />
+            <Button
+              size="large"
+              variant="outlined"
+              onClick={() => {
+                window.location = new URL('/auth/logout', config.backendURL);
+              }}
             >
-              <DialogTitle>
-                Congratulations!
-              </DialogTitle>
-              <DialogContent>
-                <DialogContentText>
-                  You have completed your Taximus Maximus submission.
-                  <br />
-                  You can either download your filled in tax form as
-                  <br />
-                  a PDF, or go back and edit your information.
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button autoFocus onClick={handleClose} color="textSecondary">
-                  Go Back
-                </Button>
-                <Button onClick={handleClose} color="textSecondary">
-                  Download
-                </Button>
-              </DialogActions>
-            </Dialog>
-          </Box>
+              <Typography variant="h4">LOGOUT</Typography>
+            </Button>
 
-        </div>
+            <div className={classes.unaffected}>
+              <Button size="large" variant="outlined">
+                <Typography variant="h4">SAVE</Typography>
+              </Button>
+
+              <Button size="large" variant="outlined" onClick={handleClickOpen}>
+                <Typography variant="h4">FINISH</Typography>
+              </Button>
+
+              <Dialog
+                open={open}
+                onClose={handleClose}
+              >
+                <DialogTitle>
+                  Congratulations!
+                </DialogTitle>
+                <DialogContent>
+                  <DialogContentText>
+                    You have completed your Taximus Maximus submission.
+                    <br />
+                    You can either download your filled in tax form as
+                    <br />
+                    a PDF, or go back and edit your information.
+                  </DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                  <Button autoFocus onClick={handleClose} color="textSecondary">
+                    Go Back
+                  </Button>
+                  <Button onClick={handleClose} color="textSecondary">
+                    Download
+                  </Button>
+                </DialogActions>
+              </Dialog>
+            </div>
+          </Toolbar>
+        </Box>
       </div>
     </Container>
   );

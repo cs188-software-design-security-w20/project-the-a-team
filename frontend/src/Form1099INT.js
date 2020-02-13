@@ -32,13 +32,6 @@ export default function Form1099INT({
     <List className={classes.root}>
       <ListItem>
         <TextField
-          value={f1099int.uuid}
-          onChange={setField('uuid')}
-          label="UUID"
-          size="medium"
-          variant="outlined"
-        />
-        <TextField
           value={f1099int.payer}
           onChange={setField('payer')}
           label="Payer"
@@ -56,13 +49,10 @@ export default function Form1099INT({
   <InputAdornment position="start">$</InputAdornment>,
           }}
         />
-      </ListItem>
-
-      <ListItem>
         <TextField
-          value={f1099int.savingsInterest}
-          onChange={setField('savingsInterest')}
-          label="US Savings Interest"
+          value={f1099int.usSavingTreasInterest}
+          onChange={setField('usSavingTreasInterest')}
+          label="US Savings and Treasury Interest"
           size="medium"
           variant="outlined"
           I
@@ -71,7 +61,6 @@ export default function Form1099INT({
   <InputAdornment position="start">$</InputAdornment>,
           }}
         />
-
         <TextField
           value={f1099int.taxExemptInterest}
           onChange={setField('taxExemptInterest')}
@@ -83,6 +72,10 @@ export default function Form1099INT({
   <InputAdornment position="start">$</InputAdornment>,
           }}
         />
+
+      </ListItem>
+
+      <ListItem>
 
         <TextField
           value={f1099int.taxWithheld}
@@ -104,12 +97,11 @@ export default function Form1099INT({
 
 Form1099INT.propTypes = {
   f1099int: PropTypes.shape({
-    uuid: PropTypes.string,
     payer: PropTypes.string,
-    income: PropTypes.string,
-    savingsInterest: PropTypes.string,
-    taxExemptInterest: PropTypes.string,
-    taxWithheld: PropTypes.string,
+    income: PropTypes.number,
+    usSavingTreasInterest: PropTypes.number,
+    taxExemptInterest: PropTypes.number,
+    taxWithheld: PropTypes.number,
   }).isRequired,
 
   setF1099INT: PropTypes.func.isRequired,
