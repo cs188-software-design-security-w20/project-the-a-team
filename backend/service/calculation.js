@@ -1,7 +1,17 @@
 'use strict';
 
+const fs = require('fs').promises;
+const os = require('os');
+const path = require('path');
+const rimrafAsync = require('rimraf');
+const { promisify } = require('util');
+
+const { fillForm } = require('./filler.js');
 const query = require('./query.js');
-const taxtable = JSON.parse(require('../taxtable.json'));
+const { storeFile } = require('./storage.js');
+const taxtable = require('../taxtable.json');
+
+const rimraf = promisify(rimrafAsync);
 
 function roundDown(n, r) {
   return n / r * r; // eslint-disable-line
@@ -71,11 +81,11 @@ function calcTax(line11b, isSingle) {
   if (line11b < 300000n) {
     const dollars = line11b / 100n;
     const rounded = String(roundDown(dollars, 25n));
-    tax = taxtable[rounded];
+    tax = BigInt(taxtable[rounded]);
   } else if (line11b < 10000000n) {
     const dollars = line11b / 100n;
     const rounded = String(roundDown(dollars, 50n));
-    tax = taxtable[rounded];
+    tax = BigInt(taxtable[rounded]);
   } else if (line11b < 16072500n) {
     tax = roundDiv(line11b * 24n, 100n);
   } else if (line11b < 20410000n) {
@@ -148,12 +158,7 @@ function bigIntToString(bigInt, roundUpToZero) {
   return `${dollarPart}.${centPart}`;
 }
 
-function calculate(user) {
-  const forms = query.getUserData(user);
-  if (forms === null) {
-    console.log('there are no forms for this user'); // eslint-disable-line
-    return null;
-  }
+function calculate(forms) {
   const [dep1, dep2, dep3, dep4] = forms.dependents;
   const isSingle = !(forms.taxinfo.spouseName && forms.taxinfo.spouseSsn);
   const line1 = calcTotalWages(forms.fw2);
@@ -162,17 +167,21 @@ function calculate(user) {
   const line3a = calcTotalQualDiv(forms.f1099div);
   const line3b = calcTotalOrdDiv(forms.f1099div);
   const line7b = line1 + line2b + line3b;
-  const line11b = 12200n - line7b;
+  const line8b = line7b;
+  const line9 = 1220000n;
+  const line11a = line9;
+  const line11b = line8b < line11a ? 0n : line8b - line11a;
   const line12a = calcTax(line11b, isSingle);
   const line13a = calcTotalDependentCredit(forms.taxinfo, forms.dependents, line7b, line12a);
   const line14 = line12a - line13a;
   const line17 = calcTotalTaxWithheld([forms.fw2, forms.f1099int, forms.f1099div, forms.f1099b]);
   const line20 = line17 > line14 ? line17 - line14 : 0n;
   return {
-    firstName: forms.taxinfo.firstName + forms.taxinfo.middleName[0],
+    firstName: forms.taxinfo.firstName + (forms.taxinfo.middleName ? ` ${forms.taxinfo.middleName[0]}` : ''),
     lastName: forms.taxinfo.lastName,
+    ssn: forms.taxinfo.ssn,
     spouseName: forms.taxinfo.spouseName,
-    spouseSsn: forms.taxinfo.spouseSsn,
+    spouseSSN: forms.taxinfo.spouseSsn,
     addr1: forms.taxinfo.addr1,
     addr2: forms.taxinfo.addr2,
     addr3: forms.taxinfo.addr3,
@@ -200,9 +209,9 @@ function calculate(user) {
     l3a: bigIntToString(line3a),
     l3b: bigIntToString(line3b),
     l7b: bigIntToString(line7b),
-    l8b: bigIntToString(line7b),
-    l9: '12200',
-    l11a: '12200',
+    l8b: bigIntToString(line8b),
+    l9: bigIntToString(line9),
+    l11a: bigIntToString(line11a),
     l11b: bigIntToString(line11b),
     l12a: bigIntToString(line12a),
     l12b: bigIntToString(line12a),
@@ -221,4 +230,31 @@ function calculate(user) {
   };
 }
 
-module.exports = { calculate };
+const TMP_DIR = os.tmpdir();
+
+async function fillAndSave(user) {
+  const forms = await query.getUserData(user);
+  if (forms === null) {
+    console.log('there are no forms for this user'); // eslint-disable-line
+    return;
+  }
+
+  const f1040 = calculate(forms);
+  const dir = await fs.mkdtemp(TMP_DIR + path.sep);
+  try {
+    const filledForm = path.join(dir, 'f1040-filled.pdf');
+    await fillForm('1040', f1040, filledForm);
+    console.log(`Filled form in ${filledForm}`);
+    const storedFileName = await storeFile(filledForm);
+    console.log(`Stored file in ${storedFileName}`);
+  } finally {
+    try {
+      await rimraf(dir);
+    } catch (e) {
+      console.error(`Unable to delete temporary directory: ${dir}`);
+      // We give up.
+    }
+  }
+}
+
+module.exports = { calculate, fillAndSave };

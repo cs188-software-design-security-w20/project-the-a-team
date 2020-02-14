@@ -8,6 +8,7 @@
     "googleClientSecret": "GDH3uh2ounBBF7wMm51Y8vDd",
     "cookieSecret": "Qyr4XSH8rECvHWc8qo19uQ",
     "cellEncryptionSecret": "igfW97eNZOA2AQoNnjCY0WZaHOgPRUOt+SwTA1bHQos=",
+    "bucketEncryptionSecret": "fdp9qcLxJ3tXrcWYDzW2/jBX7xcVs28ba4DBbJ4pg5w=",
     "serviceAccount": {
       "type": "service_account",
       "project_id": "cs-188-the-a-team",

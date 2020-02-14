@@ -23,7 +23,7 @@ services:
     links:
       - db_postgres
     volumes:
-      - ./backend:/opt/app:ro
+      - ./backend:/opt/app
     restart: "always"
     ulimits:
       nproc: 500
