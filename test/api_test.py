@@ -216,6 +216,10 @@ class TestTaximus(unittest.TestCase):
         if not r.json():
             raise RuntimeError('Authentication failed, check your cookies')
 
+    def tearDown(self):
+        r = requests.delete(backend_url_base + '/tax', cookies=cookies)
+        self.assertEqual(r.status_code, 204)
+
     def test_GET_auth(self):
         r = requests.get(backend_url_base + '/auth')
         self.assertEqual(r.status_code, 200)
@@ -483,6 +487,7 @@ class TestTaximus(unittest.TestCase):
                 result = transform_taxinfo_output(r.json())
                 expected = uuid_lower(test_case)
                 self.assertTrue(is_deep_subset(result, expected))
+                self.tearDown()
 
         for test_case in fail_cases:
             data, message = test_case
@@ -490,6 +495,7 @@ class TestTaximus(unittest.TestCase):
                 r = requests.post(backend_url_base + '/tax', cookies=cookies, json=data)
                 self.assertEqual(r.status_code, 400)
                 self.assertEqual(r.json()['message'], message)
+                self.tearDown()
 
         with self.subTest(test_case='ignore_invalid_keys'):
             r = requests.get(backend_url_base + '/tax', cookies=cookies)
@@ -507,6 +513,23 @@ class TestTaximus(unittest.TestCase):
             r = requests.get(backend_url_base + '/tax', cookies=cookies)
             self.assertEqual(r.status_code, 200)
             self.assertEqual(r.json()['lastName'], rand_string)
+            self.tearDown()
+
+        with self.subTest(test_case='update_object'):
+            rand_uuid = str(uuid.uuid4())
+            rand_string1 = random_string()
+            rand_string2 = random_string()
+            r = requests.post(backend_url_base + '/tax', cookies=cookies, json={'fw2': {rand_uuid: {'employer': rand_string1}}})
+            self.assertEqual(r.status_code, 204)
+            r = requests.get(backend_url_base + '/tax', cookies=cookies)
+            self.assertEqual(r.status_code, 200)
+            self.assertEqual([item for item in r.json()['fw2'] if item['uuid'] == rand_uuid][0]['employer'], rand_string1)
+            r = requests.post(backend_url_base + '/tax', cookies=cookies, json={'fw2': {rand_uuid: {'employer': rand_string2}}})
+            self.assertEqual(r.status_code, 204)
+            r = requests.get(backend_url_base + '/tax', cookies=cookies)
+            self.assertEqual(r.status_code, 200)
+            self.assertEqual([item for item in r.json()['fw2'] if item['uuid'] == rand_uuid][0]['employer'], rand_string2)
+            self.tearDown()
 
         with self.subTest(test_case='undefined_does_not_change_value'):
             rand_string1 = random_string()
@@ -524,6 +547,7 @@ class TestTaximus(unittest.TestCase):
             self.assertEqual(ret1['addr1'], rand_string1)
             self.assertEqual(ret1['addr1'], ret2['addr1'])
             self.assertEqual(ret2['addr2'], rand_string2)
+            self.tearDown()
 
         with self.subTest(test_case='null_subitem_deletion'):
             for form_name in ['fw2', 'f1099int', 'f1099b', 'f1099div', 'dependents']:
@@ -538,6 +562,7 @@ class TestTaximus(unittest.TestCase):
                 r = requests.get(backend_url_base + '/tax', cookies=cookies)
                 self.assertEqual(r.status_code, 200)
                 self.assertEqual(sum(item['uuid'] == rand_uuid for item in r.json()[form_name]), 0)
+                self.tearDown()
 
     def test_prototype_pollution(self):
         r = requests.post(backend_url_base + '/tax', cookies=cookies, json={
