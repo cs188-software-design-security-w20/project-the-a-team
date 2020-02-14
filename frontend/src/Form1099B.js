@@ -1,4 +1,6 @@
 import React from 'react';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -26,6 +28,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Form1099B({
   f1099b,
   setF1099B,
+  onDelete,
 }) {
   const classes = useStyles();
 
@@ -68,8 +71,7 @@ export default function Form1099B({
           size="medium"
           variant="outlined"
           InputProps={{
-            startAdornment:
-  <InputAdornment position="start">$</InputAdornment>,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
           }}
         />
         <FormControl
@@ -93,10 +95,13 @@ export default function Form1099B({
           size="medium"
           variant="outlined"
           InputProps={{
-            startAdornment:
-  <InputAdornment position="start">$</InputAdornment>,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
           }}
         />
+
+        <IconButton aria-label="delete" onClick={onDelete}>
+          <DeleteOutlineIcon />
+        </IconButton>
       </ListItem>
     </List>
   );
@@ -112,4 +117,6 @@ Form1099B.propTypes = {
   }).isRequired,
 
   setF1099B: PropTypes.func.isRequired,
+
+  onDelete: PropTypes.func.isRequired,
 };

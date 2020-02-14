@@ -54,6 +54,14 @@ function addColon(str) {
   return str ? `: ${str}` : '';
 }
 
+const deletedUUIDs = {
+  dependent: [],
+  b1099: [],
+  div1099: [],
+  int1099: [],
+  w2: [],
+};
+
 export default function HomePage() {
   const classes = useStyles();
 
@@ -105,6 +113,51 @@ export default function HomePage() {
       uuid = uuidv4();
     }
     return uuid;
+  };
+
+  const removeDependent = (index) => {
+    setDependent((orig) => {
+      const copy = [...orig];
+      deletedUUIDs.dependent.push(orig[index].uuid);
+      copy.splice(index, 1);
+      return copy;
+    });
+  };
+
+  const remove1099B = (index) => {
+    set1099B((orig) => {
+      const copy = [...orig];
+      deletedUUIDs.b1099.push(orig[index].uuid);
+      copy.splice(index, 1);
+      return copy;
+    });
+  };
+
+  const remove1099Div = (index) => {
+    set1099Div((orig) => {
+      const copy = [...orig];
+      deletedUUIDs.div1099.push(orig[index].uuid);
+      copy.splice(index, 1);
+      return copy;
+    });
+  };
+
+  const remove1099Int = (index) => {
+    set1099INT((orig) => {
+      const copy = [...orig];
+      deletedUUIDs.int1099.push(orig[index].uuid);
+      copy.splice(index, 1);
+      return copy;
+    });
+  };
+
+  const removeW2 = (index) => {
+    setW2((orig) => {
+      const copy = [...orig];
+      deletedUUIDs.w2.push(orig[index].uuid);
+      copy.splice(index, 1);
+      return copy;
+    });
   };
 
   const addNewDependent = () => {
@@ -237,7 +290,11 @@ export default function HomePage() {
           'Dependent Information',
           'Dependent',
           (dependent, index) => (
-            <Dependent dependent={dependent} setDependent={setSubfield(setDependent, index)} />
+            <Dependent
+              dependent={dependent}
+              setDependent={setSubfield(setDependent, index)}
+              onDelete={() => removeDependent(index)}
+            />
           ),
           arrDependents,
           addNewDependent,
@@ -247,7 +304,9 @@ export default function HomePage() {
         {formBlock(
           'Form W-2 Income Information',
           'Form W-2',
-          (fw2, index) => <FormW2 fw2={fw2} setFw2={setSubfield(setW2, index)} />,
+          (fw2, index) => (
+            <FormW2 fw2={fw2} setFw2={setSubfield(setW2, index)} onDelete={() => removeW2(index)} />
+          ),
           arrW2,
           addNewW2,
           'employer',
@@ -257,7 +316,11 @@ export default function HomePage() {
           'Form 1099-INT Information',
           'Form 1099-INT',
           (f1099int, index) => (
-            <Form1099INT f1099int={f1099int} setF1099INT={setSubfield(set1099INT, index)} />
+            <Form1099INT
+              f1099int={f1099int}
+              setF1099INT={setSubfield(set1099INT, index)}
+              onDelete={() => remove1099Int(index)}
+            />
           ),
           arr1099INT,
           addNew1099INT,
@@ -268,7 +331,11 @@ export default function HomePage() {
           'Form 1099-B Information',
           'Form 1099-B',
           (f1099b, index) => (
-            <Form1099B f1099b={f1099b} setF1099B={setSubfield(set1099B, index)} />
+            <Form1099B
+              f1099b={f1099b}
+              setF1099B={setSubfield(set1099B, index)}
+              onDelete={() => remove1099B(index)}
+            />
           ),
           arr1099B,
           addNew1099B,
@@ -279,7 +346,11 @@ export default function HomePage() {
           'Form 1099-DIV Information',
           'Form 1099-DIV',
           (f1099div, index) => (
-            <Form1099Div f1099div={f1099div} setF1099Div={setSubfield(set1099Div, index)} />
+            <Form1099Div
+              f1099div={f1099div}
+              setF1099Div={setSubfield(set1099Div, index)}
+              onDelete={() => remove1099Div(index)}
+            />
           ),
           arr1099Div,
           addNew1099Div,

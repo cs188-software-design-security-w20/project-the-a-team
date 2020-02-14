@@ -1,4 +1,6 @@
 import React from 'react';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -25,6 +27,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Dependent({
   dependent,
   setDependent,
+  onDelete,
 }) {
   const classes = useStyles();
 
@@ -100,6 +103,10 @@ export default function Dependent({
             <MenuItem value={false}>No</MenuItem>
           </Select>
         </FormControl>
+
+        <IconButton aria-label="delete" onClick={onDelete}>
+          <DeleteOutlineIcon />
+        </IconButton>
       </ListItem>
 
     </List>
@@ -115,4 +122,6 @@ Dependent.propTypes = {
   }).isRequired,
 
   setDependent: PropTypes.func.isRequired,
+
+  onDelete: PropTypes.func.isRequired,
 };

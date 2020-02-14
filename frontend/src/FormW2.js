@@ -1,4 +1,6 @@
 import React from 'react';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -18,6 +20,7 @@ const useStyles = makeStyles((theme) => ({
 export default function FormW2({
   fw2,
   setFw2,
+  onDelete,
 }) {
   const classes = useStyles();
 
@@ -49,8 +52,7 @@ export default function FormW2({
           size="medium"
           variant="outlined"
           InputProps={{
-            startAdornment:
-  <InputAdornment position="start">$</InputAdornment>,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
           }}
         />
         <TextField
@@ -60,10 +62,13 @@ export default function FormW2({
           size="medium"
           variant="outlined"
           InputProps={{
-            startAdornment:
-  <InputAdornment position="start">$</InputAdornment>,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
           }}
         />
+
+        <IconButton aria-label="delete" onClick={onDelete}>
+          <DeleteOutlineIcon />
+        </IconButton>
       </ListItem>
     </List>
   );
@@ -77,4 +82,6 @@ FormW2.propTypes = {
   }).isRequired,
 
   setFw2: PropTypes.func.isRequired,
+
+  onDelete: PropTypes.func.isRequired,
 };
