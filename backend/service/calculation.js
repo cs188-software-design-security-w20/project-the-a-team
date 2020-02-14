@@ -1,7 +1,7 @@
 'use strict';
 
 const query = require('./query.js');
-const taxtable = JSON.parse(require('../taxtable.json'));
+const taxtable = require('../taxtable.json');
 
 function roundDown(n, r) {
   return n / r * r; // eslint-disable-line
@@ -71,25 +71,25 @@ function calcTax(line11b, isSingle) {
   if (line11b < 300000n) {
     const dollars = line11b / 100n;
     const rounded = String(roundDown(dollars, 25n));
-    tax = taxtable[rounded];
+    tax = taxtable[rounded] * 100n;
   } else if (line11b < 10000000n) {
     const dollars = line11b / 100n;
     const rounded = String(roundDown(dollars, 50n));
-    tax = taxtable[rounded];
+    tax = taxtable[rounded] * 100n;
   } else if (line11b < 16072500n) {
-    tax = roundDiv(line11b * 24n, 100n);
+    tax = roundDiv(line11b * 24n, 100n) - 582550n;
   } else if (line11b < 20410000n) {
-    tax = roundDiv(line11b * 32n, 100n);
+    tax = roundDiv(line11b * 32n, 100n) - 1868350n;
   } else if (line11b < 30617500n && !isSingle) {
-    tax = roundDiv(line11b * 35n, 100n);
+    tax = roundDiv(line11b * 35n, 100n) - 2480600n;
   } else if (!isSingle) {
-    tax = roundDiv(line11b * 37n, 100n);
+    tax = roundDiv(line11b * 37n, 100n) - 3093000n;
   } else if (line11b < 51030000n && isSingle) {
-    tax = roundDiv(line11b * 35n, 100n);
+    tax = roundDiv(line11b * 35n, 100n) - 2408600n;
   } else if (isSingle) {
-    tax = roundDiv(line11b * 37n, 100n);
+    tax = roundDiv(line11b * 37n, 100n) - 3093000n;
   }
-  return tax * 100n;
+  return tax;
 }
 
 function calcTotalDependentCredit(taxinfo, dependents, line8b, line12b) {
