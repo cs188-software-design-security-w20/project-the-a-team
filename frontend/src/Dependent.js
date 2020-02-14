@@ -6,6 +6,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
+import Box from '@material-ui/core/Box';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
@@ -38,15 +39,17 @@ export default function Dependent({
   return (
     <List className={classes.root}>
 
-      <ListItem>
-        <TextField
-          value={dependent.name}
-          onChange={setField('name')}
-          label="Full Name"
-          variant="outlined"
-          fullWidth
-        />
-      </ListItem>
+      <Box width="120%">
+        <ListItem>
+          <TextField
+            value={dependent.name}
+            onChange={setField('name')}
+            label="Full Name"
+            variant="outlined"
+            fullWidth
+          />
+        </ListItem>
+      </Box>
 
       <ListItem>
         <TextField

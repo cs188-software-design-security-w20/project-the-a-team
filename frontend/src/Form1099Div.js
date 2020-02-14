@@ -11,6 +11,7 @@ const useStyles = makeStyles((theme) => ({
     '& .MuiTextField-root': {
       marginRight: theme.spacing(2),
     },
+    width: '100%',
   },
   formControl: {
     marginRight: theme.spacing(2),
@@ -41,6 +42,7 @@ export default function Form1099Div({
           label="Payer"
           size="medium"
           variant="outlined"
+          fullWidth
         />
       </ListItem>
 

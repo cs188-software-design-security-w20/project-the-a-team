@@ -14,6 +14,7 @@ const useStyles = makeStyles((theme) => ({
     '& .MuiTextField-root': {
       marginRight: theme.spacing(2),
     },
+    width: '100%',
   },
   formControl: {
     margin: theme.spacing(2),

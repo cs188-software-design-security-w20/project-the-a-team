@@ -94,9 +94,22 @@ export default function HomePage() {
     setOpen(false);
   };
 
+  const handleClickSave = () => {
+    setOpen(true);
+  };
+
+  const checkUUID = (arr) => {
+    const uuids = new Set(arr.map((entry) => entry.uuid));
+    let uuid = uuidv4();
+    while (uuids.has(uuid)) {
+      uuid = uuidv4();
+    }
+    return uuid;
+  };
+
   const addNewDependent = () => {
     setDependent((orig) => [...orig, {
-      uuid: uuidv4(),
+      uuid: checkUUID(orig),
       name: '',
       ssn: '',
       relation: '',
@@ -106,7 +119,7 @@ export default function HomePage() {
 
   const addNewW2 = () => {
     setW2((orig) => [...orig, {
-      uuid: uuidv4(),
+      uuid: checkUUID(orig),
       employer: '',
       income: 0,
       taxWithheld: 0,
@@ -115,7 +128,7 @@ export default function HomePage() {
 
   const addNew1099INT = () => {
     set1099INT((orig) => [...orig, {
-      uuid: uuidv4(),
+      uuid: checkUUID(orig),
       payer: '',
       income: 0,
       usSavingTreasInterest: 0,
@@ -126,7 +139,7 @@ export default function HomePage() {
 
   const addNew1099B = () => {
     set1099B((orig) => [...orig, {
-      uuid: uuidv4(),
+      uuid: checkUUID(orig),
       desc: '',
       proceeds: 0,
       basis: 0,
@@ -137,7 +150,7 @@ export default function HomePage() {
 
   const addNew1099Div = () => {
     set1099Div((orig) => [...orig, {
-      uuid: uuidv4(),
+      uuid: checkUUID(orig),
       payer: '',
       ordDividends: 0,
       qualDividends: 0,
@@ -288,7 +301,9 @@ export default function HomePage() {
 
             <div className={classes.unaffected}>
               <Button size="large" variant="outlined">
-                <Typography variant="h4">SAVE</Typography>
+                <Typography variant="h4" onClick={handleClickSave}>
+                  SAVE
+                </Typography>
               </Button>
 
               <Button size="large" variant="outlined" onClick={handleClickOpen}>
@@ -315,7 +330,12 @@ export default function HomePage() {
                   <Button autoFocus onClick={handleClose} color="textSecondary">
                     Go Back
                   </Button>
-                  <Button onClick={handleClose} color="textSecondary">
+                  <Button
+                    color="textSecondary"
+                    onClick={() => {
+                      window.location = new URL('/text/pdf', config.backendURL);
+                    }}
+                  >
                     Download
                   </Button>
                 </DialogActions>
