@@ -81,6 +81,9 @@ const updateUserData = async (user, data) => {
       transaction: t,
     });
     const promises = [];
+    promises.push(user.update({
+      pdfResult: null,
+    }, { transaction: t }));
     promises.push(taxinfo.update({
       lastName: data.lastName,
       firstName: data.firstName,
@@ -228,10 +231,20 @@ const clearUserData = async (user) => sequelize.transaction(async (t) => {
   return user.update({ pdfResult: null }, { transaction: t });
 });
 
+const setUserPdfResult = (user, fname) => (
+  sequelize.transaction((t) => (
+    user.update({
+      pdfResult: fname,
+    }, { transaction: t })
+  ))
+);
+
+
 module.exports = {
   getUserByUUID,
   ensureUserTaxinfo,
   getUserData,
   updateUserData,
   clearUserData,
+  setUserPdfResult,
 };

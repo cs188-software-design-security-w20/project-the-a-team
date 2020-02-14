@@ -236,7 +236,7 @@ async function fillAndSave(user) {
   const forms = await query.getUserData(user);
   if (forms === null) {
     console.log('there are no forms for this user'); // eslint-disable-line
-    return;
+    return null;
   }
 
   const f1040 = calculate(forms);
@@ -244,14 +244,17 @@ async function fillAndSave(user) {
   try {
     const filledForm = path.join(dir, 'f1040-filled.pdf');
     await fillForm('1040', f1040, filledForm);
-    console.log(`Filled form in ${filledForm}`);
+    console.log(`Filled form in ${filledForm}`); // eslint-disable-line
     const storedFileName = await storeFile(filledForm);
-    console.log(`Stored file in ${storedFileName}`);
+    console.log(`Stored file in ${storedFileName}`); // eslint-disable-line
+
+    await query.setUserPdfResult(storedFileName);
+    return storedFileName;
   } finally {
     try {
       await rimraf(dir);
     } catch (e) {
-      console.error(`Unable to delete temporary directory: ${dir}`);
+      console.error(`Unable to delete temporary directory: ${dir}`); // eslint-disable-line
       // We give up.
     }
   }
