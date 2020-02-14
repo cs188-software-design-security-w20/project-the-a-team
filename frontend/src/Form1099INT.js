@@ -11,6 +11,7 @@ const useStyles = makeStyles((theme) => ({
     '& .MuiTextField-root': {
       marginRight: theme.spacing(2),
     },
+    width: '100%',
   },
 }));
 
@@ -37,7 +38,10 @@ export default function Form1099INT({
           label="Payer"
           size="medium"
           variant="outlined"
+          fullWidth
         />
+      </ListItem>
+      <ListItem>
         <TextField
           value={f1099int.income}
           onChange={setField('income')}
@@ -72,10 +76,6 @@ export default function Form1099INT({
   <InputAdornment position="start">$</InputAdornment>,
           }}
         />
-
-      </ListItem>
-
-      <ListItem>
 
         <TextField
           value={f1099int.taxWithheld}
