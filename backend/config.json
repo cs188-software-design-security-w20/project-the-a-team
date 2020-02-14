@@ -1,11 +1,24 @@
 {
   "backendURL": "http://localhost:8080/",
   "frontendURL": "http://localhost:3000/",
+  "storageBucket": "cs-188-taxmax-test",
   "cookieExpireMinutes": 15,
   "credentials": {
     "googleClientId": "793727643432-tod94uova6eff4ojqqmnpdc3kunsrj9g.apps.googleusercontent.com",
     "googleClientSecret": "GDH3uh2ounBBF7wMm51Y8vDd",
     "cookieSecret": "Qyr4XSH8rECvHWc8qo19uQ",
-    "cellEncryptionSecret": "igfW97eNZOA2AQoNnjCY0WZaHOgPRUOt+SwTA1bHQos="
+    "cellEncryptionSecret": "igfW97eNZOA2AQoNnjCY0WZaHOgPRUOt+SwTA1bHQos=",
+    "serviceAccount": {
+      "type": "service_account",
+      "project_id": "cs-188-the-a-team",
+      "private_key_id": "913ff8fd03434b0dc4606ff89952937b4d358f35",
+      "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCbM7xt7fcHPzik\nGy6+Bfns54SZVytCGCKJAi9iyCnBnrbja17lB/5nULh/byP2TstdlW5YxBAXdpD/\nlPrfBi5WLfi2FNWa8LE7VV98Y9bdgkkr2QFo4Hdw2M7w0H4fXL2PUODD5zf1Yjjq\nRnsHMOaa1Gu91tH+rgNyVMr7vmCo8QCM7Ax1vtxZ2J0nHe+IUmVfzO9XDyJYhb3c\nB3HqPmbTcpTCiypU+qmG30x2pmbagWM5fHSeiZoJt8jxUXd/xO4kQrf3QBSPnS7w\nIiOVhDNTg899mIXrczhJRh8CZMr2WZ7uAoa58HmPLpOxPdkU3YJDYCZJJq2zaO2x\n24JVcsDpAgMBAAECggEAAIm+q8i6dY8ZAqGjqSM9v/NisheQ0J54jS4hold/Dzr+\nLOjqrUODNLy9XQISbKMj4O/OECxNgXqm4J9LD4ehahP9TnVL8x5F67FICYHSRSuT\ngR2exoGDtyjl7m9h8TjPNpkGpHXlC4/dp7tFkoDEsJFPYSW74zoGIfOhuLB1kZRd\n7nJF0Lvg/c3FXuC4vsiFriA85K3b1uCZF4O1XX1WvpQIQdWtU8IiImGj87RZJ125\n3l7EZDlUV7Je677YFM87tLi5k3a2PuxGcNvux6JhJFW49QCPtAYKQgWlTbLMfAag\nd2Ksv0MpnFQ57tVZtbj0yut40GpfX0r36dN9/TMO0QKBgQDXY99rhSa6PZVshoBc\n4sc42tpOPht33tQesXNdTGvN6/D2G3VlrYwLDJ4QADd9lNdYfe4J9/NT8zfAYiJo\nOgyfM8dp/NK+t8/ZUaNBMKcDpHR7nIbpSEw43AYaDDibcEKwgWJ5xH7v3ZRn4aOW\nizOFnSmgDWvUm/+HVsVEeQCjkQKBgQC4dsw0ZElidMozIr3TzZHJn6iqrJjBor+x\niVqc0fw1wKbAjqcq1fQpkFa82T8LZUD+Fub94qoarf3DytYOZSYBVy9Wl3fBkwxx\nfrbgQLkyEkUg1GtgizeU1biWS9QwePW/stbULV1mZj+xBnISYdqbR+F5ozmDsmvX\n6p2D7KLr2QKBgQCjW4ryuCz0KYrvoV8vk4u3cj0KBI6+rlDA6qLtiu1kY2MAtTin\noiVJqAslZZSweTeOVQw5oUV6UUficEtaM1SpVhMTLn4DydMpJoKkCatR1uPFcKTd\nv0iYAz/Zd5VjRpQ93BN8+OuxLqPE2dxBbFfqKZWNX0B+IsZ9tfCtivxSEQKBgFEu\nJwxfnlQwJdR/U59k9uYO18HVF50QLODLHA+r8h0N3dUccsFNS5kHJsURrscrFoE8\nPwg4urfnHqkOGUpYhXNNlU28dz2/o1hHdeAXW+mHVNjv4xmn6xwbOpMaaBW1BiIJ\naLYUCOjJ0vnrZkRkwDpaVgacKPGmkgOCAzRN7h1xAoGAIh9EaWJB1OVy7ZO2Fe1I\ndtppmJ7YQcU8k2NVtWQwoRPPFMI1MOSiQ1GuyfyvIguAPbuJYkrpfr8wbdM3IAMy\ny7EnlDZKI6L65L87HOTJBmVrc/WD0IUM8a8vFiTgDtubJr8F47wOqvEb1fweN68u\nfw5eGgYI+El9ci13K1YKIJc=\n-----END PRIVATE KEY-----\n",
+      "client_email": "development@cs-188-the-a-team.iam.gserviceaccount.com",
+      "client_id": "110006602981779004666",
+      "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+      "token_uri": "https://oauth2.googleapis.com/token",
+      "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+      "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/development%40cs-188-the-a-team.iam.gserviceaccount.com"
+    }
   }
 }
