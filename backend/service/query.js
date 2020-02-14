@@ -202,9 +202,36 @@ const updateUserData = async (user, data) => {
   });
 };
 
+const clearUserData = async (user) => sequelize.transaction(async (t) => {
+  const taxinfo = await Taxinfo.findOne({
+    where: { userId: user.id },
+    transaction: t,
+  });
+  await Promise.all([Fw2, F1099int, F1099b, F1099div, Dependents].map((form) => form.destroy({
+    where: { taxinfoId: taxinfo.id },
+    transaction: t,
+  })));
+  await taxinfo.update({
+    lastName: null,
+    firstName: null,
+    middleName: null,
+    ssn: null,
+    spouseName: null,
+    spouseSSN: null,
+    addr1: null,
+    addr2: null,
+    addr3: null,
+    bankAccount: null,
+    bankRouting: null,
+    bankIsChecking: null,
+  }, { transaction: t });
+  return user.update({ pdfResult: null }, { transaction: t });
+});
+
 module.exports = {
   getUserByUUID,
   ensureUserTaxinfo,
   getUserData,
   updateUserData,
+  clearUserData,
 };

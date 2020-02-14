@@ -73,4 +73,14 @@ router.post('/', bodyParser.json(), async (req, res) => {
   }
 });
 
+router.delete('/', async (req, res) => {
+  try {
+    await query.clearUserData(req.user);
+    res.status(204).end();
+  } catch (err) {
+    console.error(err); // eslint-disable-line no-console
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;
