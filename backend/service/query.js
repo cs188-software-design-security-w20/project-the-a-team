@@ -14,12 +14,12 @@ const converter = require('../utils/conversion.js');
 const cryptor = require('../utils/encryption.js');
 const validator = require('../utils/validation.js');
 
-const getUserByUUID = async (userUUID) => sequelize.transaction(async (t) => User.findOne({
+const getUserByUUID = (userUUID) => sequelize.transaction((t) => User.findOne({
   where: { uuid: userUUID },
   transaction: t,
 }));
 
-const ensureUserTaxinfo = async (googleId) => sequelize.transaction(async (t) => {
+const ensureUserTaxinfo = (googleId) => sequelize.transaction(async (t) => {
   validator.validateGoogleId(googleId);
   const [user, created] = await User.findOrCreate({
     where: { googleId },
@@ -33,7 +33,7 @@ const ensureUserTaxinfo = async (googleId) => sequelize.transaction(async (t) =>
   return user;
 });
 
-const getUserData = async (user) => sequelize.transaction(async (t) => {
+const getUserData = (user) => sequelize.transaction(async (t) => {
   const taxinfo = await Taxinfo.findOne({
     where: { userId: user.id },
     attributes: { exclude: ['userId', 'createdAt', 'updatedAt'] },
@@ -205,7 +205,7 @@ const updateUserData = async (user, data) => {
   });
 };
 
-const clearUserData = async (user) => sequelize.transaction(async (t) => {
+const clearUserData = (user) => sequelize.transaction(async (t) => {
   const taxinfo = await Taxinfo.findOne({
     where: { userId: user.id },
     transaction: t,
@@ -238,7 +238,6 @@ const setUserPdfResult = (user, fname) => (
     }, { transaction: t })
   ))
 );
-
 
 module.exports = {
   getUserByUUID,
