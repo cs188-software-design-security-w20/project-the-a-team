@@ -1,5 +1,6 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -59,7 +60,10 @@ export default function FormW2({
   <InputAdornment position="start">$</InputAdornment>,
         }}
       />
-      <Button onClick={onDelete}>Delete</Button>
+
+      <IconButton aria-label="delete" onClick={onDelete}>
+        <DeleteOutlineIcon />
+      </IconButton>
     </div>
   );
 }

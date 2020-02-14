@@ -1,5 +1,6 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -93,7 +94,10 @@ export default function Form1099Div({
   <InputAdornment position="start">$</InputAdornment>,
           }}
         />
-        <Button onClick={onDelete}>Delete</Button>
+
+        <IconButton aria-label="delete" onClick={onDelete}>
+          <DeleteOutlineIcon />
+        </IconButton>
       </ListItem>
     </List>
   );
