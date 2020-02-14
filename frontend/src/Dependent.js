@@ -40,36 +40,22 @@ export default function Dependent({
 
       <ListItem>
         <TextField
-          value={dependent.firstName}
-          onChange={setField('firstName')}
-          label="First Name"
-          size="medium"
+          value={dependent.name}
+          onChange={setField('name')}
+          label="Full Name"
           variant="outlined"
-        />
-        <TextField
-          value={dependent.middleName}
-          onChange={setField('middleName')}
-          label="Middle Name"
-          size="medium"
-          variant="outlined"
-        />
-        <TextField
-          value={dependent.lastName}
-          onChange={setField('lastMame')}
-          label="Last Name"
-          size="medium"
-          variant="outlined"
-        />
-        <TextField
-          value={dependent.ssn}
-          onChange={setField('ssm')}
-          label="Social Security Number"
-          size="medium"
-          variant="outlined"
+          fullWidth
         />
       </ListItem>
 
       <ListItem>
+        <TextField
+          value={dependent.ssn}
+          onChange={setField('ssn')}
+          label="Social Security Number"
+          size="medium"
+          variant="outlined"
+        />
         <FormControl
           variant="outlined"
           className={classes.formControl}
@@ -104,8 +90,8 @@ export default function Dependent({
           <InputLabel>Child Tax Credit</InputLabel>
           <Select
             label="Child Tax Credit"
-            value={dependent.childTaxCredit}
-            onChange={setField('childTaxCredit')}
+            value={dependent.childCredit}
+            onChange={setField('childCredit')}
           >
             <MenuItem value>Yes</MenuItem>
             <MenuItem value={false}>No</MenuItem>
@@ -119,12 +105,10 @@ export default function Dependent({
 
 Dependent.propTypes = {
   dependent: PropTypes.shape({
-    firstName: PropTypes.string,
-    middleName: PropTypes.string,
-    lastName: PropTypes.string,
+    name: PropTypes.string,
     ssn: PropTypes.string,
     relation: PropTypes.string,
-    childTaxCredit: PropTypes.bool,
+    childCredit: PropTypes.bool,
   }).isRequired,
 
   setDependent: PropTypes.func.isRequired,

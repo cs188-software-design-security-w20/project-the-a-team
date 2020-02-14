@@ -100,8 +100,8 @@ export default function PersonalInfo({
 
       <ListItem>
         <TextField
-          value={personalInfo.address}
-          onChange={setField('address')}
+          value={personalInfo.addr1}
+          onChange={setField('addr1')}
           label="Mailing Address"
           size="medium"
           variant="outlined"
@@ -111,16 +111,26 @@ export default function PersonalInfo({
 
       <ListItem>
         <TextField
-          value={personalInfo.spouseFirstName}
-          onChange={setField('spouseFirstName')}
-          label="Spouse First Name"
+          value={personalInfo.addr2}
+          onChange={setField('addr2')}
+          label="Apartment Number"
           size="medium"
           variant="outlined"
         />
         <TextField
-          value={personalInfo.spouseMiddleName}
-          onChange={setField('spouseMiddleName')}
-          label="Spouse Middle Name"
+          value={personalInfo.addr3}
+          onChange={setField('add3')}
+          label="City, State and Zip Code"
+          size="medium"
+          variant="outlined"
+        />
+      </ListItem>
+
+      <ListItem>
+        <TextField
+          value={personalInfo.spouseFirstName}
+          onChange={setField('spouseFirstName')}
+          label="Spouse First Name"
           size="medium"
           variant="outlined"
         />
@@ -142,15 +152,15 @@ export default function PersonalInfo({
 
       <ListItem>
         <TextField
-          value={personalInfo.bankAcctNum}
-          onChange={setField('bankAcctNum')}
+          value={personalInfo.bankAccount}
+          onChange={setField('bankAccount')}
           label="Bank Account Number"
           size="medium"
           variant="outlined"
         />
         <TextField
-          value={personalInfo.bankRoutingNum}
-          onChange={setField('bankRoutingNum')}
+          value={personalInfo.bankRouting}
+          onChange={setField('bankRouting')}
           label="Bank Routing Number"
           size="medium"
           variant="outlined"
@@ -184,13 +194,14 @@ PersonalInfo.propTypes = {
     lastName: PropTypes.string,
     ssn: PropTypes.string,
     filingStatus: PropTypes.string,
-    address: PropTypes.string,
-    bankAcctNum: PropTypes.string,
-    bankRoutingNum: PropTypes.string,
+    addr1: PropTypes.string,
+    addr2: PropTypes.string,
+    addr3: PropTypes.string,
+    bankAccount: PropTypes.string,
+    bankRouting: PropTypes.string,
     bankIsChecking: PropTypes.bool,
     spouseFirstName: PropTypes.string,
     spouseLastName: PropTypes.string,
-    spouseMiddleName: PropTypes.string,
     spouseSSN: PropTypes.string,
   }).isRequired,
 

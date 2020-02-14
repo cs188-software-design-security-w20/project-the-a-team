@@ -4,7 +4,7 @@ const isBoolean = (obj) => typeof obj === 'boolean';
 const isString = (obj) => typeof obj === 'string';
 const isObject = (obj) => typeof obj === 'object' && !Array.isArray(obj) && obj !== null;
 const isNumber = (obj) => typeof obj === 'number';
-const isInMoneyLimit = (x) => x >= 0 && x <= Number.MAX_SAFE_INTEGER / 100;
+const isInMoneyLimit = (x) => Math.abs(x) <= Number.MAX_SAFE_INTEGER / 100;
 const isInStringLimit = (s) => s.length <= 255;
 const isDigitOnly = (s) => s.match(/^\d*$/);
 const isValidSSN = (s) => s.match(/^\d{9}$/);

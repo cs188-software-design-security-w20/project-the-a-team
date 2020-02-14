@@ -29,13 +29,6 @@ export default function FormW2({
   return (
     <div className={classes.root}>
       <TextField
-        value={fw2.uuid}
-        onChange={setField('uuid')}
-        label="UUID"
-        size="medium"
-        variant="outlined"
-      />
-      <TextField
         value={fw2.employer}
         onChange={setField('employer')}
         label="Employer"
@@ -70,7 +63,6 @@ export default function FormW2({
 
 FormW2.propTypes = {
   fw2: PropTypes.shape({
-    uuid: PropTypes.string,
     employer: PropTypes.string,
     income: PropTypes.number,
     taxWithheld: PropTypes.number,

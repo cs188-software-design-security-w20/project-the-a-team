@@ -1,6 +1,15 @@
 'use strict';
 
 const query = require('./query.js');
+const taxtable = JSON.parse(require('../taxtable.json'));
+
+function roundDown(n, r) {
+  return n / r * r; // eslint-disable-line
+}
+
+function roundDiv(n, d) {
+  return (n + d / 2n) / d;
+}
 
 function calcTotalWages(fw2) {
   let total = 0n;
@@ -57,6 +66,71 @@ function calcTotalOrdDiv(f1099div) {
   return total;
 }
 
+function calcTax(line11b, isSingle) {
+  let tax = 0n;
+  if (line11b < 300000n) {
+    const dollars = line11b / 100n;
+    const rounded = String(roundDown(dollars, 25n));
+    tax = taxtable[rounded];
+  } else if (line11b < 10000000n) {
+    const dollars = line11b / 100n;
+    const rounded = String(roundDown(dollars, 50n));
+    tax = taxtable[rounded];
+  } else if (line11b < 16072500n) {
+    tax = roundDiv(line11b * 24n, 100n);
+  } else if (line11b < 20410000n) {
+    tax = roundDiv(line11b * 32n, 100n);
+  } else if (line11b < 30617500n && !isSingle) {
+    tax = roundDiv(line11b * 35n, 100n);
+  } else if (!isSingle) {
+    tax = roundDiv(line11b * 37n, 100n);
+  } else if (line11b < 51030000n && isSingle) {
+    tax = roundDiv(line11b * 35n, 100n);
+  } else if (isSingle) {
+    tax = roundDiv(line11b * 37n, 100n);
+  }
+  return tax * 100n;
+}
+
+function calcTotalDependentCredit(taxinfo, dependents, line8b, line12b) {
+  let line1 = 0n;
+  let line2 = 0n;
+  for (const dependent in dependents) {
+    if (dependent.childCredit) {
+      line1 += 2000n;
+    } else {
+      line2 += 500n;
+    }
+  }
+  const line3 = line1 + line2;
+  let line7 = 0n;
+  if (line8b < 200000n) {
+    line7 = 200000n - line8b;
+  }
+  line7 /= 20n;
+  if (line3 > line7) {
+    return 0n;
+  }
+  const line8 = line7 - line3;
+  const line11 = line12b;
+  if (line8 > line11) {
+    return line11;
+  }
+  return line8;
+}
+
+function calcTotalTaxWithheld(forms) {
+  let total = 0n;
+  for (const formType of forms) {
+    for (const form of formType) {
+      if (form.taxWithheld) {
+        total += (BigInt(form.taxWithheld));
+      }
+    }
+  }
+  return total;
+}
+
 function bigIntToString(bigInt, roundUpToZero) {
   let num = bigInt;
   const isNeg = num < 0n;
@@ -88,6 +162,12 @@ function calculate(user) {
   const line3a = calcTotalQualDiv(forms.f1099div);
   const line3b = calcTotalOrdDiv(forms.f1099div);
   const line7b = line1 + line2b + line3b;
+  const line11b = 12200n - line7b;
+  const line12a = calcTax(line11b, isSingle);
+  const line13a = calcTotalDependentCredit(forms.taxinfo, forms.dependents, line7b, line12a);
+  const line14 = line12a - line13a;
+  const line17 = calcTotalTaxWithheld([forms.fw2, forms.f1099int, forms.f1099div, forms.f1099b]);
+  const line20 = line17 > line14 ? line17 - line14 : 0n;
   return {
     firstName: forms.taxinfo.firstName + forms.taxinfo.middleName[0],
     lastName: forms.taxinfo.lastName,
@@ -120,6 +200,24 @@ function calculate(user) {
     l3a: bigIntToString(line3a),
     l3b: bigIntToString(line3b),
     l7b: bigIntToString(line7b),
+    l8b: bigIntToString(line7b),
+    l9: '12200',
+    l11a: '12200',
+    l11b: bigIntToString(line11b),
+    l12a: bigIntToString(line12a),
+    l12b: bigIntToString(line12a),
+    l13a: bigIntToString(line13a),
+    l13b: bigIntToString(line13a),
+    l14: bigIntToString(line14),
+    l15: '-0-',
+    l16: bigIntToString(line14),
+    l17: bigIntToString(line17),
+    l19: bigIntToString(line17),
+    l20: bigIntToString(line20),
+    routingno: forms.taxinfo.bankRouting,
+    accountno: forms.taxinfo.bankAccount,
+    isChecking: forms.taxinfo.bankIsChecking,
+    isSavings: !forms.taxinfo.bankIsChecking,
   };
 }
 
