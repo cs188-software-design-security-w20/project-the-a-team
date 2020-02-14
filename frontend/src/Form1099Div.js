@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -21,6 +22,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Form1099Div({
   f1099div,
   setF1099Div,
+  onDelete,
 }) {
   const classes = useStyles();
 
@@ -91,6 +93,7 @@ export default function Form1099Div({
   <InputAdornment position="start">$</InputAdornment>,
           }}
         />
+        <Button onClick={onDelete}>Delete</Button>
       </ListItem>
     </List>
   );
@@ -106,4 +109,6 @@ Form1099Div.propTypes = {
   }).isRequired,
 
   setF1099Div: PropTypes.func.isRequired,
+
+  onDelete: PropTypes.func.isRequired,
 };

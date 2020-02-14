@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import { makeStyles } from '@material-ui/core/styles';
 import InputAdornment from '@material-ui/core/InputAdornment';
@@ -15,6 +16,7 @@ const useStyles = makeStyles((theme) => ({
 export default function FormW2({
   fw2,
   setFw2,
+  onDelete,
 }) {
   const classes = useStyles();
 
@@ -57,6 +59,7 @@ export default function FormW2({
   <InputAdornment position="start">$</InputAdornment>,
         }}
       />
+      <Button onClick={onDelete}>Delete</Button>
     </div>
   );
 }
@@ -69,4 +72,6 @@ FormW2.propTypes = {
   }).isRequired,
 
   setFw2: PropTypes.func.isRequired,
+
+  onDelete: PropTypes.func.isRequired,
 };

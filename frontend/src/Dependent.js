@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -24,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Dependent({
   dependent,
   setDependent,
+  onDelete,
 }) {
   const classes = useStyles();
 
@@ -97,6 +99,8 @@ export default function Dependent({
             <MenuItem value={false}>No</MenuItem>
           </Select>
         </FormControl>
+
+        <Button onClick={onDelete}>Delete</Button>
       </ListItem>
 
     </List>
@@ -112,4 +116,6 @@ Dependent.propTypes = {
   }).isRequired,
 
   setDependent: PropTypes.func.isRequired,
+
+  onDelete: PropTypes.func.isRequired,
 };

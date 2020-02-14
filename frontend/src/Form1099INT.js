@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
@@ -17,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
 export default function Form1099INT({
   f1099int,
   setF1099INT,
+  onDelete,
 }) {
   const classes = useStyles();
 
@@ -45,8 +47,7 @@ export default function Form1099INT({
           size="medium"
           variant="outlined"
           InputProps={{
-            startAdornment:
-  <InputAdornment position="start">$</InputAdornment>,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
           }}
         />
         <TextField
@@ -55,10 +56,8 @@ export default function Form1099INT({
           label="US Savings and Treasury Interest"
           size="medium"
           variant="outlined"
-          I
           InputProps={{
-            startAdornment:
-  <InputAdornment position="start">$</InputAdornment>,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
           }}
         />
         <TextField
@@ -68,8 +67,7 @@ export default function Form1099INT({
           size="medium"
           variant="outlined"
           InputProps={{
-            startAdornment:
-  <InputAdornment position="start">$</InputAdornment>,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
           }}
         />
 
@@ -84,11 +82,10 @@ export default function Form1099INT({
           size="medium"
           variant="outlined"
           InputProps={{
-            startAdornment:
-  <InputAdornment position="start">$</InputAdornment>,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
           }}
         />
-
+        <Button onClick={onDelete}>Delete</Button>
       </ListItem>
 
     </List>
@@ -105,4 +102,6 @@ Form1099INT.propTypes = {
   }).isRequired,
 
   setF1099INT: PropTypes.func.isRequired,
+
+  onDelete: PropTypes.func.isRequired,
 };
