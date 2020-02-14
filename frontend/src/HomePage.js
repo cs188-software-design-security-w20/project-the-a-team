@@ -96,17 +96,17 @@ export default function HomePage() {
 
   const handleClickSave = () => {
     setOpen(true);
-  }
+  };
 
   const checkUUID = (arr) => {
-    const uuids = new Set(arr.map(entry => entry.uuid));
+    const uuids = new Set(arr.map((entry) => entry.uuid));
     let uuid = uuidv4();
     while (uuids.has(uuid)) {
       uuid = uuidv4();
     }
     return uuid;
   };
-  
+
   const addNewDependent = () => {
     setDependent((orig) => [...orig, {
       uuid: checkUUID(orig),

@@ -6,6 +6,7 @@ import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
+import Box from '@material-ui/core/Box';
 import { makeStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 
@@ -98,16 +99,18 @@ export default function PersonalInfo({
 
       </ListItem>
 
-      <ListItem>
-        <TextField
-          value={personalInfo.addr1}
-          onChange={setField('addr1')}
-          label="Mailing Address"
-          size="medium"
-          variant="outlined"
-          fullWidth
-        />
-      </ListItem>
+      <Box width="102%">
+        <ListItem>
+          <TextField
+            value={personalInfo.addr1}
+            onChange={setField('addr1')}
+            label="Mailing Address"
+            size="medium"
+            variant="outlined"
+            fullWidth
+          />
+        </ListItem>
+      </Box>
 
       <ListItem>
         <TextField
