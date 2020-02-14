@@ -404,7 +404,8 @@ export default function HomePage() {
                   <Button
                     color="textSecondary"
                     onClick={() => {
-                      window.location = new URL('/text/pdf', config.backendURL);
+                      window.open(new URL('/tax/pdf', config.backendURL),
+                        '_blank');
                     }}
                   >
                     Download
