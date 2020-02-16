@@ -14,7 +14,7 @@ const taxtable = require('../taxtable.json');
 const rimraf = promisify(rimrafAsync);
 
 function roundDown(n, r) {
-  return n / r * r; // eslint-disable-line
+  return (n / r) * r;
 }
 
 function roundDiv(n, d) {
@@ -235,7 +235,7 @@ const TMP_DIR = os.tmpdir();
 async function fillAndSave(user) {
   const forms = await query.getUserData(user);
   if (forms === null) {
-    console.log('there are no forms for this user'); // eslint-disable-line
+    console.log('there are no forms for this user'); // eslint-disable-line no-console
     return null;
   }
 
@@ -244,16 +244,16 @@ async function fillAndSave(user) {
   try {
     const filledForm = path.join(dir, 'f1040-filled.pdf');
     await fillForm('1040', f1040, filledForm);
-    console.log(`Filled form in ${filledForm}`); // eslint-disable-line
+    console.log(`Filled form in ${filledForm}`); // eslint-disable-line no-console
     const storedFileName = await storeFile(filledForm);
-    console.log(`Stored file in ${storedFileName}`); // eslint-disable-line
+    console.log(`Stored file in ${storedFileName}`); // eslint-disable-line no-console
     await query.setUserPdfResult(user, storedFileName);
     return storedFileName;
   } finally {
     try {
       await rimraf(dir);
     } catch (e) {
-      console.error(`Unable to delete temporary directory: ${dir}`); // eslint-disable-line
+      console.error(`Unable to delete temporary directory: ${dir}`); // eslint-disable-line no-console
       // We give up.
     }
   }

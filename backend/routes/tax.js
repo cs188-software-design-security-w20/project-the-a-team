@@ -111,6 +111,7 @@ router.get('/pdf', async (req, res) => {
       res.set('Content-Type', 'application/pdf');
       storage.getFileStream(fname).pipe(res);
     } else {
+      res.set('Content-Type', 'application/pdf');
       storage.getFileStream(req.user.pdfResult).pipe(res);
     }
   } catch (err) {

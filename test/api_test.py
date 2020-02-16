@@ -33,14 +33,14 @@ def transform_taxinfo_output(taxinfo):
     return result
 
 
-def is_deep_subset(haystack, needle):
+def is_deep_subset(haystack, needle, *, float_tolerance=False):
     for key, value in needle.items():
         if key not in haystack:
             return False
         if isinstance(value, dict):
             if not is_deep_subset(haystack[key], value):
                 return False
-        elif isinstance(haystack[key], float) and isinstance(value, float):
+        elif float_tolerance and isinstance(haystack[key], float) and isinstance(value, float):
             if not math.isclose(haystack[key], value):
                 return False
         elif haystack[key] != value:
@@ -65,6 +65,14 @@ def random_digits(length):
 
 def random_money(scale=MAX_MONEY):
     return round(rnd.uniform(-scale, scale), 2)
+
+
+def random_two_different(rand_func, *args, **kwargs):
+    while True:
+        rand_value1 = rand_func(*args, **kwargs)
+        rand_value2 = rand_func(*args, **kwargs)
+        if rand_value1 != rand_value2:
+            return (rand_value1, rand_value2)
 
 
 class TestTaximus(unittest.TestCase):
@@ -486,7 +494,7 @@ class TestTaximus(unittest.TestCase):
                 self.assertEqual(r.status_code, 200)
                 result = transform_taxinfo_output(r.json())
                 expected = uuid_lower(test_case)
-                self.assertTrue(is_deep_subset(result, expected))
+                self.assertTrue(is_deep_subset(result, expected, float_tolerance=True))
                 self.tearDown()
 
         for test_case in fail_cases:
@@ -517,8 +525,7 @@ class TestTaximus(unittest.TestCase):
 
         with self.subTest(test_case='update_object'):
             rand_uuid = str(uuid.uuid4())
-            rand_string1 = random_string()
-            rand_string2 = random_string()
+            rand_string1, rand_string2 = random_two_different(random_string)
             r = requests.post(backend_url_base + '/tax', cookies=cookies, json={'fw2': {rand_uuid: {'employer': rand_string1}}})
             self.assertEqual(r.status_code, 204)
             r = requests.get(backend_url_base + '/tax', cookies=cookies)
@@ -532,13 +539,12 @@ class TestTaximus(unittest.TestCase):
             self.tearDown()
 
         with self.subTest(test_case='undefined_does_not_change_value'):
-            rand_string1 = random_string()
+            rand_string1, rand_string2 = random_two_different(random_string)
             r = requests.post(backend_url_base + '/tax', cookies=cookies, json={'addr1': rand_string1})
             self.assertEqual(r.status_code, 204)
             r = requests.get(backend_url_base + '/tax', cookies=cookies)
             self.assertEqual(r.status_code, 200)
             ret1 = r.json()
-            rand_string2 = random_string()
             r = requests.post(backend_url_base + '/tax', cookies=cookies, json={'addr2': rand_string2})
             self.assertEqual(r.status_code, 204)
             r = requests.get(backend_url_base + '/tax', cookies=cookies)
@@ -575,7 +581,29 @@ class TestTaximus(unittest.TestCase):
         self.assertEqual(r.status_code, 204)
 
     def test_pdf(self):
-        pass  # TODO
+        rand_account1, rand_account2 = random_two_different(random_digits, 9)
+        r = requests.post(backend_url_base + '/tax', cookies=cookies, json={'bankAccount': rand_account1})
+        self.assertEqual(r.status_code, 204)
+        r = requests.get(backend_url_base + '/tax/pdf', cookies=cookies)
+        pdf1 = r.content
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.headers['Content-Type'], 'application/pdf')
+        self.assertEqual(pdf1[:4], b'%PDF')
+        r = requests.get(backend_url_base + '/tax/pdf', cookies=cookies)
+        pdf2 = r.content
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.headers['Content-Type'], 'application/pdf')
+        self.assertEqual(pdf2[:4], b'%PDF')
+        self.assertEqual(pdf1, pdf2)
+        r = requests.post(backend_url_base + '/tax', cookies=cookies, json={'bankAccount': rand_account2})
+        self.assertEqual(r.status_code, 204)
+        r = requests.get(backend_url_base + '/tax/pdf', cookies=cookies)
+        pdf3 = r.content
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.headers['Content-Type'], 'application/pdf')
+        self.assertEqual(pdf3[:4], b'%PDF')
+        self.assertNotEqual(pdf1, pdf3)
+        self.assertNotEqual(pdf2, pdf3)
 
     def test_404(self):
         r = requests.get(backend_url_base + '/nope')
