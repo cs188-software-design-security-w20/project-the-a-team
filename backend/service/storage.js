@@ -20,12 +20,17 @@ async function storeFile(srcFilename) {
 }
 exports.storeFile = storeFile;
 
-function getFileStream(filename) {
-  return bucket.file(filename).setEncryptionKey(encryptionKey).createReadStream();
+function getFile(filename) {
+  return bucket.file(filename).setEncryptionKey(encryptionKey);
 }
-exports.getFileStream = getFileStream;
+exports.getFile = getFile;
 
-async function deleteFile(fname) {
-  await bucket.file(fname).delete();
+async function deleteFile(filename) {
+  try {
+    await bucket.file(filename).delete();
+  } catch (err) {
+    console.error(err); // eslint-disable-line no-console
+    // We give up.
+  }
 }
 exports.deleteFile = deleteFile;

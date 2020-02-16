@@ -81,11 +81,13 @@ const updateUserData = async (user, data) => {
       where: { userId: user.id },
       transaction: t,
     });
-    storage.deleteFile(user.pdfResult);
     const promises = [];
-    promises.push(user.update({
-      pdfResult: null,
-    }, { transaction: t }));
+    if (user.pdfResult !== null) {
+      promises.push(storage.deleteFile(user.pdfResult));
+      promises.push(user.update({
+        pdfResult: null,
+      }, { transaction: t }));
+    }
     promises.push(taxinfo.update({
       lastName: data.lastName,
       firstName: data.firstName,

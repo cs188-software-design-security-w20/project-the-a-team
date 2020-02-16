@@ -1,5 +1,7 @@
 'use strict';
 
+const stream = require('stream');
+const util = require('util');
 const express = require('express');
 const bodyParser = require('body-parser');
 
@@ -8,6 +10,8 @@ const calculation = require('../service/calculation.js');
 const storage = require('../service/storage.js');
 const converter = require('../utils/conversion.js');
 const validator = require('../utils/validation.js');
+
+const pipeline = util.promisify(stream.pipeline);
 
 const router = new express.Router();
 
@@ -106,17 +110,23 @@ const lockedFillAndSave = makeLocked(calculation.fillAndSave);
 
 router.get('/pdf', async (req, res) => {
   try {
-    if (!req.user.pdfResult) {
-      const fname = await lockedFillAndSave(req.user);
-      res.set('Content-Type', 'application/pdf');
-      storage.getFileStream(fname).pipe(res);
-    } else {
-      res.set('Content-Type', 'application/pdf');
-      storage.getFileStream(req.user.pdfResult).pipe(res);
-    }
+    const fname = req.user.pdfResult ? req.user.pdfResult : await lockedFillAndSave(req.user);
+    const file = storage.getFile(fname);
+    // This is race condition-prone, as we should use createReadStream directly to find out
+    // if the file exists. However, doing so is deemed to be difficult, so we punt on that for now.
+    const [exist] = await file.exists();
+    if (!exist) throw new Error('File should exist!!!!');
+    res.set('Content-Type', 'application/pdf');
+    await pipeline(file.createReadStream(), res);
   } catch (err) {
     console.error(err); // eslint-disable-line no-console
-    res.status(500).json({ message: 'Server error' });
+    try {
+      res.set('Content-Type', 'text/html');
+      res.status(500).end('PDF file not available');
+    } catch (err2) {
+      console.error('We couldn\'t send error:', err2); // eslint-disable-line no-console
+      // We give up.
+    }
   }
 });
 
