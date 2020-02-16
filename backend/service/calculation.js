@@ -247,8 +247,7 @@ async function fillAndSave(user) {
     console.log(`Filled form in ${filledForm}`); // eslint-disable-line
     const storedFileName = await storeFile(filledForm);
     console.log(`Stored file in ${storedFileName}`); // eslint-disable-line
-
-    await query.setUserPdfResult(storedFileName);
+    await query.setUserPdfResult(user, storedFileName);
     return storedFileName;
   } finally {
     try {
