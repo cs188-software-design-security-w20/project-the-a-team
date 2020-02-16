@@ -13,6 +13,7 @@ const Dependents = require('../models/Dependents.js');
 const converter = require('../utils/conversion.js');
 const cryptor = require('../utils/encryption.js');
 const validator = require('../utils/validation.js');
+const storage = require('./storage.js');
 
 const getUserByUUID = (userUUID) => sequelize.transaction((t) => User.findOne({
   where: { uuid: userUUID },
@@ -80,6 +81,7 @@ const updateUserData = async (user, data) => {
       where: { userId: user.id },
       transaction: t,
     });
+    storage.deleteFile(user.pdfResult);
     const promises = [];
     promises.push(user.update({
       pdfResult: null,

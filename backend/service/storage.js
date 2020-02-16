@@ -24,3 +24,8 @@ function getFileStream(filename) {
   return bucket.file(filename).setEncryptionKey(encryptionKey).createReadStream();
 }
 exports.getFileStream = getFileStream;
+
+async function deleteFile(fname) {
+  await bucket.file(fname).delete();
+}
+exports.deleteFile = deleteFile;
