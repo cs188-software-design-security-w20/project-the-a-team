@@ -21,7 +21,7 @@ async function fillForm(form, data, destFileName) {
   for (const key of Object.keys(data)) {
     const field = fields[key];
     if (!field) {
-      console.error(`Field not found: ${key}`);
+      console.error(`Field not found: ${key}`); // eslint-disable-line no-console
     } else if (field.type === 'Checkbox') {
       if (data[key]) {
         betterData[field.pdfName] = field.checked;
@@ -31,7 +31,7 @@ async function fillForm(form, data, destFileName) {
         betterData[field.pdfName] = data[key];
       }
     } else {
-      console.warn(`Unknown field type: ${field.type}`);
+      console.warn(`Unknown field type: ${field.type}`); // eslint-disable-line no-console
     }
   }
 

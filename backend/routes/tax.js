@@ -4,6 +4,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const query = require('../service/query.js');
+const calculation = require('../service/calculation.js');
+const storage = require('../service/storage.js');
 const converter = require('../utils/conversion.js');
 const validator = require('../utils/validation.js');
 
@@ -77,6 +79,41 @@ router.delete('/', async (req, res) => {
   try {
     await query.clearUserData(req.user);
     res.status(204).end();
+  } catch (err) {
+    console.error(err); // eslint-disable-line no-console
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+function makeLocked(cb) {
+  const map = new Map();
+  return async (user) => {
+    if (map.has(user.id)) {
+      return map.get(user.id);
+    }
+    const promise = cb(user);
+    map.set(user.id, promise);
+    try {
+      await promise;
+    } finally {
+      map.delete(user.id);
+    }
+    return promise;
+  };
+}
+
+const lockedFillAndSave = makeLocked(calculation.fillAndSave);
+
+router.get('/pdf', async (req, res) => {
+  try {
+    if (!req.user.pdfResult) {
+      const fname = await lockedFillAndSave(req.user);
+      res.set('Content-Type', 'application/pdf');
+      storage.getFileStream(fname).pipe(res);
+    } else {
+      res.set('Content-Type', 'application/pdf');
+      storage.getFileStream(req.user.pdfResult).pipe(res);
+    }
   } catch (err) {
     console.error(err); // eslint-disable-line no-console
     res.status(500).json({ message: 'Server error' });

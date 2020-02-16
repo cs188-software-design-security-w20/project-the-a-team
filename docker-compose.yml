@@ -22,8 +22,6 @@ services:
       - "8080:8080"
     links:
       - db_postgres
-    volumes:
-      - ./backend:/opt/app:ro
     restart: "always"
     ulimits:
       nproc: 500

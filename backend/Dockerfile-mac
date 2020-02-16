@@ -1,9 +1,0 @@
-FROM node:12-buster
-
-RUN mkdir -p /opt/app
-WORKDIR /opt/app
-
-ADD . /opt/app/
-RUN rm -rf node_modules && yarn
-
-CMD node index.js
