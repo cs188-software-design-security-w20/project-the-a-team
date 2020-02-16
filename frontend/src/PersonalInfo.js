@@ -28,19 +28,17 @@ export default function PersonalInfo({
 }) {
   const classes = useStyles();
 
-  const invalidSSN = personalInfo.ssn !== ''
-&& !/^[0-9]{9}$/.test(personalInfo.ssn);
+  const invalidSSN = personalInfo.ssn !== '' && !/^[0-9]{9}$/.test(personalInfo.ssn);
 
-  const invalidSpouseSSN = personalInfo.spouseSSN !== ''
-&& !/^[0-9]{9}$/.test(personalInfo.spouseSSN);
+  const invalidSpouseSSN = personalInfo.spouseSSN !== '' && !/^[0-9]{9}$/.test(personalInfo.spouseSSN);
 
   const invalidBankAcctNum = personalInfo.bankAccount !== ''
-&& (!/^\d*$/.test(personalInfo.bankAccount)
-&& personalInfo.bankAccount.length > 17);
+    && (!/^\d*$/.test(personalInfo.bankAccount)
+    && personalInfo.bankAccount.length > 17);
 
   const invalidBankRouting = personalInfo.bankRouting !== ''
-&& (!/^\d*$/.test(personalInfo.bankRouting)
-&& personalInfo.bankRouting.length > 17);
+    && (!/^\d*$/.test(personalInfo.bankRouting)
+    && personalInfo.bankRouting.length > 9);
 
   const setField = (field) => (e) => {
     const { value } = e.target;

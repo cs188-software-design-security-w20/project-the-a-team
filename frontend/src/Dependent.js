@@ -31,8 +31,7 @@ export default function Dependent({
 }) {
   const classes = useStyles();
 
-  const invalidSSN = dependent.ssn !== ''
-&& !/^[0-9]{9}$/.test(dependent.ssn);
+  const invalidSSN = dependent.ssn !== '' && !/^[0-9]{9}$/.test(dependent.ssn);
 
   const setField = (field) => (e) => {
     const { value } = e.target;
