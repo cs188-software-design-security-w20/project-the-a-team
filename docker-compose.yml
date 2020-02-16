@@ -5,15 +5,15 @@ services:
     environment:
       POSTGRES_USER: taximus
       POSTGRES_DB: taxmax
-      # POSTGRES_PASSWORD:  # TODO: assign during production
+      POSTGRES_PASSWORD: 'gMb3jENs2ldXMNOVLFoZe4ON9OFMNqsUqiNi6iCzy'
     logging:
       driver: none
     restart: "always"
-    ulimits:
-      nproc: 500
-      nofile:
-        soft: 2048
-        hard: 4096
+    # ulimits:
+    #   nproc: 500
+      # nofile:
+      #   soft: 2048
+      #   hard: 4096
   backend:
     build: ./backend
     # environment:
@@ -23,8 +23,8 @@ services:
     links:
       - db_postgres
     restart: "always"
-    ulimits:
-      nproc: 500
-      nofile:
-        soft: 2048
-        hard: 4096
+    # ulimits:
+    #   nproc: 500
+    #   nofile:
+    #     soft: 2048
+    #     hard: 4096

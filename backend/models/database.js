@@ -1,8 +1,9 @@
 'use strict';
 
 const Sequelize = require('sequelize');
+const config = require('../config.json');
 
-const sequelize = new Sequelize('taxmax', 'taximus', '', { // TODO: assign password during production
+const sequelize = new Sequelize('taxmax', 'taximus', config.credentials.databasePassword, {
   host: 'db_postgres',
   dialect: 'postgres',
   isolationLevel: Sequelize.Transaction.ISOLATION_LEVELS.SERIALIZABLE,
