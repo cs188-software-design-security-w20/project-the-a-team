@@ -31,8 +31,8 @@ export default function Dependent({
 }) {
   const classes = useStyles();
 
-  const [ssn, setSSN] = React.useState(dependent.ssn);
-  const invalidSSN = ssn !== '' && !/^[0-9]{9}$/.test(ssn);
+  const invalidSSN = dependent.ssn !== ''
+&& !/^[0-9]{9}$/.test(dependent.ssn);
 
   const setField = (field) => (e) => {
     const { value } = e.target;
@@ -57,8 +57,8 @@ export default function Dependent({
 
       <ListItem>
         <TextField
-          value={ssn}
-          onChange={(e) => setSSN(e.target.value)}
+          value={dependent.ssn}
+          onChange={setField('ssn')}
           label="Social Security Number"
           size="medium"
           variant="outlined"

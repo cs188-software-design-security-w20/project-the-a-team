@@ -94,8 +94,6 @@ export default function HomePage() {
 
   const [open, setOpen] = React.useState(false);
 
-  const [number, setNumber] = React.useState('');
-
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -111,12 +109,9 @@ export default function HomePage() {
   const checkUUID = (arr) => {
     const uuids = new Set(arr.map((entry) => entry.uuid));
     let uuid = uuidv4();
-    const invalid = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(number);
-    while (uuids.has(uuid) || invalid) {
+    while (uuids.has(uuid)) {
       uuid = uuidv4();
-      setNumber(uuid);
     }
-    console.log(uuid);
     return uuid;
   };
 

@@ -28,19 +28,19 @@ export default function PersonalInfo({
 }) {
   const classes = useStyles();
 
-  const [ssn, setSSN] = React.useState(personalInfo.ssn);
-  const invalidSSN = ssn !== '' && !/^[0-9]{9}$/.test(ssn);
+  const invalidSSN = personalInfo.ssn !== ''
+&& !/^[0-9]{9}$/.test(personalInfo.ssn);
 
-  const [spouseSSN, setSpouseSSN] = React.useState(personalInfo.spouseSSN);
-  const invalidSpouseSSN = spouseSSN !== '' && !/^[0-9]{9}$/.test(spouseSSN);
+  const invalidSpouseSSN = personalInfo.spouseSSN !== ''
+&& !/^[0-9]{9}$/.test(personalInfo.spouseSSN);
 
-  const [bankAcctNum, setBankAcctNum] = React.useState(personalInfo.bankAccount);
-  const invalidBankAcctNum = bankAcctNum !== ''
-&& (!/^\d*$/.test(bankAcctNum) && bankAcctNum.length > 17);
+  const invalidBankAcctNum = personalInfo.bankAccount !== ''
+&& (!/^\d*$/.test(personalInfo.bankAccount)
+&& personalInfo.bankAccount.length > 17);
 
-  const [bankRouting, setBankRouting] = React.useState(personalInfo.bankRouting);
-  const invalidBankRouting = bankRouting !== ''
-&& (!/^\d*$/.test(bankAcctNum) && bankAcctNum.length > 17);
+  const invalidBankRouting = personalInfo.bankRouting !== ''
+&& (!/^\d*$/.test(personalInfo.bankRouting)
+&& personalInfo.bankRouting.length > 17);
 
   const setField = (field) => (e) => {
     const { value } = e.target;
@@ -80,8 +80,8 @@ export default function PersonalInfo({
         />
 
         <TextField
-          value={ssn}
-          onChange={(e) => setSSN(e.target.value)}
+          value={personalInfo.ssn}
+          onChange={setField('ssn')}
           label="Social Security Number"
           size="medium"
           variant="outlined"
@@ -166,8 +166,8 @@ export default function PersonalInfo({
           variant="outlined"
         />
         <TextField
-          value={spouseSSN}
-          onChange={(e) => setSpouseSSN(e.target.value)}
+          value={personalInfo.spouseSSN}
+          onChange={setField('spouseSSN')}
           label="Spouse SSN"
           size="medium"
           error={invalidSpouseSSN}
@@ -178,8 +178,8 @@ export default function PersonalInfo({
 
       <ListItem>
         <TextField
-          value={bankAcctNum}
-          onChange={(e) => setBankAcctNum(e.target.value)}
+          value={personalInfo.bankAccount}
+          onChange={setField('bankAccount')}
           label="Bank Account Number"
           size="medium"
           variant="outlined"
@@ -188,8 +188,8 @@ export default function PersonalInfo({
           required
         />
         <TextField
-          value={bankRouting}
-          onChange={(e) => setBankRouting(e.target.value)}
+          value={personalInfo.bankRouting}
+          onChange={setField('bankRouting')}
           label="Bank Routing Number"
           size="medium"
           variant="outlined"
