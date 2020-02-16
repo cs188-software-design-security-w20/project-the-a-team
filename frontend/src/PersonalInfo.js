@@ -28,6 +28,20 @@ export default function PersonalInfo({
 }) {
   const classes = useStyles();
 
+  const [ssn, setSSN] = React.useState(personalInfo.ssn);
+  const invalidSSN = ssn !== '' && !/^[0-9]{9}$/.test(ssn);
+
+  const [spouseSSN, setSpouseSSN] = React.useState(personalInfo.spouseSSN);
+  const invalidSpouseSSN = spouseSSN !== '' && !/^[0-9]{9}$/.test(spouseSSN);
+
+  const [bankAcctNum, setBankAcctNum] = React.useState(personalInfo.bankAccount);
+  const invalidBankAcctNum = bankAcctNum !== ''
+&& (!/^\d*$/.test(bankAcctNum) && bankAcctNum.length > 17);
+
+  const [bankRouting, setBankRouting] = React.useState(personalInfo.bankRouting);
+  const invalidBankRouting = bankRouting !== ''
+&& (!/^\d*$/.test(bankAcctNum) && bankAcctNum.length > 17);
+
   const setField = (field) => (e) => {
     const { value } = e.target;
     setPersonalInfo((orig) => ({
@@ -45,6 +59,7 @@ export default function PersonalInfo({
           onChange={setField('firstName')}
           label="First Name"
           variant="outlined"
+          required
         />
 
         <TextField
@@ -61,19 +76,24 @@ export default function PersonalInfo({
           label="Last Name"
           size="medium"
           variant="outlined"
+          required
         />
 
         <TextField
-          value={personalInfo.ssn}
-          onChange={setField('ssn')}
+          value={ssn}
+          onChange={(e) => setSSN(e.target.value)}
           label="Social Security Number"
           size="medium"
           variant="outlined"
+          error={invalidSSN}
+          helperText={invalidSSN ? 'Enter a valid SSN.' : ''}
+          required
         />
 
         <FormControl
           variant="outlined"
           className={classes.formControl}
+          required
         >
           <InputLabel>
             Filing Status
@@ -107,6 +127,7 @@ export default function PersonalInfo({
           size="medium"
           variant="outlined"
           fullWidth
+          required
         />
       </ListItem>
 
@@ -117,6 +138,7 @@ export default function PersonalInfo({
           label="Apartment Number"
           size="medium"
           variant="outlined"
+          required
         />
         <TextField
           value={personalInfo.addr3}
@@ -124,6 +146,7 @@ export default function PersonalInfo({
           label="City, State and Zip Code"
           size="medium"
           variant="outlined"
+          required
         />
       </ListItem>
 
@@ -143,32 +166,41 @@ export default function PersonalInfo({
           variant="outlined"
         />
         <TextField
-          value={personalInfo.spouseSSN}
-          onChange={setField('spouseSSN')}
+          value={spouseSSN}
+          onChange={(e) => setSpouseSSN(e.target.value)}
           label="Spouse SSN"
           size="medium"
+          error={invalidSpouseSSN}
           variant="outlined"
+          helperText={invalidSpouseSSN ? 'Enter a valid SSN.' : ''}
         />
       </ListItem>
 
       <ListItem>
         <TextField
-          value={personalInfo.bankAccount}
-          onChange={setField('bankAccount')}
+          value={bankAcctNum}
+          onChange={(e) => setBankAcctNum(e.target.value)}
           label="Bank Account Number"
           size="medium"
           variant="outlined"
+          error={invalidBankAcctNum}
+          helperText={invalidBankAcctNum ? 'Enter a valid bank account number.' : ''}
+          required
         />
         <TextField
-          value={personalInfo.bankRouting}
-          onChange={setField('bankRouting')}
+          value={bankRouting}
+          onChange={(e) => setBankRouting(e.target.value)}
           label="Bank Routing Number"
           size="medium"
           variant="outlined"
+          error={invalidBankRouting}
+          helperText={invalidBankRouting ? 'Enter a valid bank routing number.' : ''}
+          required
         />
         <FormControl
           variant="outlined"
           className={classes.formControl}
+          required
         >
           <InputLabel>
             Checking/Savings

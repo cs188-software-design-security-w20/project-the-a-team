@@ -94,6 +94,8 @@ export default function HomePage() {
 
   const [open, setOpen] = React.useState(false);
 
+  const [number, setNumber] = React.useState('');
+
   const handleClickOpen = () => {
     setOpen(true);
   };
@@ -109,9 +111,12 @@ export default function HomePage() {
   const checkUUID = (arr) => {
     const uuids = new Set(arr.map((entry) => entry.uuid));
     let uuid = uuidv4();
-    while (uuids.has(uuid)) {
+    const invalid = /^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(number);
+    while (uuids.has(uuid) || invalid) {
       uuid = uuidv4();
+      setNumber(uuid);
     }
+    console.log(uuid);
     return uuid;
   };
 
@@ -267,7 +272,7 @@ export default function HomePage() {
           <Toolbar>
             <Grid container alignItems="flex-start" justify="flex-end" direction="row">
               <Box mt={2}>
-                <Typography color="textSecondary" variant="h3" className={classes.customizeToolbar} inline>
+                <Typography color="textSecondary" variant="h3" className={classes.customizeToolbar}>
                   <b>Taximus</b>
                   <br />
                   <b>Maximus</b>
