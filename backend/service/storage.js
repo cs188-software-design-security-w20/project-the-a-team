@@ -28,6 +28,7 @@ exports.getFile = getFile;
 async function deleteFile(filename) {
   try {
     await bucket.file(filename).delete();
+    console.log(`Deleted file ${filename}`); // eslint-disable-line no-console
   } catch (err) {
     console.error(err); // eslint-disable-line no-console
     // We give up.

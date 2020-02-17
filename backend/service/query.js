@@ -232,6 +232,7 @@ const clearUserData = (user) => sequelize.transaction(async (t) => {
     bankRouting: null,
     bankIsChecking: null,
   }, { transaction: t });
+  if (user.pdfResult) await storage.deleteFile(user.pdfResult);
   return user.update({ pdfResult: null }, { transaction: t });
 });
 
