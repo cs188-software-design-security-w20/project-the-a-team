@@ -19,7 +19,7 @@ services:
     # environment:
       # - NODE_ENV=production  # TODO: set this in production
     ports:
-      - "8080:8080"
+      - "8080:8080"  # TODO: do not expose this port in production
     links:
       - db_postgres
     restart: "always"
@@ -28,3 +28,18 @@ services:
     #   nofile:
     #     soft: 2048
     #     hard: 4096
+  # nginx:
+  #   image: nginx
+  #   restart: "always"
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   links:
+  #     - backend
+  #   volumes:
+  #     - ./frontend/build:/usr/share/nginx/html:ro
+  #     - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  #     # TODO: mounting symlink /etc/letsencrypt/live/... does not work, better alternatives?
+  #     - /etc/letsencrypt/archive/tax.timothygu.me/fullchain1.pem:/letsencrypt/fullchain.pem:ro
+  #     - /etc/letsencrypt/archive/tax.timothygu.me/privkey1.pem:/letsencrypt/privkey.pem:ro
+  #     - ./ssl-dhparams.pem:/letsencrypt/ssl-dhparams.pem:ro
