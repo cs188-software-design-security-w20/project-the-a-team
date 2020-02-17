@@ -28,6 +28,18 @@ export default function PersonalInfo({
 }) {
   const classes = useStyles();
 
+  const invalidSSN = personalInfo.ssn !== '' && !/^[0-9]{9}$/.test(personalInfo.ssn);
+
+  const invalidSpouseSSN = personalInfo.spouseSSN !== '' && !/^[0-9]{9}$/.test(personalInfo.spouseSSN);
+
+  const invalidBankAcctNum = personalInfo.bankAccount !== ''
+    && (!/^\d*$/.test(personalInfo.bankAccount)
+    && personalInfo.bankAccount.length > 17);
+
+  const invalidBankRouting = personalInfo.bankRouting !== ''
+    && (!/^\d*$/.test(personalInfo.bankRouting)
+    && personalInfo.bankRouting.length > 9);
+
   const setField = (field) => (e) => {
     const { value } = e.target;
     setPersonalInfo((orig) => ({
@@ -45,6 +57,7 @@ export default function PersonalInfo({
           onChange={setField('firstName')}
           label="First Name"
           variant="outlined"
+          required
         />
 
         <TextField
@@ -61,6 +74,7 @@ export default function PersonalInfo({
           label="Last Name"
           size="medium"
           variant="outlined"
+          required
         />
 
         <TextField
@@ -69,11 +83,15 @@ export default function PersonalInfo({
           label="Social Security Number"
           size="medium"
           variant="outlined"
+          error={invalidSSN}
+          helperText={invalidSSN ? 'Enter a valid SSN.' : ''}
+          required
         />
 
         <FormControl
           variant="outlined"
           className={classes.formControl}
+          required
         >
           <InputLabel>
             Filing Status
@@ -100,6 +118,7 @@ export default function PersonalInfo({
           size="medium"
           variant="outlined"
           fullWidth
+          required
         />
       </ListItem>
 
@@ -110,6 +129,7 @@ export default function PersonalInfo({
           label="Apartment Number"
           size="medium"
           variant="outlined"
+          required
         />
         <TextField
           value={personalInfo.addr3}
@@ -117,6 +137,7 @@ export default function PersonalInfo({
           label="City, State and Zip Code"
           size="medium"
           variant="outlined"
+          required
         />
       </ListItem>
 
@@ -133,7 +154,9 @@ export default function PersonalInfo({
           onChange={setField('spouseSSN')}
           label="Spouse SSN"
           size="medium"
+          error={invalidSpouseSSN}
           variant="outlined"
+          helperText={invalidSpouseSSN ? 'Enter a valid SSN.' : ''}
         />
       </ListItem>
 
@@ -144,6 +167,9 @@ export default function PersonalInfo({
           label="Bank Account Number"
           size="medium"
           variant="outlined"
+          error={invalidBankAcctNum}
+          helperText={invalidBankAcctNum ? 'Enter a valid bank account number.' : ''}
+          required
         />
         <TextField
           value={personalInfo.bankRouting}
@@ -151,10 +177,14 @@ export default function PersonalInfo({
           label="Bank Routing Number"
           size="medium"
           variant="outlined"
+          error={invalidBankRouting}
+          helperText={invalidBankRouting ? 'Enter a valid bank routing number.' : ''}
+          required
         />
         <FormControl
           variant="outlined"
           className={classes.formControl}
+          required
         >
           <InputLabel>
             Account Type

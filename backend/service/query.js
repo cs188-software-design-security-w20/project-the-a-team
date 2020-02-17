@@ -13,6 +13,7 @@ const Dependents = require('../models/Dependents.js');
 const converter = require('../utils/conversion.js');
 const cryptor = require('../utils/encryption.js');
 const validator = require('../utils/validation.js');
+const storage = require('./storage.js');
 
 const getUserByUUID = (userUUID) => sequelize.transaction((t) => User.findOne({
   where: { uuid: userUUID },
@@ -81,9 +82,12 @@ const updateUserData = async (user, data) => {
       transaction: t,
     });
     const promises = [];
-    promises.push(user.update({
-      pdfResult: null,
-    }, { transaction: t }));
+    if (user.pdfResult !== null) {
+      promises.push(storage.deleteFile(user.pdfResult));
+      promises.push(user.update({
+        pdfResult: null,
+      }, { transaction: t }));
+    }
     promises.push(taxinfo.update({
       lastName: data.lastName,
       firstName: data.firstName,
@@ -228,6 +232,7 @@ const clearUserData = (user) => sequelize.transaction(async (t) => {
     bankRouting: null,
     bankIsChecking: null,
   }, { transaction: t });
+  if (user.pdfResult) await storage.deleteFile(user.pdfResult);
   return user.update({ pdfResult: null }, { transaction: t });
 });
 

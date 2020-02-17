@@ -293,7 +293,7 @@ export default function HomePage({ data }) {
           <Toolbar>
             <Grid container alignItems="flex-start" justify="flex-end" direction="row">
               <Box mt={2}>
-                <Typography color="textSecondary" variant="h3" className={classes.customizeToolbar} inline>
+                <Typography color="textSecondary" variant="h3" className={classes.customizeToolbar}>
                   <b>Taximus</b>
                   <br />
                   <b>Maximus</b>
@@ -430,7 +430,8 @@ export default function HomePage({ data }) {
                   <Button
                     color="textSecondary"
                     onClick={() => {
-                      window.location = new URL('/text/pdf', config.backendURL);
+                      window.open(new URL('/tax/pdf', config.backendURL),
+                        '_blank');
                     }}
                   >
                     Download

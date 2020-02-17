@@ -31,6 +31,8 @@ export default function Dependent({
 }) {
   const classes = useStyles();
 
+  const invalidSSN = dependent.ssn !== '' && !/^[0-9]{9}$/.test(dependent.ssn);
+
   const setField = (field) => (e) => {
     const { value } = e.target;
     setDependent((orig) => ({
@@ -59,6 +61,8 @@ export default function Dependent({
           label="Social Security Number"
           size="medium"
           variant="outlined"
+          error={invalidSSN}
+          helperText={invalidSSN ? 'Enter a valid SSN.' : ''}
         />
         <FormControl
           variant="outlined"
