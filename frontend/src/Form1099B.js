@@ -32,6 +32,14 @@ export default function Form1099B({
 }) {
   const classes = useStyles();
 
+  const setNumField = (field) => (e) => {
+    const { valueAsNumber } = e.target;
+    setF1099B((orig) => ({
+      ...orig,
+      [field]: valueAsNumber,
+    }));
+  };
+
   const setField = (field) => (e) => {
     const { value } = e.target;
     setF1099B((orig) => ({
@@ -42,16 +50,6 @@ export default function Form1099B({
 
   return (
     <List className={classes.root}>
-      <ListItem>
-        <TextField
-          value={f1099b.proceeds}
-          onChange={setField('proceeds')}
-          label="Proceeds"
-          size="medium"
-          variant="outlined"
-          fullWidth
-        />
-      </ListItem>
       <ListItem>
         <TextField
           value={f1099b.desc}
@@ -65,8 +63,20 @@ export default function Form1099B({
 
       <ListItem>
         <TextField
+          value={f1099b.proceeds}
+          onChange={setNumField('proceeds')}
+          type="number"
+          label="Proceeds"
+          size="medium"
+          variant="outlined"
+          InputProps={{
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
+          }}
+        />
+        <TextField
           value={f1099b.basis}
-          onChange={setField('basis')}
+          onChange={setNumField('basis')}
+          type="number"
           label="Basis"
           size="medium"
           variant="outlined"
@@ -90,7 +100,8 @@ export default function Form1099B({
         </FormControl>
         <TextField
           value={f1099b.taxWithheld}
-          onChange={setField('taxWithhed')}
+          onChange={setNumField('taxWithheld')}
+          type="number"
           label="Tax Income Withheld"
           size="medium"
           variant="outlined"

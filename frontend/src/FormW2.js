@@ -24,6 +24,14 @@ export default function FormW2({
 }) {
   const classes = useStyles();
 
+  const setNumField = (field) => (e) => {
+    const { valueAsNumber } = e.target;
+    setFw2((orig) => ({
+      ...orig,
+      [field]: valueAsNumber,
+    }));
+  };
+
   const setField = (field) => (e) => {
     const { value } = e.target;
     setFw2((orig) => ({
@@ -47,7 +55,8 @@ export default function FormW2({
       <ListItem>
         <TextField
           value={fw2.income}
-          onChange={setField('income')}
+          onChange={setNumField('income')}
+          type="number"
           label="Income"
           size="medium"
           variant="outlined"
@@ -57,7 +66,8 @@ export default function FormW2({
         />
         <TextField
           value={fw2.taxWithheld}
-          onChange={setField('taxWithheld')}
+          onChange={setNumField('taxWithheld')}
+          type="number"
           label="Tax Withheld"
           size="medium"
           variant="outlined"

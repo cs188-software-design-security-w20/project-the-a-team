@@ -28,6 +28,14 @@ export default function Form1099Div({
 }) {
   const classes = useStyles();
 
+  const setNumField = (field) => (e) => {
+    const { valueAsNumber } = e.target;
+    setF1099Div((orig) => ({
+      ...orig,
+      [field]: valueAsNumber,
+    }));
+  };
+
   const setField = (field) => (e) => {
     const { value } = e.target;
     setF1099Div((orig) => ({
@@ -52,48 +60,48 @@ export default function Form1099Div({
       <ListItem>
         <TextField
           value={f1099div.ordDividends}
-          onChange={setField('ordDividends')}
+          onChange={setNumField('ordDividends')}
+          type="number"
           label="Total Ordinary Dividends"
           size="medium"
           variant="outlined"
           InputProps={{
-            startAdornment:
-  <InputAdornment position="start">$</InputAdornment>,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
           }}
         />
         <TextField
           value={f1099div.qualDividends}
-          onChange={setField('qualDividends')}
+          onChange={setNumField('qualDividends')}
+          type="number"
           label="Total Qualified Dividends"
           size="medium"
           variant="outlined"
           InputProps={{
-            startAdornment:
-  <InputAdornment position="start">$</InputAdornment>,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
           }}
         />
 
         <TextField
           value={f1099div.taxWithheld}
-          onChange={setField('taxWithhed')}
+          onChange={setNumField('taxWithheld')}
+          type="number"
           label="Tax Income Withheld"
           size="medium"
           variant="outlined"
           InputProps={{
-            startAdornment:
-  <InputAdornment position="start">$</InputAdornment>,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
           }}
         />
 
         <TextField
           value={f1099div.exemptInterestDiv}
-          onChange={setField('exemptInterestDiv')}
+          onChange={setNumField('exemptInterestDiv')}
+          type="number"
           label="Exempt Interest Dividends"
           size="medium"
           variant="outlined"
           InputProps={{
-            startAdornment:
-  <InputAdornment position="start">$</InputAdornment>,
+            startAdornment: <InputAdornment position="start">$</InputAdornment>,
           }}
         />
 

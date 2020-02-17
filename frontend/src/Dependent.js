@@ -64,33 +64,14 @@ export default function Dependent({
           error={invalidSSN}
           helperText={invalidSSN ? 'Enter a valid SSN.' : ''}
         />
-        <FormControl
+
+        <TextField
+          value={dependent.relation}
+          onChange={setField('relation')}
+          label="Dependent Relation"
+          size="medium"
           variant="outlined"
-          className={classes.formControl}
-        >
-          <InputLabel>Dependent Relation</InputLabel>
-          <Select
-            label="Dependent Relation"
-            value={dependent.relation}
-            onChange={setField('relation')}
-          >
-            <MenuItem value="child">
-              Child/Stechild/Foster Child
-            </MenuItem>
-            <MenuItem value="sibling">
-              Brother/Sister/Stepbrother/Stepsister
-            </MenuItem>
-            <MenuItem value="Parent">
-              Father/Mother/Stepfather/Stepmother
-            </MenuItem>
-            <MenuItem value="extendedFamily">
-              Uncle/Aunt/Niece/Nephews
-            </MenuItem>
-            <MenuItem value="inLaws">
-              Spouse Family
-            </MenuItem>
-          </Select>
-        </FormControl>
+        />
         <FormControl
           variant="outlined"
           className={classes.formControl}

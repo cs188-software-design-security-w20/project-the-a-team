@@ -24,6 +24,14 @@ export default function Form1099INT({
 }) {
   const classes = useStyles();
 
+  const setNumField = (field) => (e) => {
+    const { valueAsNumber } = e.target;
+    setF1099INT((orig) => ({
+      ...orig,
+      [field]: valueAsNumber,
+    }));
+  };
+
   const setField = (field) => (e) => {
     const { value } = e.target;
     setF1099INT((orig) => ({
@@ -47,7 +55,8 @@ export default function Form1099INT({
       <ListItem>
         <TextField
           value={f1099int.income}
-          onChange={setField('income')}
+          onChange={setNumField('income')}
+          type="number"
           label="Income"
           size="medium"
           variant="outlined"
@@ -57,7 +66,8 @@ export default function Form1099INT({
         />
         <TextField
           value={f1099int.usSavingTreasInterest}
-          onChange={setField('usSavingTreasInterest')}
+          onChange={setNumField('usSavingTreasInterest')}
+          type="number"
           label="US Savings and Treasury Interest"
           size="medium"
           variant="outlined"
@@ -67,7 +77,8 @@ export default function Form1099INT({
         />
         <TextField
           value={f1099int.taxExemptInterest}
-          onChange={setField('taxExemptInterest')}
+          onChange={setNumField('taxExemptInterest')}
+          type="number"
           label="Tax Exempt Interest"
           size="medium"
           variant="outlined"
@@ -78,7 +89,8 @@ export default function Form1099INT({
 
         <TextField
           value={f1099int.taxWithheld}
-          onChange={setField('taxWithheld')}
+          onChange={setNumField('taxWithheld')}
+          type="number"
           label="Tax Income Withheld"
           size="medium"
           variant="outlined"

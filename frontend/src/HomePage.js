@@ -84,26 +84,29 @@ export default function HomePage({ data }) {
   });
 
   const [arrDependents, setDependent] = React.useState(data.dependents.map((dependent) => ({
+    uuid: dependent.uuid,
     childCredit: Boolean(dependent.childCredit),
     name: dependent.name || '',
     relation: dependent.relation || '',
     ssn: dependent.ssn || '',
-    uuid: dependent.uuid || '',
   })));
 
   const [arrW2, setW2] = React.useState(data.fw2.map((fw2) => ({
+    uuid: fw2.uuid,
     employer: fw2.employer || '',
     income: fw2.income || 0,
     taxWithheld: fw2.taxWithheld || 0,
   })));
 
   const [arr1099INT, set1099INT] = React.useState(data.f1099int.map((f1099int) => ({
+    uuid: f1099int.uuid,
     employer: f1099int.employer || '',
     income: f1099int.income || 0,
     taxWithheld: f1099int.taxWithheld || 0,
   })));
 
   const [arr1099B, set1099B] = React.useState(data.f1099b.map((f1099b) => ({
+    uuid: f1099b.uuid,
     desc: f1099b.desc || '',
     proceeds: f1099b.proceeds || 0,
     basis: f1099b.basis || 0,
@@ -112,6 +115,7 @@ export default function HomePage({ data }) {
   })));
 
   const [arr1099Div, set1099Div] = React.useState(data.f1099div.map((f1099div) => ({
+    uuid: f1099div.uuid,
     payer: f1099div.payer || '',
     ordDividends: f1099div.ordDividends || 0,
     qualDividends: f1099div.qualDividends || 0,
@@ -129,10 +133,9 @@ export default function HomePage({ data }) {
     setDlDialogOpen(false);
   };
 
-  const [savedOpen, setSavedOpen] = React.useState(false);
-
-  const handleSavedClose = () => {
-    setSavedOpen(false);
+  const [snackbar, setSnackbar] = React.useState(null);
+  const handleSnackbarClose = () => {
+    setSnackbar(null);
   };
 
   const handleClickSave = async () => {
@@ -144,12 +147,12 @@ export default function HomePage({ data }) {
       dependents[dependentUUID] = null;
     }
 
-    const w2 = Object.create(null);
-    for (const fw2 of arrW2) {
-      w2[fw2.uuid] = fw2;
+    const fw2 = Object.create(null);
+    for (const w2 of arrW2) {
+      fw2[w2.uuid] = w2;
     }
     for (const w2UUID of deletedUUIDs.fw2) {
-      w2[w2UUID] = null;
+      fw2[w2UUID] = null;
     }
 
     const f1099int = Object.create(null);
@@ -179,26 +182,46 @@ export default function HomePage({ data }) {
     const body = {
       ...personalInfo,
       dependents,
-      w2,
-      '1099int': f1099int,
-      '1099b': f1099b,
-      '1099div': f1099div,
+      fw2,
+      f1099int,
+      f1099b,
+      f1099div,
     };
 
-    await fetch(new URL('/tax', config.backendURL), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      credentials: 'include',
-    });
+    try {
+      const response = await fetch(new URL('/tax', config.backendURL), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw response;
+      }
 
-    deletedUUIDs.dependents = [];
-    deletedUUIDs.f1099b = [];
-    deletedUUIDs.f1099div = [];
-    deletedUUIDs.f1099int = [];
-    deletedUUIDs.fw2 = [];
+      deletedUUIDs.dependents = [];
+      deletedUUIDs.f1099b = [];
+      deletedUUIDs.f1099div = [];
+      deletedUUIDs.f1099int = [];
+      deletedUUIDs.fw2 = [];
 
-    setSavedOpen(true);
+      setSnackbar('Saved.');
+    } catch (err) {
+      let handled = false;
+      if (err instanceof Response) {
+        try {
+          const json = await err.json();
+          setSnackbar(`Error: ${json.message}`);
+          handled = true;
+        } catch (err2) {
+          // We give up.
+        }
+      }
+      if (!handled) {
+        setSnackbar('Error: failed to save.');
+        console.error(err); // eslint-disable-line no-console
+      }
+    }
   };
 
   const checkUUID = (arr) => {
@@ -434,7 +457,7 @@ export default function HomePage({ data }) {
           ),
           arr1099B,
           addNew1099B,
-          'description',
+          'desc',
         )}
 
         {formBlock(
@@ -476,10 +499,10 @@ export default function HomePage({ data }) {
                   vertical: 'bottom',
                   horizontal: 'left',
                 }}
-                open={savedOpen}
+                open={Boolean(snackbar)}
                 autoHideDuration={6000}
-                onClose={handleSavedClose}
-                message="Saved."
+                onClose={handleSnackbarClose}
+                message={snackbar}
               />
 
               <Button size="large" variant="outlined" onClick={handleClickOpen}>
