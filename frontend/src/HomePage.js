@@ -19,6 +19,7 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Snackbar from '@material-ui/core/Snackbar';
 import config from './config';
 
 import PersonalInfo from './PersonalInfo';
@@ -118,18 +119,86 @@ export default function HomePage({ data }) {
     exemptInterestDiv: f1099div.exemptInterestDiv || 0,
   })));
 
-  const [open, setOpen] = React.useState(false);
+  const [dlDialogOpen, setDlDialogOpen] = React.useState(false);
 
   const handleClickOpen = () => {
-    setOpen(true);
+    setDlDialogOpen(true);
   };
 
   const handleClose = () => {
-    setOpen(false);
+    setDlDialogOpen(false);
   };
 
-  const handleClickSave = () => {
-    setOpen(true);
+  const [savedOpen, setSavedOpen] = React.useState(false);
+
+  const handleSavedClose = () => {
+    setSavedOpen(false);
+  };
+
+  const handleClickSave = async () => {
+    const dependents = Object.create(null);
+    for (const dependent of arrDependents) {
+      dependents[dependent.uuid] = dependent;
+    }
+    for (const dependentUUID of deletedUUIDs.dependents) {
+      dependents[dependentUUID] = null;
+    }
+
+    const w2 = Object.create(null);
+    for (const fw2 of arrW2) {
+      w2[fw2.uuid] = fw2;
+    }
+    for (const w2UUID of deletedUUIDs.fw2) {
+      w2[w2UUID] = null;
+    }
+
+    const f1099int = Object.create(null);
+    for (const form1099Int of arr1099INT) {
+      f1099int[form1099Int.uuid] = form1099Int;
+    }
+    for (const form1099IntUUID of deletedUUIDs.f1099int) {
+      f1099int[form1099IntUUID] = null;
+    }
+
+    const f1099b = Object.create(null);
+    for (const form1099B of arr1099B) {
+      f1099b[form1099B.uuid] = form1099B;
+    }
+    for (const form1099BUUID of deletedUUIDs.f1099b) {
+      f1099b[form1099BUUID] = null;
+    }
+
+    const f1099div = Object.create(null);
+    for (const form1099Div of arr1099Div) {
+      f1099div[form1099Div.uuid] = form1099Div;
+    }
+    for (const form1099DivUUID of deletedUUIDs.f1099div) {
+      f1099div[form1099DivUUID] = null;
+    }
+
+    const body = {
+      ...personalInfo,
+      dependents,
+      w2,
+      '1099int': f1099int,
+      '1099b': f1099b,
+      '1099div': f1099div,
+    };
+
+    await fetch(new URL('/tax', config.backendURL), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      credentials: 'include',
+    });
+
+    deletedUUIDs.dependents = [];
+    deletedUUIDs.f1099b = [];
+    deletedUUIDs.f1099div = [];
+    deletedUUIDs.f1099int = [];
+    deletedUUIDs.fw2 = [];
+
+    setSavedOpen(true);
   };
 
   const checkUUID = (arr) => {
@@ -402,13 +471,23 @@ export default function HomePage({ data }) {
                   SAVE
                 </Typography>
               </Button>
+              <Snackbar
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'left',
+                }}
+                open={savedOpen}
+                autoHideDuration={6000}
+                onClose={handleSavedClose}
+                message="Saved."
+              />
 
               <Button size="large" variant="outlined" onClick={handleClickOpen}>
                 <Typography variant="h4">FINISH</Typography>
               </Button>
 
               <Dialog
-                open={open}
+                open={dlDialogOpen}
                 onClose={handleClose}
               >
                 <DialogTitle>
