@@ -133,7 +133,7 @@ export default function PersonalInfo({
         />
         <TextField
           value={personalInfo.addr3}
-          onChange={setField('add3')}
+          onChange={setField('addr3')}
           label="City, State and Zip Code"
           size="medium"
           variant="outlined"

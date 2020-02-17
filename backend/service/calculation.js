@@ -160,7 +160,7 @@ function bigIntToString(bigInt, roundUpToZero) {
 
 function calculate(forms) {
   const [dep1, dep2, dep3, dep4] = forms.dependents;
-  const isSingle = !(forms.taxinfo.spouseName && forms.taxinfo.spouseSsn);
+  const isSingle = !(forms.taxinfo.spouseName && forms.taxinfo.spouseSSN);
   const line1 = calcTotalWages(forms.fw2);
   const line2a = calcTotalTaxExemptInterest(forms.f1099int, forms.f1099div);
   const line2b = calcTotalTaxableInterest(forms.f1099int);
@@ -181,7 +181,7 @@ function calculate(forms) {
     lastName: forms.taxinfo.lastName,
     ssn: forms.taxinfo.ssn,
     spouseName: forms.taxinfo.spouseName,
-    spouseSSN: forms.taxinfo.spouseSsn,
+    spouseSSN: forms.taxinfo.spouseSSN,
     addr1: forms.taxinfo.addr1,
     addr2: forms.taxinfo.addr2,
     addr3: forms.taxinfo.addr3,
