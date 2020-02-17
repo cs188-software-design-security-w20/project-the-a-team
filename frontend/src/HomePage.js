@@ -256,7 +256,7 @@ export default function HomePage({ data }) {
       <>
         <Box mr={1} mx="auto">
           {array.map((obj, index) => (
-            <ExpansionPanel>
+            <ExpansionPanel key={shortTitle + obj.uuid}>
               <ExpansionPanelSummary expandIcon={<ExpandMoreIcon />}>
                 <Typography variant="h4">
                   {title + addColon(obj[summaryProp])}
