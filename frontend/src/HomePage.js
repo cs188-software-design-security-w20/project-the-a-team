@@ -56,11 +56,11 @@ function addColon(str) {
 }
 
 const deletedUUIDs = {
-  dependent: [],
-  b1099: [],
-  div1099: [],
-  int1099: [],
-  w2: [],
+  dependents: [],
+  f1099b: [],
+  f1099div: [],
+  f1099int: [],
+  fw2: [],
 };
 
 export default function HomePage({ data }) {
@@ -144,7 +144,7 @@ export default function HomePage({ data }) {
   const removeDependent = (index) => {
     setDependent((orig) => {
       const copy = [...orig];
-      deletedUUIDs.dependent.push(orig[index].uuid);
+      deletedUUIDs.dependents.push(orig[index].uuid);
       copy.splice(index, 1);
       return copy;
     });
@@ -153,7 +153,7 @@ export default function HomePage({ data }) {
   const remove1099B = (index) => {
     set1099B((orig) => {
       const copy = [...orig];
-      deletedUUIDs.b1099.push(orig[index].uuid);
+      deletedUUIDs.f1099b.push(orig[index].uuid);
       copy.splice(index, 1);
       return copy;
     });
@@ -162,7 +162,7 @@ export default function HomePage({ data }) {
   const remove1099Div = (index) => {
     set1099Div((orig) => {
       const copy = [...orig];
-      deletedUUIDs.div1099.push(orig[index].uuid);
+      deletedUUIDs.f1099div.push(orig[index].uuid);
       copy.splice(index, 1);
       return copy;
     });
@@ -171,7 +171,7 @@ export default function HomePage({ data }) {
   const remove1099Int = (index) => {
     set1099INT((orig) => {
       const copy = [...orig];
-      deletedUUIDs.int1099.push(orig[index].uuid);
+      deletedUUIDs.f1099int.push(orig[index].uuid);
       copy.splice(index, 1);
       return copy;
     });
@@ -180,7 +180,7 @@ export default function HomePage({ data }) {
   const removeW2 = (index) => {
     setW2((orig) => {
       const copy = [...orig];
-      deletedUUIDs.w2.push(orig[index].uuid);
+      deletedUUIDs.fw2.push(orig[index].uuid);
       copy.splice(index, 1);
       return copy;
     });
