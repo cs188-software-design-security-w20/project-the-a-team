@@ -110,12 +110,19 @@ const lockedFillAndSave = makeLocked(calculation.fillAndSave);
 
 router.get('/pdf', async (req, res) => {
   try {
-    const fname = req.user.pdfResult ? req.user.pdfResult : await lockedFillAndSave(req.user);
-    const file = storage.getFile(fname);
-    // This is race condition-prone, as we should use createReadStream directly to find out
-    // if the file exists. However, doing so is deemed to be difficult, so we punt on that for now.
-    const [exist] = await file.exists();
-    if (!exist) throw new Error('File should exist!!!!');
+    let file;
+    if (req.user.pdfResult) {
+      file = storage.getFile(req.user.pdfResult);
+      // This is race condition-prone, as we should use createReadStream directly to find out if
+      // the file exists. However, doing so is deemed to be difficult, so we punt on that for now.
+      const [exist] = await file.exists();
+      if (!exist) {
+        console.warn('File missing! Regenerating...'); // eslint-disable-line no-console
+        file = storage.getFile(await lockedFillAndSave(req.user));
+      }
+    } else {
+      file = storage.getFile(await lockedFillAndSave(req.user));
+    }
     res.set('Content-Type', 'application/pdf');
     await pipeline(file.createReadStream(), res);
   } catch (err) {
