@@ -44,6 +44,7 @@ function App() {
           throw new Error('Response not okay');
         }
         const data = await response.json();
+        console.log(data);
         setLoginData(data);
       } catch (err) {
         console.error(err);
@@ -54,7 +55,7 @@ function App() {
     })();
   }, []);
 
-  const innerComponent = loginData === null ? <LoginPage /> : <HomePage />;
+  const innerComponent = loginData === null ? <LoginPage /> : <HomePage data={loginData} />;
 
   return (
     <ThemeProvider theme={theme}>

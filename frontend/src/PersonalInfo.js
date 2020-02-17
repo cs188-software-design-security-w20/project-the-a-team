@@ -83,17 +83,10 @@ export default function PersonalInfo({
             value={personalInfo.filingStatus}
             onChange={setField('filingStatus')}
           >
-            <MenuItem value="marriedFilingJointly">
-              Married Filing Jointly
-            </MenuItem>
             <MenuItem value="marriedFilingSeparately">
               Married Filing Separately
             </MenuItem>
-            <MenuItem value="headOfHousehold">
-              Head of Household
-            </MenuItem>
             <MenuItem value="single">Single</MenuItem>
-            <MenuItem value="widowed">Widowed</MenuItem>
           </Select>
         </FormControl>
 
@@ -129,16 +122,9 @@ export default function PersonalInfo({
 
       <ListItem>
         <TextField
-          value={personalInfo.spouseFirstName}
-          onChange={setField('spouseFirstName')}
-          label="Spouse First Name"
-          size="medium"
-          variant="outlined"
-        />
-        <TextField
-          value={personalInfo.spouseLastName}
-          onChange={setField('spouseLastName')}
-          label="Spouse Last Name"
+          value={personalInfo.spouseName}
+          onChange={setField('spouseName')}
+          label="Spouse Name"
           size="medium"
           variant="outlined"
         />
@@ -171,12 +157,12 @@ export default function PersonalInfo({
           className={classes.formControl}
         >
           <InputLabel>
-            Checking/Savings
+            Account Type
           </InputLabel>
           <Select
-            label="Filing Status"
-            value={personalInfo.filingStatus}
-            onChange={setField('filingStatus')}
+            label="Account Type"
+            value={personalInfo.bankIsChecking}
+            onChange={setField('bankIsChecking')}
           >
             <MenuItem value>Checkings</MenuItem>
             <MenuItem value={false}>Savings</MenuItem>
@@ -201,8 +187,7 @@ PersonalInfo.propTypes = {
     bankAccount: PropTypes.string,
     bankRouting: PropTypes.string,
     bankIsChecking: PropTypes.bool,
-    spouseFirstName: PropTypes.string,
-    spouseLastName: PropTypes.string,
+    spouseName: PropTypes.string,
     spouseSSN: PropTypes.string,
   }).isRequired,
 

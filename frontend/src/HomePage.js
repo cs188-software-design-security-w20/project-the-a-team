@@ -10,6 +10,7 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
 import Box from '@material-ui/core/Box';
 import AddCircleIcon from '@material-ui/icons/AddCircle';
 import Button from '@material-ui/core/Button';
@@ -62,35 +63,60 @@ const deletedUUIDs = {
   w2: [],
 };
 
-export default function HomePage() {
+export default function HomePage({ data }) {
   const classes = useStyles();
 
   const [personalInfo, setPersonalInfo] = React.useState({
-    firstName: '',
-    middleName: '',
-    lastName: '',
-    ssn: '',
-    filingStatus: '',
-    addr1: '',
-    addr2: '',
-    addr3: '',
-    spouseFirstName: '',
-    spouseLastName: '',
-    spouseSSN: '',
-    bankAccount: '',
-    bankRouting: '',
-    bankIsChecking: false,
+    firstName: data.firstName || '',
+    middleName: data.middleName || '',
+    lastName: data.lastName || '',
+    ssn: data.ssn || '',
+    filingStatus: ((data.spouseName !== '') && (data.spouseSSN !== '')) ? 'marriedFilingSeparately' : 'single',
+    addr1: data.addr1 || '',
+    addr2: data.addr2 || '',
+    addr3: data.addr3 || '',
+    spouseName: data.spouseName || '',
+    spouseSSN: data.spouseSSN || '',
+    bankAccount: data.bankAccount || '',
+    bankRouting: data.bankRouting || '',
+    bankIsChecking: Boolean(data.bankIsChecking),
   });
 
-  const [arrDependents, setDependent] = React.useState([]);
+  const [arrDependents, setDependent] = React.useState(data.dependents.map((dependent) => ({
+    childCredit: Boolean(dependent.childCredit),
+    name: dependent.name || '',
+    relation: dependent.relation || '',
+    ssn: dependent.ssn || '',
+    uuid: dependent.uuid || '',
+  })));
 
-  const [arrW2, setW2] = React.useState([]);
+  const [arrW2, setW2] = React.useState(data.fw2.map((fw2) => ({
+    employer: fw2.employer || '',
+    income: fw2.income || 0,
+    taxWithheld: fw2.taxWithheld || 0,
+  })));
 
-  const [arr1099INT, set1099INT] = React.useState([]);
+  const [arr1099INT, set1099INT] = React.useState(data.f1099int.map((f1099int) => ({
+    employer: f1099int.employer || '',
+    income: f1099int.income || 0,
+    taxWithheld: f1099int.taxWithheld || 0,
+  })));
 
-  const [arr1099B, set1099B] = React.useState([]);
+  const [arr1099B, set1099B] = React.useState(data.f1099b.map((f1099b) => ({
+    desc: f1099b.desc || '',
+    proceeds: f1099b.proceeds || 0,
+    basis: f1099b.basis || 0,
+    isLongTerm: Boolean(f1099b.isLongTerm),
+    taxWithheld: f1099b.taxWithheld || 0,
+  })));
 
-  const [arr1099Div, set1099Div] = React.useState([]);
+  const [arr1099Div, set1099Div] = React.useState(data.f1099div.map((f1099div) => ({
+    payer: f1099div.payer || '',
+    ordDividends: f1099div.ordDividends || 0,
+    qualDividends: f1099div.qualDividends || 0,
+    taxWithheld: f1099div.taxWithheld || 0,
+    exemptInterestDiv: f1099div.exemptInterestDiv || 0,
+  })));
 
   const [open, setOpen] = React.useState(false);
 
@@ -418,3 +444,58 @@ export default function HomePage() {
     </Container>
   );
 }
+
+HomePage.propTypes = {
+  data: PropTypes.shape({
+    firstName: PropTypes.string,
+    middleName: PropTypes.string,
+    lastName: PropTypes.string,
+    ssn: PropTypes.string,
+    filingStatus: PropTypes.string,
+    addr1: PropTypes.string,
+    addr2: PropTypes.string,
+    addr3: PropTypes.string,
+    spouseName: PropTypes.string,
+    spouseSSN: PropTypes.string,
+    bankAccount: PropTypes.string,
+    bankRouting: PropTypes.string,
+    bankIsChecking: PropTypes.bool,
+
+    dependents: PropTypes.arrayOf(PropTypes.shape({
+      name: PropTypes.string,
+      ssn: PropTypes.string,
+      relation: PropTypes.string,
+      childCredit: PropTypes.bool,
+    }).isRequired).isRequired,
+
+    f1099b: PropTypes.arrayOf(PropTypes.shape({
+      desc: PropTypes.string,
+      proceeds: PropTypes.number,
+      basis: PropTypes.number,
+      isLongTerm: PropTypes.bool,
+      taxWithheld: PropTypes.number,
+    }).isRequired).isRequired,
+
+    f1099div: PropTypes.arrayOf(PropTypes.shape({
+      payer: PropTypes.string,
+      ordDividends: PropTypes.number,
+      qualDividends: PropTypes.number,
+      taxWithheld: PropTypes.number,
+      exemptInterestDiv: PropTypes.number,
+    }).isRequired).isRequired,
+
+    f1099int: PropTypes.arrayOf(PropTypes.shape({
+      payer: PropTypes.string,
+      income: PropTypes.number,
+      usSavingTreasInterest: PropTypes.number,
+      taxExemptInterest: PropTypes.number,
+      taxWithheld: PropTypes.number,
+    }).isRequired).isRequired,
+
+    fw2: PropTypes.arrayOf(PropTypes.shape({
+      employer: PropTypes.string,
+      income: PropTypes.number,
+      taxWithheld: PropTypes.number,
+    }).isRequired).isRequired,
+  }).isRequired,
+};
