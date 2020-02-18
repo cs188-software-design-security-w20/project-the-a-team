@@ -1,7 +1,7 @@
 'use strict';
 
 const crypto = require('crypto');
-const key = Buffer.from(require('../config.json').credentials.cellEncryptionSecret, 'base64');
+const key = Buffer.from(require('../config.js').credentials.cellEncryptionSecret, 'base64');
 
 const encryptData = (plaintext) => {
   if ([undefined, null, ''].includes(plaintext)) {

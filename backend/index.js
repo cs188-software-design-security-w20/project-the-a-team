@@ -8,7 +8,7 @@ const cors = require('cors');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 
-const config = require('./config.json');
+const config = require('./config.js');
 const syncAllTables = require('./models/sync.js');
 const query = require('./service/query.js');
 const logger = require('./utils/logger.js');

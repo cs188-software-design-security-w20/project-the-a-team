@@ -2,9 +2,6 @@
 node_modules
 .yarn
 
-# production
-/build
-
 # misc
 .DS_Store
 .env.local
@@ -16,6 +13,6 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-access.log
-
 .vscode
+
+/docker-compose-production.yml

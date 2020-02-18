@@ -1,7 +1,7 @@
 'use strict';
 
 const Sequelize = require('sequelize');
-const config = require('../config.json');
+const config = require('../config.js');
 
 const sequelize = new Sequelize('taxmax', 'taximus', config.credentials.databasePassword, {
   host: 'db_postgres',

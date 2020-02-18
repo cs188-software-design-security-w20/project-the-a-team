@@ -10,7 +10,7 @@ const calculation = require('../service/calculation.js');
 const storage = require('../service/storage.js');
 const converter = require('../utils/conversion.js');
 const validator = require('../utils/validation.js');
-const config = require('../config.json');
+const config = require('../config.js');
 
 const pipeline = util.promisify(stream.pipeline);
 
