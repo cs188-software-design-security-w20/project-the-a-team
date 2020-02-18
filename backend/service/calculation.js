@@ -223,6 +223,7 @@ function calculate(forms) {
     l17: bigIntToString(line17),
     l19: bigIntToString(line17),
     l20: bigIntToString(line20),
+    l21a: bigIntToString(line20),
     routingno: forms.taxinfo.bankRouting,
     accountno: forms.taxinfo.bankAccount,
     isChecking: forms.taxinfo.bankIsChecking,
