@@ -109,30 +109,21 @@ app.use((req, res, next) => {
   next();
 });
 
-// TODO: remove these debug endpoints or set to development only
-app.get('/', (req, res) => {
-  res.set('Content-Type', 'text/html');
-  if (req.user) {
-    res.end(`
-      debug: you are logged in with:<br>
-      internal id: ${req.user.id}<br>
-      uuid: ${req.user.uuid}<br>
-      google id: ${req.user.googleId}
-    `);
-  } else {
-    res.end('debug: you are not logged in');
-  }
-});
-
-app.get('/must-login', checkLogin, (req, res) => {
-  res.set('Content-Type', 'text/html');
-  res.end(`
-    debug: you should be logged in with:<br>
-    internal id: ${req.user.id}<br>
-    uuid: ${req.user.uuid}<br>
-    google id: ${req.user.googleId}
-  `);
-});
+if (process.env.NODE_ENV !== 'production') {
+  app.get('/', (req, res) => {
+    res.set('Content-Type', 'text/html');
+    if (req.user) {
+      res.end(`
+        Debug: you are logged in with:<br>
+        internal id: ${req.user.id}<br>
+        uuid: ${req.user.uuid}<br>
+        google id: ${req.user.googleId}
+      `);
+    } else {
+      res.end('Debug: you are not logged in');
+    }
+  });
+}
 
 app.use('/auth', authRouter);
 app.use('/tax', checkLogin, taxRouter);

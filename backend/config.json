@@ -7,7 +7,7 @@
   "limit": {
     "requestWindowSeconds": 5,
     "requestMax": 15,
-    "postJSONBodyMax": "32KB"
+    "postJSONBodyMax": "512KB"
   },
   "credentials": {
     "googleClientId": "793727643432-tod94uova6eff4ojqqmnpdc3kunsrj9g.apps.googleusercontent.com",

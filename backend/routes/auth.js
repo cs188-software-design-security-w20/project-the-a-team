@@ -3,7 +3,7 @@
 const express = require('express');
 const passport = require('passport');
 
-const config = require('../config');
+const config = require('../config.js');
 
 const router = new express.Router();
 

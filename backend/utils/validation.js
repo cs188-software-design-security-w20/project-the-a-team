@@ -9,6 +9,7 @@ const isInStringLimit = (s) => s.length <= 255;
 const isDigitOnly = (s) => s.match(/^\d*$/);
 const isValidSSN = (s) => s.match(/^\d{9}$/);
 const isValidUUID = (s) => s.match(/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i);
+const maxSubitems = 20;
 
 class ValidationError extends Error {
   constructor(message) {
@@ -208,8 +209,20 @@ const validateTaxinfoInput = (taxinfoInput) => {
   validateSubitemInput(taxinfoInput.dependents, 'Dependents', validateDependentsItem);
 };
 
+const validateSubitemLimit = (oldUUIDs, newData) => {
+  for (const form of ['fw2', 'f1099int', 'f1099b', 'f1099div', 'dependents']) {
+    if (newData[form] === undefined) continue; // eslint-disable-line no-continue
+    const oldForms = new Set(oldUUIDs[form].map((item) => item.toLowerCase()));
+    const newForms = new Set(Object.keys(newData[form]).map((item) => item.toLowerCase()));
+    if (new Set([...oldForms, ...newForms]).size > maxSubitems) {
+      throw new ValidationError(`You cannot have more than ${maxSubitems} ${form}`);
+    }
+  }
+};
+
 module.exports = {
   validateGoogleId,
   isValidationError,
   validateTaxinfoInput,
+  validateSubitemLimit,
 };

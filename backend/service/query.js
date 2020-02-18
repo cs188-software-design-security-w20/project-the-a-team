@@ -81,6 +81,31 @@ const updateUserData = async (user, data) => {
       where: { userId: user.id },
       transaction: t,
     });
+    const findQueryOptions = {
+      attributes: ['uuid'],
+      where: { taxinfoId: taxinfo.id },
+      transaction: t,
+    };
+    const [
+      fw2,
+      f1099int,
+      f1099b,
+      f1099div,
+      dependents,
+    ] = await Promise.all([
+      Fw2,
+      F1099int,
+      F1099b,
+      F1099div,
+      Dependents,
+    ].map((form) => form.findAll(findQueryOptions)));
+    validator.validateSubitemLimit({
+      fw2: fw2.map((item) => item.uuid),
+      f1099int: f1099int.map((item) => item.uuid),
+      f1099b: f1099b.map((item) => item.uuid),
+      f1099div: f1099div.map((item) => item.uuid),
+      dependents: dependents.map((item) => item.uuid),
+    }, data);
     const promises = [];
     if (user.pdfResult !== null) {
       promises.push(storage.deleteFile(user.pdfResult));

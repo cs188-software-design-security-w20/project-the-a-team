@@ -659,11 +659,34 @@ class TestTaximus(unittest.TestCase):
         self.assertTrue(any(r.status_code == 429 for r in rs))
         self.assertTrue(any(r.json() == {'message': 'Too many requests, please try again later.'} for r in rs))
 
-    def test_POST_tax_limit(self):
-        r = requests.post(backend_url_base + '/tax', cookies=cookies, json='A' * 32769)
+    def test_POST_tax_size_limit(self):
+        r = requests.post(backend_url_base + '/tax', cookies=cookies, json='A' * 524289)
         self.assertEqual(r.status_code, 413)
-        r = requests.post(backend_url_base + '/tax', cookies=cookies, json='A' * 1000)
+        r = requests.post(backend_url_base + '/tax', cookies=cookies, json='A' * 10000)
         self.assertNotEqual(r.status_code, 413)
+
+    def test_POST_tax_subitem_limit(self):
+        max_subitem = 20
+        for form_name in ['fw2', 'f1099int', 'f1099b', 'f1099div', 'dependents']:
+            self.setUp()
+            for i in range(max_subitem):
+                uuid = '11111111-1111-1111-1111-{}'.format(111111111111 + i)
+                r = requests.post(backend_url_base + '/tax', cookies=cookies, json={form_name: {uuid: {}}})
+                self.assertEqual(r.status_code, 204)
+            uuid = '11111111-1111-1111-1111-000000000000'
+            r = requests.post(backend_url_base + '/tax', cookies=cookies, json={form_name: {uuid: {}}})
+            self.assertEqual(r.status_code, 400)
+            self.assertEqual(r.json()['message'], 'You cannot have more than {} {}'.format(max_subitem, form_name))
+            self.tearDown()
+        for form_name in ['fw2', 'f1099int', 'f1099b', 'f1099div', 'dependents']:
+            self.setUp()
+            r = requests.post(backend_url_base + '/tax', cookies=cookies, json={form_name: {
+                    '11111111-1111-1111-1111-{}'.format(111111111111 + i): {} for i in range(max_subitem + 1)
+                }
+            })
+            self.assertEqual(r.status_code, 400)
+            self.assertEqual(r.json()['message'], 'You cannot have more than {} {}'.format(max_subitem, form_name))
+            self.tearDown()
 
 
 if __name__ == '__main__':
