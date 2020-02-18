@@ -20,6 +20,9 @@ const useStyles = makeStyles((theme) => ({
     margin: theme.spacing(2),
     minWidth: 200,
   },
+  addr: {
+    width: '50%',
+  },
 }));
 
 export default function PersonalInfo({
@@ -129,14 +132,16 @@ export default function PersonalInfo({
           variant="outlined"
           required
         />
-        <TextField
-          value={personalInfo.addr3}
-          onChange={setField('addr3')}
-          label="City, State and Zip Code"
-          size="medium"
-          variant="outlined"
-          required
-        />
+        <FormControl className={classes.addr}>
+          <TextField
+            value={personalInfo.addr3}
+            onChange={setField('addr3')}
+            label="City, State and Zip Code"
+            size="medium"
+            variant="outlined"
+            required
+          />
+        </FormControl>
       </ListItem>
 
       <ListItem>
