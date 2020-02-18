@@ -1,3 +1,5 @@
-export default ({
-  backendURL: 'http://localhost:8080/', // TODO: how to manage development/production difference?
-});
+export default process.env.NODE_ENV === 'production' ? {
+  backendURL: 'https://api.tax.timothygu.me/',
+} : {
+  backendURL: 'http://localhost:8080/',
+};
