@@ -3,6 +3,12 @@
   "frontendURL": "http://localhost:3000/",
   "storageBucket": "cs-188-taxmax-test",
   "cookieExpireMinutes": 15,
+  "logFile": "/var/log/taxmax.log",
+  "limit": {
+    "requestWindowSeconds": 5,
+    "requestMax": 15,
+    "postJSONBodyMax": "32KB"
+  },
   "credentials": {
     "googleClientId": "793727643432-tod94uova6eff4ojqqmnpdc3kunsrj9g.apps.googleusercontent.com",
     "googleClientSecret": "GDH3uh2ounBBF7wMm51Y8vDd",

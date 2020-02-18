@@ -3,6 +3,7 @@
 const { URL } = require('url');
 const express = require('express');
 const cookieSession = require('cookie-session');
+const rateLimit = require('express-rate-limit');
 const cors = require('cors');
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
@@ -10,6 +11,7 @@ const GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 const config = require('./config.json');
 const syncAllTables = require('./models/sync.js');
 const query = require('./service/query.js');
+const logger = require('./utils/logger.js');
 const authRouter = require('./routes/auth.js');
 const taxRouter = require('./routes/tax.js');
 
@@ -89,6 +91,23 @@ const checkLogin = (req, res, next) => {
     res.status(401).json({ message: 'Please login' });
   }
 };
+
+const limiter = rateLimit({
+  windowMs: config.limit.requestWindowSeconds * 1000,
+  max: config.limit.requestMax,
+  message: { message: 'Too many requests, please try again later.' },
+  keyGenerator: (req) => (req.user ? req.user : req.ip),
+  headers: false,
+});
+
+app.use(limiter);
+
+app.use((req, res, next) => {
+  if (req.user) { // only log authenticated requests
+    logger.log(`${new Date().toISOString()} ${req.ip} ${req.user.id} ${req.method} ${req.path}\n`);
+  }
+  next();
+});
 
 // TODO: remove these debug endpoints or set to development only
 app.get('/', (req, res) => {

@@ -23,6 +23,8 @@ services:
     links:
       - db_postgres
     restart: "always"
+    volumes:
+      - ./access.log:/var/log/taxmax.log
     # ulimits:
     #   nproc: 500
     #   nofile:

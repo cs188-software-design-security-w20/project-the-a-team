@@ -11,12 +11,14 @@ import unittest
 import uuid
 
 import requests
+from requests_futures.sessions import FuturesSession
 
 os.chdir(os.path.dirname(os.path.realpath(sys.argv[0])))
 
 config = json.loads(pathlib.Path('config.json').read_text())
 backend_url_base = config['backend_url_base']
 cookies = config['cookies']
+num_requests = config['num_requests']
 
 BROWSER_ACCEPT = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'
 MAX_MONEY = 90071992547409.9
@@ -73,6 +75,24 @@ def random_two_different(rand_func, *args, **kwargs):
         rand_value2 = rand_func(*args, **kwargs)
         if rand_value1 != rand_value2:
             return (rand_value1, rand_value2)
+
+
+request_old = requests.api.request
+
+
+def request_with_retry(*args, **kwargs):
+    while True:
+        r = request_old(*args, **kwargs)
+        if r.status_code != 429:
+            return r
+
+
+def patch_requests_with_retry():
+    requests.api.request = request_with_retry
+
+
+def unpatch_requests_with_retry():
+    requests.api.request = request_old
 
 
 class TestTaximus(unittest.TestCase):
@@ -224,9 +244,13 @@ class TestTaximus(unittest.TestCase):
         if not r.json():
             raise RuntimeError('Authentication failed, check your cookies')
 
+    def setUp(self):
+        patch_requests_with_retry()
+
     def tearDown(self):
         r = requests.delete(backend_url_base + '/tax', cookies=cookies)
         self.assertEqual(r.status_code, 204)
+        unpatch_requests_with_retry()
 
     def test_GET_auth(self):
         r = requests.get(backend_url_base + '/auth')
@@ -488,6 +512,7 @@ class TestTaximus(unittest.TestCase):
 
         for test_case in success_cases:
             with self.subTest(test_case=test_case):
+                self.setUp()
                 r = requests.post(backend_url_base + '/tax', cookies=cookies, json=test_case)
                 self.assertEqual(r.status_code, 204)
                 r = requests.get(backend_url_base + '/tax', cookies=cookies)
@@ -500,12 +525,14 @@ class TestTaximus(unittest.TestCase):
         for test_case in fail_cases:
             data, message = test_case
             with self.subTest(test_case=test_case):
+                self.setUp()
                 r = requests.post(backend_url_base + '/tax', cookies=cookies, json=data)
                 self.assertEqual(r.status_code, 400)
                 self.assertEqual(r.json()['message'], message)
                 self.tearDown()
 
         with self.subTest(test_case='ignore_invalid_keys'):
+            self.setUp()
             r = requests.get(backend_url_base + '/tax', cookies=cookies)
             self.assertEqual(r.status_code, 200)
             ret1 = r.json()
@@ -524,6 +551,7 @@ class TestTaximus(unittest.TestCase):
             self.tearDown()
 
         with self.subTest(test_case='update_object'):
+            self.setUp()
             rand_uuid = str(uuid.uuid4())
             rand_string1, rand_string2 = random_two_different(random_string)
             r = requests.post(backend_url_base + '/tax', cookies=cookies, json={'fw2': {rand_uuid: {'employer': rand_string1}}})
@@ -539,6 +567,7 @@ class TestTaximus(unittest.TestCase):
             self.tearDown()
 
         with self.subTest(test_case='undefined_does_not_change_value'):
+            self.setUp()
             rand_string1, rand_string2 = random_two_different(random_string)
             r = requests.post(backend_url_base + '/tax', cookies=cookies, json={'addr1': rand_string1})
             self.assertEqual(r.status_code, 204)
@@ -557,6 +586,7 @@ class TestTaximus(unittest.TestCase):
 
         with self.subTest(test_case='null_subitem_deletion'):
             for form_name in ['fw2', 'f1099int', 'f1099b', 'f1099div', 'dependents']:
+                self.setUp()
                 rand_uuid = str(uuid.uuid4())
                 r = requests.post(backend_url_base + '/tax', cookies=cookies, json={form_name: {rand_uuid: {}}})
                 self.assertEqual(r.status_code, 204)
@@ -620,6 +650,20 @@ class TestTaximus(unittest.TestCase):
         r = requests.get(backend_url_base + '/tax', headers={'Accept': BROWSER_ACCEPT}, allow_redirects=False)
         self.assertEqual(r.status_code, 302)
         self.assertIn('Location', r.headers)
+
+    def test_request_limit(self):
+        unpatch_requests_with_retry()
+        session = FuturesSession()
+        rs = [session.get(backend_url_base + '/tax') for _ in range(num_requests)]
+        rs = [r.result() for r in rs]
+        self.assertTrue(any(r.status_code == 429 for r in rs))
+        self.assertTrue(any(r.json() == {'message': 'Too many requests, please try again later.'} for r in rs))
+
+    def test_POST_tax_limit(self):
+        r = requests.post(backend_url_base + '/tax', cookies=cookies, json='A' * 32769)
+        self.assertEqual(r.status_code, 413)
+        r = requests.post(backend_url_base + '/tax', cookies=cookies, json='A' * 1000)
+        self.assertNotEqual(r.status_code, 413)
 
 
 if __name__ == '__main__':
