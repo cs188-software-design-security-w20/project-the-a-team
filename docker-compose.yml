@@ -9,11 +9,6 @@ services:
     logging:
       driver: none
     restart: "always"
-    # ulimits:
-    #   nproc: 500
-      # nofile:
-      #   soft: 2048
-      #   hard: 4096
   backend:
     build: ./backend
     # environment:
@@ -25,11 +20,6 @@ services:
     restart: "always"
     volumes:
       - ./access.log:/var/log/taxmax.log
-    # ulimits:
-    #   nproc: 500
-    #   nofile:
-    #     soft: 2048
-    #     hard: 4096
   # nginx:
   #   image: nginx
   #   restart: "always"
