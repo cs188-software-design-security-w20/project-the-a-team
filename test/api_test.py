@@ -660,7 +660,7 @@ class TestTaximus(unittest.TestCase):
         self.assertTrue(any(r.json() == {'message': 'Too many requests, please try again later.'} for r in rs))
 
     def test_POST_tax_size_limit(self):
-        r = requests.post(backend_url_base + '/tax', cookies=cookies, json='A' * 524289)
+        r = requests.post(backend_url_base + '/tax', cookies=cookies, json='A' * 1048577)
         self.assertEqual(r.status_code, 413)
         r = requests.post(backend_url_base + '/tax', cookies=cookies, json='A' * 10000)
         self.assertNotEqual(r.status_code, 413)
@@ -686,6 +686,22 @@ class TestTaximus(unittest.TestCase):
             })
             self.assertEqual(r.status_code, 400)
             self.assertEqual(r.json()['message'], 'You cannot have more than {} {}'.format(max_subitem, form_name))
+            self.tearDown()
+        for form_name in ['fw2', 'f1099int', 'f1099b', 'f1099div', 'dependents']:
+            self.setUp()
+            r = requests.post(backend_url_base + '/tax', cookies=cookies, json={form_name: {
+                    '11111111-1111-1111-1111-{}'.format(111111111111 + i): {} for i in range(max_subitem)
+                }
+            })
+            self.assertEqual(r.status_code, 204)
+            r = requests.post(backend_url_base + '/tax', cookies=cookies, json={form_name: {
+                **{
+                    '11111111-1111-1111-1111-{}'.format(111111111111 + i): None for i in range(max_subitem // 2)
+                }, **{
+                    '21111111-1111-1111-1111-{}'.format(111111111111 + i): {} for i in range(max_subitem // 2)
+                }
+            }})
+            self.assertEqual(r.status_code, 204)
             self.tearDown()
 
 

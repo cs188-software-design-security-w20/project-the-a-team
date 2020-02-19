@@ -212,9 +212,13 @@ const validateTaxinfoInput = (taxinfoInput) => {
 const validateSubitemLimit = (oldUUIDs, newData) => {
   for (const form of ['fw2', 'f1099int', 'f1099b', 'f1099div', 'dependents']) {
     if (newData[form] === undefined) continue; // eslint-disable-line no-continue
-    const oldForms = new Set(oldUUIDs[form].map((item) => item.toLowerCase()));
-    const newForms = new Set(Object.keys(newData[form]).map((item) => item.toLowerCase()));
-    if (new Set([...oldForms, ...newForms]).size > maxSubitems) {
+    const oldForms = new Set(oldUUIDs[form].map((key) => key.toLowerCase()));
+    const newChanges = Object.keys(newData[form]);
+    const newAdd = new Set(newChanges.filter((key) => newData[form][key] !== null)
+      .map((key) => key.toLowerCase()));
+    const newDelete = new Set(newChanges.filter((key) => newData[form][key] === null)
+      .map((key) => key.toLowerCase()));
+    if (new Set([...oldForms, ...newAdd].filter((x) => !newDelete.has(x))).size > maxSubitems) {
       throw new ValidationError(`You cannot have more than ${maxSubitems} ${form}`);
     }
   }
