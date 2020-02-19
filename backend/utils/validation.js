@@ -218,6 +218,12 @@ const validateSubitemLimit = (oldUUIDs, newData) => {
       .map((key) => key.toLowerCase()));
     const newDelete = new Set(newChanges.filter((key) => newData[form][key] === null)
       .map((key) => key.toLowerCase()));
+    if (newAdd.size > maxSubitems) {
+      throw new ValidationError(`You cannot create or update more than ${maxSubitems} ${form}`);
+    }
+    if (newDelete.size > maxSubitems) {
+      throw new ValidationError(`You cannot delete more than ${maxSubitems} ${form}`);
+    }
     if (new Set([...oldForms, ...newAdd].filter((x) => !newDelete.has(x))).size > maxSubitems) {
       throw new ValidationError(`You cannot have more than ${maxSubitems} ${form}`);
     }

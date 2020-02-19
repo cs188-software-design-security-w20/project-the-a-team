@@ -670,29 +670,35 @@ class TestTaximus(unittest.TestCase):
         for form_name in ['fw2', 'f1099int', 'f1099b', 'f1099div', 'dependents']:
             self.setUp()
             for i in range(max_subitem):
-                uuid = '11111111-1111-1111-1111-{}'.format(111111111111 + i)
-                r = requests.post(backend_url_base + '/tax', cookies=cookies, json={form_name: {uuid: {}}})
+                form_uuid = '11111111-1111-1111-1111-{}'.format(111111111111 + i)
+                r = requests.post(backend_url_base + '/tax', cookies=cookies, json={form_name: {form_uuid: {}}})
                 self.assertEqual(r.status_code, 204)
-            uuid = '11111111-1111-1111-1111-000000000000'
-            r = requests.post(backend_url_base + '/tax', cookies=cookies, json={form_name: {uuid: {}}})
+            form_uuid = '11111111-1111-1111-1111-000000000000'
+            r = requests.post(backend_url_base + '/tax', cookies=cookies, json={form_name: {form_uuid: {}}})
             self.assertEqual(r.status_code, 400)
             self.assertEqual(r.json()['message'], 'You cannot have more than {} {}'.format(max_subitem, form_name))
             self.tearDown()
         for form_name in ['fw2', 'f1099int', 'f1099b', 'f1099div', 'dependents']:
             self.setUp()
             r = requests.post(backend_url_base + '/tax', cookies=cookies, json={form_name: {
-                    '11111111-1111-1111-1111-{}'.format(111111111111 + i): {} for i in range(max_subitem + 1)
-                }
-            })
+                '11111111-1111-1111-1111-{}'.format(111111111111 + i): {} for i in range(max_subitem + 1)
+            }})
             self.assertEqual(r.status_code, 400)
-            self.assertEqual(r.json()['message'], 'You cannot have more than {} {}'.format(max_subitem, form_name))
+            self.assertEqual(r.json()['message'], 'You cannot create or update more than {} {}'.format(max_subitem, form_name))
             self.tearDown()
         for form_name in ['fw2', 'f1099int', 'f1099b', 'f1099div', 'dependents']:
             self.setUp()
             r = requests.post(backend_url_base + '/tax', cookies=cookies, json={form_name: {
-                    '11111111-1111-1111-1111-{}'.format(111111111111 + i): {} for i in range(max_subitem)
-                }
-            })
+                '11111111-1111-1111-1111-{}'.format(111111111111 + i): None for i in range(max_subitem + 1)
+            }})
+            self.assertEqual(r.status_code, 400)
+            self.assertEqual(r.json()['message'], 'You cannot delete more than {} {}'.format(max_subitem, form_name))
+            self.tearDown()
+        for form_name in ['fw2', 'f1099int', 'f1099b', 'f1099div', 'dependents']:
+            self.setUp()
+            r = requests.post(backend_url_base + '/tax', cookies=cookies, json={form_name: {
+                '11111111-1111-1111-1111-{}'.format(111111111111 + i): {} for i in range(max_subitem)
+            }})
             self.assertEqual(r.status_code, 204)
             r = requests.post(backend_url_base + '/tax', cookies=cookies, json={form_name: {
                 **{

@@ -18,16 +18,21 @@ const decryptData = (ciphertext) => {
   if ([undefined, null, ''].includes(ciphertext)) {
     return ciphertext;
   }
-  const parts = ciphertext.split('|');
-  if (parts.length !== 3) {
-    throw new Error('Malformed ciphertext');
+  try {
+    const parts = ciphertext.split('|');
+    if (parts.length !== 3) {
+      throw new Error('Malformed ciphertext');
+    }
+    const [iv, enc, tag] = parts;
+    const cipher = crypto.createDecipheriv('aes-256-gcm', key, Buffer.from(iv, 'base64'));
+    cipher.setAuthTag(Buffer.from(tag, 'base64'));
+    let plaintext = cipher.update(enc, 'base64', 'utf8');
+    plaintext += cipher.final('utf8');
+    return plaintext;
+  } catch (err) {
+    console.error(err); // eslint-disable-line no-console
+    return null;
   }
-  const [iv, enc, tag] = parts;
-  const cipher = crypto.createDecipheriv('aes-256-gcm', key, Buffer.from(iv, 'base64'));
-  cipher.setAuthTag(Buffer.from(tag, 'base64'));
-  let plaintext = cipher.update(enc, 'base64', 'utf8');
-  plaintext += cipher.final('utf8');
-  return plaintext;
 };
 
 module.exports = {
