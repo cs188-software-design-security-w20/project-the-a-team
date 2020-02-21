@@ -5,6 +5,7 @@ import math
 import os
 import pathlib
 import random
+import re
 import string
 import sys
 import unittest
@@ -35,12 +36,19 @@ def transform_taxinfo_output(taxinfo):
     return result
 
 
-def is_deep_subset(haystack, needle, *, float_tolerance=False):
+def sanitize_string(s):
+    return re.sub(r'[\x00-\x1f\x7f]', '', re.sub(r'\s', ' ', s, flags=re.ASCII))
+
+
+def is_deep_subset(haystack, needle, *, float_tolerance=False, string_filter=False):
     for key, value in needle.items():
         if key not in haystack:
             return False
         if isinstance(value, dict):
-            if not is_deep_subset(haystack[key], value):
+            if not is_deep_subset(haystack[key], value, float_tolerance=float_tolerance, string_filter=string_filter):
+                return False
+        elif string_filter and isinstance(haystack[key], str) and isinstance(value, str):
+            if haystack[key] != sanitize_string(value):
                 return False
         elif float_tolerance and isinstance(haystack[key], float) and isinstance(value, float):
             if not math.isclose(haystack[key], value):
@@ -57,8 +65,11 @@ def uuid_lower(taxinfo):
     return result
 
 
+charset = ''.join(chr(x) for x in range(128))
+
+
 def random_string(length=32):
-    return ''.join(rnd.choice(string.printable) for _ in range(length))
+    return ''.join(rnd.choice(charset) for _ in range(length))
 
 
 def random_digits(length):
@@ -519,7 +530,7 @@ class TestTaximus(unittest.TestCase):
                 self.assertEqual(r.status_code, 200)
                 result = transform_taxinfo_output(r.json())
                 expected = uuid_lower(test_case)
-                self.assertTrue(is_deep_subset(result, expected, float_tolerance=True))
+                self.assertTrue(is_deep_subset(result, expected, float_tolerance=True, string_filter=True))
                 self.tearDown()
 
         for test_case in fail_cases:
@@ -547,7 +558,7 @@ class TestTaximus(unittest.TestCase):
             self.assertEqual(r.status_code, 204)
             r = requests.get(backend_url_base + '/tax', cookies=cookies)
             self.assertEqual(r.status_code, 200)
-            self.assertEqual(r.json()['lastName'], rand_string)
+            self.assertEqual(r.json()['lastName'], sanitize_string(rand_string))
             self.tearDown()
 
         with self.subTest(test_case='update_object'):
@@ -558,12 +569,12 @@ class TestTaximus(unittest.TestCase):
             self.assertEqual(r.status_code, 204)
             r = requests.get(backend_url_base + '/tax', cookies=cookies)
             self.assertEqual(r.status_code, 200)
-            self.assertEqual([item for item in r.json()['fw2'] if item['uuid'] == rand_uuid][0]['employer'], rand_string1)
+            self.assertEqual([item for item in r.json()['fw2'] if item['uuid'] == rand_uuid][0]['employer'], sanitize_string(rand_string1))
             r = requests.post(backend_url_base + '/tax', cookies=cookies, json={'fw2': {rand_uuid: {'employer': rand_string2}}})
             self.assertEqual(r.status_code, 204)
             r = requests.get(backend_url_base + '/tax', cookies=cookies)
             self.assertEqual(r.status_code, 200)
-            self.assertEqual([item for item in r.json()['fw2'] if item['uuid'] == rand_uuid][0]['employer'], rand_string2)
+            self.assertEqual([item for item in r.json()['fw2'] if item['uuid'] == rand_uuid][0]['employer'], sanitize_string(rand_string2))
             self.tearDown()
 
         with self.subTest(test_case='undefined_does_not_change_value'):
@@ -579,9 +590,9 @@ class TestTaximus(unittest.TestCase):
             r = requests.get(backend_url_base + '/tax', cookies=cookies)
             self.assertEqual(r.status_code, 200)
             ret2 = r.json()
-            self.assertEqual(ret1['addr1'], rand_string1)
+            self.assertEqual(ret1['addr1'], sanitize_string(rand_string1))
             self.assertEqual(ret1['addr1'], ret2['addr1'])
-            self.assertEqual(ret2['addr2'], rand_string2)
+            self.assertEqual(ret2['addr2'], sanitize_string(rand_string2))
             self.tearDown()
 
         with self.subTest(test_case='null_subitem_deletion'):

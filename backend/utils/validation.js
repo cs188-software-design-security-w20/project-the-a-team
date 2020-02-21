@@ -41,6 +41,10 @@ const validateString = (str, paramName) => {
   }
 };
 
+const sanitizeString = (str) => ([undefined, null].includes(str)
+  ? str : str.replace(/\s/g, ' ').replace(/[\x00-\x1f\x7f]/g, '') // eslint-disable-line no-control-regex
+);
+
 const validateMoney = (money, paramName) => {
   if ([undefined, null].includes(money)) {
     return;
@@ -104,6 +108,7 @@ const validateBankRouting = (bankRouting, paramName = 'Bank routing') => {
   }
 };
 
+/* eslint-disable no-param-reassign */
 const validateFw2Item = (fw2Item) => {
   if (fw2Item === null) {
     return;
@@ -112,6 +117,7 @@ const validateFw2Item = (fw2Item) => {
     throw new ValidationError('Fw2 value should be an object or null');
   }
   validateString(fw2Item.employer, 'Fw2 employer');
+  fw2Item.employer = sanitizeString(fw2Item.employer);
   validateMoney(fw2Item.income, 'Fw2 income');
   validateMoney(fw2Item.taxWithheld, 'Fw2 tax withheld');
 };
@@ -124,6 +130,7 @@ const validateF1099intItem = (f1099intItem) => {
     throw new ValidationError('F1099int value should be an object or null');
   }
   validateString(f1099intItem.payer, 'F1099int payer');
+  f1099intItem.payer = sanitizeString(f1099intItem.payer);
   validateMoney(f1099intItem.income, 'F1099int income');
   validateMoney(f1099intItem.usSavingTreasInterest, 'F1099int Interest on U.S. Savings Bonds and Treas. obligations');
   validateMoney(f1099intItem.taxWithheld, 'F1099int tax withheld');
@@ -138,6 +145,7 @@ const validateF1099bItem = (f1099bItem) => {
     throw new ValidationError('F1099b value should be an object or null');
   }
   validateString(f1099bItem.desc, 'F1099b desc');
+  f1099bItem.desc = sanitizeString(f1099bItem.desc);
   validateMoney(f1099bItem.proceeds, 'F1099b proceeds');
   validateMoney(f1099bItem.basis, 'F1099b basis');
   validateBoolean(f1099bItem.isLongTerm, 'F1099b is long term');
@@ -152,6 +160,7 @@ const validateF1099divItem = (f1099divItem) => {
     throw new ValidationError('F1099div value should be an object or null');
   }
   validateString(f1099divItem.payer, 'F1099div payer');
+  f1099divItem.payer = sanitizeString(f1099divItem.payer);
   validateMoney(f1099divItem.ordDividends, 'F1099div ord dividends');
   validateMoney(f1099divItem.qualDividends, 'F1099div qual dividends');
   validateMoney(f1099divItem.taxWithheld, 'F1099div tax withheld');
@@ -166,10 +175,13 @@ const validateDependentsItem = (dependentsItem) => {
     throw new ValidationError('Dependents value should be an object or null');
   }
   validateString(dependentsItem.name, 'Dependents name');
+  dependentsItem.name = sanitizeString(dependentsItem.name);
   validateSSN(dependentsItem.ssn, 'Dependents SSN');
   validateString(dependentsItem.relation, 'Dependents relation');
+  dependentsItem.relation = sanitizeString(dependentsItem.relation);
   validateBoolean(dependentsItem.childCredit, 'Dependents child credit');
 };
+/* eslint-enable no-param-reassign */
 
 const validateSubitemInput = (subInput, paramName, subValidator) => {
   if (subInput === undefined) {
@@ -189,16 +201,24 @@ const validateSubitemInput = (subInput, paramName, subValidator) => {
   }
 };
 
+/* eslint-disable no-param-reassign */
 const validateTaxinfoInput = (taxinfoInput) => {
   validateString(taxinfoInput.lastName, 'Last name');
+  taxinfoInput.lastName = sanitizeString(taxinfoInput.lastName);
   validateString(taxinfoInput.firstName, 'First name');
+  taxinfoInput.firstName = sanitizeString(taxinfoInput.firstName);
   validateString(taxinfoInput.middleName, 'Middle name');
+  taxinfoInput.middleName = sanitizeString(taxinfoInput.middleName);
   validateSSN(taxinfoInput.ssn);
   validateString(taxinfoInput.spouseName, 'Spouse name');
+  taxinfoInput.spouseName = sanitizeString(taxinfoInput.spouseName);
   validateSSN(taxinfoInput.spouseSSN, 'Spouse SSN');
   validateString(taxinfoInput.addr1, 'Address 1');
+  taxinfoInput.addr1 = sanitizeString(taxinfoInput.addr1);
   validateString(taxinfoInput.addr2, 'Address 2');
+  taxinfoInput.addr2 = sanitizeString(taxinfoInput.addr2);
   validateString(taxinfoInput.addr3, 'Address 3');
+  taxinfoInput.addr3 = sanitizeString(taxinfoInput.addr3);
   validateBankAccount(taxinfoInput.bankAccount);
   validateBankRouting(taxinfoInput.bankRouting);
   validateBoolean(taxinfoInput.bankIsChecking, 'Bank is checking');
@@ -208,6 +228,7 @@ const validateTaxinfoInput = (taxinfoInput) => {
   validateSubitemInput(taxinfoInput.f1099div, 'F1099div', validateF1099divItem);
   validateSubitemInput(taxinfoInput.dependents, 'Dependents', validateDependentsItem);
 };
+/* eslint-enable no-param-reassign */
 
 const validateSubitemLimit = (oldUUIDs, newData) => {
   for (const form of ['fw2', 'f1099int', 'f1099b', 'f1099div', 'dependents']) {
