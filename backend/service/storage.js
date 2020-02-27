@@ -1,7 +1,7 @@
 'use strict';
 
 const { Storage } = require('@google-cloud/storage');
-const uuidv4 = require('uuid/v4');
+const uuidv4 = require('uuid').v4;
 const config = require('../config.js');
 
 const encryptionKey = Buffer.from(config.credentials.bucketEncryptionSecret, 'base64');
