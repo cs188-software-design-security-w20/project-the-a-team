@@ -39,12 +39,10 @@ function App() {
         const response = await fetch(new URL('/tax', config.backendURL), {
           credentials: 'include',
         });
-        console.log(response.status);
         if (!response.ok) {
           throw new Error('Response not okay');
         }
         const data = await response.json();
-        console.log(data);
         setLoginData(data);
       } catch (err) {
         console.error(err);
