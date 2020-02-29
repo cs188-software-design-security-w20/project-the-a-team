@@ -1,0 +1,35 @@
+version: '3'
+services:
+  db_postgres:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: taximus
+      POSTGRES_DB: taxmax
+      POSTGRES_PASSWORD: '[REDACTED]'
+    logging:
+      driver: none
+    restart: "always"
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-production
+    environment:
+      - NODE_ENV=production
+    links:
+      - db_postgres
+    restart: "always"
+    volumes:
+      - /var/log/taxmax:/var/log
+  nginx:
+    image: nginx
+    restart: "always"
+    ports:
+      - "80:80"
+      - "443:443"
+    links:
+      - backend
+    volumes:
+      - ./frontend/build:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - /var/lib/dehydrated/certs/tax.timothygu.me:/letsencrypt:ro
+      - ./ssl-dhparams.pem:/etc/nginx/ssl-dhparams.pem:ro
