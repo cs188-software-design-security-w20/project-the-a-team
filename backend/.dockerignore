@@ -2,4 +2,4 @@ models/*.sql
 node_modules
 .dockerignore
 .eslintrc
-Dockerfile
+Dockerfile*
