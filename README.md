@@ -38,7 +38,7 @@ Then run `docker-compose up --build` at the project root directory to start the 
 
 ### Differences in our development version and production version
 
-Our development version and production version (deployed on our server) is almost the same except:
+Our development version and production version (deployed on our server) are almost the same except that:
 
 - We use a different compose file ([`docker-compose-production.yml`](docker-compose-production-redacted.yml)), which creates one more nginx container to serve frontend static files and enable TLS and security headers
 - We use a different Dockerfile (`backend/Dockerfile-production`), which sets a dedicated `USER` to be able to access the log file
