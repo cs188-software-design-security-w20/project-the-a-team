@@ -34,7 +34,15 @@ Before any operations, be sure to run `yarn` at the project root directory to sy
 
 Then run `docker-compose up --build` at the project root directory to start the backend (along with the database). To run the backend in the background (in detached mode), use `docker-compose up --build -d`. The development version of backend will run on http://localhost:8080/.
 
-In order for PDF saving to work, you need to have access to a Google Cloud Storage bucket using the service account credentials in `backend/config.json`. Due to security concerns, we have disabled our testing account; anyone who wishes to test that particular part of the code should use the deployed website (https://tax.timothygu.me/), or create a Google Cloud Storage bucket yourself and change the `storageBucket` and `credentials.serviceAccount` properties in `backend/config.json`.
+In order for PDF saving to work, you need to have access to a Google Cloud Storage bucket using the service account credentials in `backend/config.json`. Due to security concerns, we have disabled our testing account. Anyone who wishes to test that particular part of the code should either
+
+- use the deployed website (https://tax.timothygu.me/), or
+- create a new Google Cloud Storage bucket themselves:
+  - [Create a new storage bucket](https://cloud.google.com/storage/docs/quickstart-console#create_a_bucket)
+  - Set the `storageBucket` property in `backend/config.json` to the name of the newly created storage bucket
+  - [Create a service account](https://cloud.google.com/iam/docs/creating-managing-service-accounts)
+  - [Create a service account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys#creating_service_account_keys)
+  - Set the `credentials.serviceAccount` property in `backend/config.json` to the service account key
 
 ## Notes
 
