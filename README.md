@@ -32,7 +32,9 @@ Then `cd frontend` and use `yarn start` to run the frontend in development mode.
 
 Before any operations, be sure to run `yarn` at the project root directory to sync up the dependencies.
 
-Then run `docker-compose up --build` at the project root directory to start the backend (along with the database). To run the backend in the background (in detached mode), use `docker-compose up --build -d`. The development version of backend will run on http://localhost:8080.
+Then run `docker-compose up --build` at the project root directory to start the backend (along with the database). To run the backend in the background (in detached mode), use `docker-compose up --build -d`. The development version of backend will run on http://localhost:8080/.
+
+In order for PDF saving to work, you need to have access to a Google Cloud Storage bucket using the service account credentials in `backend/config.json`. Due to security concerns, we have disabled our testing account; anyone who wishes to test that particular part of the code should use the deployed website (https://tax.timothygu.me/), or create a Google Cloud Storage bucket yourself and change the `storageBucket` and `credentials.serviceAccount` properties in `backend/config.json`.
 
 ## Notes
 
@@ -42,12 +44,13 @@ Our development version and production version (deployed on our server) are almo
 
 - We use a different compose file ([`docker-compose-production.yml`](docker-compose-production-redacted.yml)), which creates one more nginx container to serve frontend static files and enable TLS and security headers
 - We use a different Dockerfile (`backend/Dockerfile-production`), which sets a dedicated `USER` to be able to access the log file
-- We use a different config file (`backend/config-production.json`), which:
-  - sets "backendURL" to "https://api.tax.timothygu.me/"
-  - sets "frontendURL" to "https://tax.timothygu.me/"
+- We use a different backend config file (`backend/config-production.json`), which:
+  - sets `backendURL` to "https://api.tax.timothygu.me/"
+  - sets `frontendURL` to "https://tax.timothygu.me/"
   - uses a different storage bucket
   - uses different credentials dedicated for production
+- The frontend code is [minified](https://en.wikipedia.org/wiki/Minification_(programming)) and optimized for production. You can do the same by running `yarn build` in `frontend/`, which generates the `frontend/build` directory.
 
 ### About testing with TLS 1.3
 
-Our production version is enforcing TLS 1.3. However, as far as we know, some testing tools does not support TLS 1.3 currently. If the latest version of the tool you are trying to use does not support TLS 1.3, try to use other tools, and remember that testing in the browser developer console should always work.
+Our production version is enforcing TLS 1.3. However, as far as we know, some testing tools does not support TLS 1.3 currently (including OpenSSL installed by default on Debian &lt;10 and Ubuntu &lt;18.04, as well as [old browsers](https://caniuse.com/#feat=tls1-3)). If the latest version of the tool you are trying to use does not support TLS 1.3, try to use other tools, and remember that testing in the browser developer console should always work.
